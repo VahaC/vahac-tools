@@ -1,0 +1,367 @@
+/* vCard QR Code Generator — style.css
+   Prefix: vcg-
+   Dark terminal palette matching vahac.com */
+
+/* ── Variables & reset ─────────────────────────────────── */
+
+.vcg-wrapper {
+  --vcg-bg-primary: #0a0f1e;
+  --vcg-bg-secondary: #111827;
+  --vcg-bg-card: #1a2236;
+  --vcg-bg-input: #0d1424;
+  --vcg-border: #2a3a5c;
+  --vcg-border-focus: #3b82f6;
+  --vcg-text-primary: #e2e8f0;
+  --vcg-text-secondary: #94a3b8;
+  --vcg-text-muted: #64748b;
+  --vcg-accent-blue: #3b82f6;
+  --vcg-accent-cyan: #22d3ee;
+  --vcg-accent-green: #10b981;
+  --vcg-accent-amber: #f59e0b;
+  --vcg-accent-red: #ef4444;
+  --vcg-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --vcg-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --vcg-radius: 8px;
+
+  font-family: var(--vcg-font-sans);
+  color: var(--vcg-text-primary);
+  background: var(--vcg-bg-primary);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.vcg-wrapper *,
+.vcg-wrapper *::before,
+.vcg-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Card (shared section container) ───────────────────── */
+
+.vcg-card {
+  background: var(--vcg-bg-card);
+  border: 1px solid var(--vcg-border);
+  border-radius: var(--vcg-radius);
+  padding: 20px;
+}
+
+/* ── Form section ──────────────────────────────────────── */
+
+.vcg-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.vcg-label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--vcg-text-secondary);
+  line-height: 1.3;
+}
+
+.vcg-label--full {
+  grid-column: 1 / -1;
+}
+
+/* ── Inputs & selects ──────────────────────────────────── */
+
+.vcg-input,
+.vcg-select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  height: 44px;
+  border: 1px solid var(--vcg-border);
+  border-radius: var(--vcg-radius);
+  background: var(--vcg-bg-input);
+  color: var(--vcg-text-primary);
+  font-family: var(--vcg-font-sans);
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vcg-input::placeholder {
+  color: var(--vcg-text-muted);
+}
+
+.vcg-input:focus,
+.vcg-select:focus {
+  border-color: var(--vcg-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.vcg-input--narrow {
+  width: 90px;
+}
+
+/* ── Toolbar ───────────────────────────────────────────── */
+
+.vcg-toolbar {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.vcg-toolbar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vcg-toolbar-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-left: auto;
+  align-items: flex-end;
+}
+
+.vcg-setting-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--vcg-text-muted);
+}
+
+.vcg-setting-label .vcg-select,
+.vcg-setting-label .vcg-input {
+  margin-top: 0;
+  height: 40px;
+  width: 150px;
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+
+.vcg-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--vcg-radius);
+  font-family: var(--vcg-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--vcg-border);
+  background: var(--vcg-bg-secondary);
+  color: var(--vcg-text-primary);
+  white-space: nowrap;
+  transition: background 0.15s ease,
+              border-color 0.15s ease,
+              box-shadow 0.15s ease,
+              transform 0.05s ease;
+}
+
+.vcg-btn:hover {
+  background: var(--vcg-bg-card);
+  border-color: var(--vcg-text-muted);
+}
+
+.vcg-btn:active {
+  transform: translateY(1px);
+}
+
+.vcg-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.vcg-btn--primary {
+  background: var(--vcg-accent-blue);
+  color: #fff;
+  border-color: var(--vcg-accent-blue);
+}
+
+.vcg-btn--primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.vcg-btn--secondary {
+  background: var(--vcg-bg-secondary);
+  color: var(--vcg-text-primary);
+  border-color: var(--vcg-border);
+}
+
+.vcg-btn--secondary:hover {
+  background: var(--vcg-bg-card);
+  border-color: var(--vcg-text-muted);
+}
+
+.vcg-btn--accent {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--vcg-accent-blue);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.vcg-btn--accent:hover {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+/* ── Results grid ──────────────────────────────────────── */
+
+.vcg-results {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.vcg-qr-wrap {
+  width: 340px;
+  height: 340px;
+  border: 1px solid var(--vcg-border);
+  border-radius: var(--vcg-radius);
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.vcg-canvas {
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.vcg-status {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--vcg-text-muted);
+  min-height: 1.2em;
+}
+
+.vcg-output-panel {
+  min-width: 0;
+}
+
+.vcg-output-heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--vcg-text-primary);
+  margin-bottom: 8px;
+}
+
+.vcg-textarea {
+  display: block;
+  width: 100%;
+  min-height: 310px;
+  padding: 12px;
+  border: 1px solid var(--vcg-border);
+  border-radius: var(--vcg-radius);
+  background: var(--vcg-bg-input);
+  color: var(--vcg-accent-cyan);
+  font-family: var(--vcg-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vcg-textarea:focus {
+  border-color: var(--vcg-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* ── Toast notification ────────────────────────────────── */
+
+.vcg-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--vcg-accent-green);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: var(--vcg-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.vcg-toast.vcg-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+
+.vcg-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--vcg-text-muted);
+}
+
+.vcg-footer-link {
+  color: var(--vcg-accent-blue);
+  text-decoration: none;
+}
+
+.vcg-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+
+@media (max-width: 840px) {
+  .vcg-results {
+    grid-template-columns: 1fr;
+  }
+
+  .vcg-qr-wrap {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-width: 340px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vcg-wrapper {
+    padding: 16px 10px;
+  }
+
+  .vcg-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vcg-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vcg-toolbar-buttons {
+    flex-direction: column;
+  }
+
+  .vcg-toolbar-settings {
+    margin-left: 0;
+    flex-direction: column;
+  }
+
+  .vcg-setting-label .vcg-select,
+  .vcg-setting-label .vcg-input {
+    width: 100%;
+  }
+
+  .vcg-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .vcg-textarea {
+    min-height: 200px;
+  }
+}

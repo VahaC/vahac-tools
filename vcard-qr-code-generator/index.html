@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vCard QR Code Generator — Logs from VahaC</title>
+  <meta name="description" content="Free vCard QR code generator — create a digital contact card and scannable QR code in your browser. Download VCF, PNG, SVG, or copy. No tracking.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="vcg-wrapper">
+
+    <!-- Form -->
+    <div class="vcg-card vcg-form-section">
+      <div class="vcg-form-grid">
+        <label class="vcg-label">
+          First name
+          <input class="vcg-input" id="vcg-first" type="text" placeholder="John">
+        </label>
+        <label class="vcg-label">
+          Last name
+          <input class="vcg-input" id="vcg-last" type="text" placeholder="Doe">
+        </label>
+        <label class="vcg-label">
+          Organization
+          <input class="vcg-input" id="vcg-org" type="text" placeholder="Acme Corp">
+        </label>
+        <label class="vcg-label">
+          Job title
+          <input class="vcg-input" id="vcg-title" type="text" placeholder="Engineer">
+        </label>
+        <label class="vcg-label">
+          Phone (E.164)
+          <input class="vcg-input" id="vcg-tel" type="tel" placeholder="+1234567890">
+        </label>
+        <label class="vcg-label">
+          Email
+          <input class="vcg-input" id="vcg-email" type="email" placeholder="john@example.com">
+        </label>
+        <label class="vcg-label vcg-label--full">
+          URL
+          <input class="vcg-input" id="vcg-url" type="url" placeholder="https://example.com">
+        </label>
+      </div>
+    </div>
+
+    <!-- Toolbar: buttons + QR settings -->
+    <div class="vcg-card vcg-toolbar">
+      <div class="vcg-toolbar-buttons">
+        <button class="vcg-btn vcg-btn--primary" id="vcg-btn-generate" onclick="vcgGenerate()">Generate QR</button>
+        <button class="vcg-btn vcg-btn--secondary" id="vcg-btn-download-vcf" onclick="vcgDownloadVcf()">Download .vcf</button>
+        <button class="vcg-btn vcg-btn--secondary" id="vcg-btn-download-png" onclick="vcgDownloadPng()">Download QR (PNG)</button>
+        <button class="vcg-btn vcg-btn--secondary" id="vcg-btn-download-svg" onclick="vcgDownloadSvg()">Download QR (SVG)</button>
+        <button class="vcg-btn vcg-btn--accent" id="vcg-btn-copy" onclick="vcgCopyVcard()">Copy vCard</button>
+      </div>
+      <div class="vcg-toolbar-settings">
+        <label class="vcg-setting-label">
+          Error correction
+          <select class="vcg-select" id="vcg-ecl">
+            <option value="M" selected>M (balanced)</option>
+            <option value="H">H (print-friendly)</option>
+            <option value="L">L (more capacity)</option>
+            <option value="Q">Q</option>
+          </select>
+        </label>
+        <label class="vcg-setting-label">
+          Margin
+          <input class="vcg-input vcg-input--narrow" id="vcg-margin" type="number" min="0" max="16" value="4">
+        </label>
+        <label class="vcg-setting-label">
+          Scale
+          <input class="vcg-input vcg-input--narrow" id="vcg-scale" type="number" min="1" max="20" value="8">
+        </label>
+      </div>
+    </div>
+
+    <!-- Results: QR preview + vCard text -->
+    <div class="vcg-card vcg-results">
+      <div class="vcg-qr-panel">
+        <div class="vcg-qr-wrap" id="vcg-qr-wrap">
+          <canvas class="vcg-canvas" id="vcg-qr-canvas" width="320" height="320"></canvas>
+        </div>
+        <div class="vcg-status" id="vcg-status"></div>
+      </div>
+      <div class="vcg-output-panel">
+        <div class="vcg-output-heading">Generated vCard</div>
+        <textarea class="vcg-textarea" id="vcg-output" rows="14" readonly></textarea>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="vcg-toast" id="vcg-toast"></div>
+
+    <!-- Footer -->
+    <div class="vcg-footer">
+      Built by <a href="https://vahac.com" class="vcg-footer-link">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
