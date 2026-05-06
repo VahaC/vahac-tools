@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IP Subnet Calculator Tool — Logs from VahaC</title>
+  <meta name="description" content="Free IP subnet calculator tool — enter any IP and CIDR to instantly get network, broadcast, host range, masks, and binary. 100% private, no ads.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="snc-wrapper">
+
+    <!-- Header -->
+    <div class="snc-header">
+      <h1>IP Subnet Calculator</h1>
+      <p>Enter an IP address and prefix length to instantly calculate all subnet details.</p>
+    </div>
+
+    <!-- Input -->
+    <div class="snc-input-section">
+      <div class="snc-input-row">
+        <div class="snc-input-group" style="flex: 2;">
+          <label for="snc-ip-input">IP Address</label>
+          <input type="text" id="snc-ip-input" placeholder="192.168.1.0" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="snc-input-group" style="flex: 0.7; min-width: 90px;">
+          <label for="snc-cidr-input">/ CIDR</label>
+          <input type="number" id="snc-cidr-input" min="0" max="32" placeholder="24" value="24">
+        </div>
+        <button class="snc-btn" id="snc-calc-btn" onclick="sncCalculate()">Calculate</button>
+      </div>
+
+      <div class="snc-quick-masks" id="snc-quick-masks">
+        <span>Quick:</span>
+      </div>
+
+      <div class="snc-error-msg" id="snc-error-msg"></div>
+    </div>
+
+    <!-- Results -->
+    <div class="snc-results-section" id="snc-results-section">
+      <div class="snc-results-header">
+        <h2>&#9654; Results</h2>
+        <button class="snc-btn snc-btn--secondary" onclick="sncCopyAll()" title="Copy all results as text">&#128203; Copy All</button>
+      </div>
+
+      <div class="snc-results-grid" id="snc-results-grid"></div>
+
+      <!-- Binary breakdown -->
+      <div class="snc-binary-breakdown" id="snc-binary-breakdown"></div>
+    </div>
+
+    <!-- Cheat Sheet -->
+    <div class="snc-cheatsheet">
+      <div class="snc-cheatsheet-header" onclick="sncToggleCheatsheet()">
+        <h3>&#128218; Common Subnets Cheat Sheet</h3>
+        <span class="snc-arrow" id="snc-cheat-arrow">&#9660;</span>
+      </div>
+      <div class="snc-cheatsheet-body" id="snc-cheat-body">
+        <table class="snc-cheatsheet-table">
+          <thead>
+            <tr>
+              <th>CIDR</th>
+              <th>Subnet Mask</th>
+              <th>Usable Hosts</th>
+              <th>Total IPs</th>
+            </tr>
+          </thead>
+          <tbody id="snc-cheat-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="snc-footer">
+      <p>Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> &mdash; 100% client-side, no data sent anywhere.</p>
+    </div>
+
+  </div>
+
+  <!-- Toast notification (outside wrapper for fixed positioning) -->
+  <div class="snc-toast" id="snc-toast">Copied to clipboard!</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
