@@ -1,0 +1,592 @@
+/* Password & Passphrase Generator — pwg- namespace */
+/* vahac.com dark terminal palette */
+
+.pwg-wrapper {
+  --pwg-bg-primary:    #0a0f1e;
+  --pwg-bg-secondary:  #111827;
+  --pwg-bg-card:       #1a2236;
+  --pwg-bg-input:      #0d1424;
+  --pwg-border:        #2a3a5c;
+  --pwg-border-focus:  #3b82f6;
+  --pwg-text-primary:  #e2e8f0;
+  --pwg-text-secondary:#94a3b8;
+  --pwg-text-muted:    #64748b;
+  --pwg-accent-blue:   #3b82f6;
+  --pwg-accent-cyan:   #22d3ee;
+  --pwg-accent-green:  #10b981;
+  --pwg-accent-amber:  #f59e0b;
+  --pwg-accent-red:    #ef4444;
+  --pwg-font-mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --pwg-font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
+  --pwg-radius:        8px;
+
+  font-family: var(--pwg-font-sans);
+  background: var(--pwg-bg-primary);
+  color: var(--pwg-text-primary);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  border-radius: 12px;
+  border: 1px solid var(--pwg-border);
+  min-height: 400px;
+}
+
+.pwg-wrapper *,
+.pwg-wrapper *::before,
+.pwg-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ---- Header ---- */
+.pwg-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.pwg-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--pwg-text-primary);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.pwg-subtitle {
+  font-size: 0.85rem;
+  color: var(--pwg-text-muted);
+  margin: 0;
+}
+
+/* ---- Tabs ---- */
+.pwg-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: var(--pwg-bg-secondary);
+  border-radius: var(--pwg-radius);
+  padding: 4px;
+}
+
+.pwg-tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--pwg-text-secondary);
+  font-family: var(--pwg-font-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pwg-tab:hover {
+  background: var(--pwg-bg-card);
+  color: var(--pwg-text-primary);
+}
+
+.pwg-tab--active {
+  background: var(--pwg-bg-card);
+  color: var(--pwg-accent-blue);
+  border: 1px solid var(--pwg-border);
+}
+
+/* ---- Panels ---- */
+.pwg-panel--hidden {
+  display: none;
+}
+
+/* ---- Output ---- */
+.pwg-output-group {
+  margin-bottom: 16px;
+}
+
+.pwg-output-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--pwg-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.pwg-output-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pwg-output {
+  flex: 1;
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-radius: var(--pwg-radius);
+  padding: 14px 16px;
+  font-family: var(--pwg-font-mono);
+  font-size: 1.05rem;
+  color: var(--pwg-accent-cyan);
+  word-break: break-all;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  user-select: all;
+  transition: border-color 0.2s;
+}
+
+.pwg-output:hover {
+  border-color: var(--pwg-border-focus);
+}
+
+.pwg-output--phrase {
+  font-size: 0.95rem;
+  word-break: normal;
+}
+
+/* ---- Entropy block ---- */
+.pwg-entropy-block {
+  background: var(--pwg-bg-secondary);
+  border: 1px solid var(--pwg-border);
+  border-radius: var(--pwg-radius);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+
+.pwg-entropy-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pwg-entropy-label {
+  font-size: 0.8rem;
+  color: var(--pwg-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 56px;
+}
+
+.pwg-entropy-value {
+  font-family: var(--pwg-font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pwg-text-primary);
+}
+
+.pwg-entropy-strength {
+  margin-left: auto;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--pwg-bg-card);
+}
+
+.pwg-entropy-strength.pwg-s-weak   { color: var(--pwg-accent-red);   border: 1px solid var(--pwg-accent-red); }
+.pwg-entropy-strength.pwg-s-fair   { color: var(--pwg-accent-amber); border: 1px solid var(--pwg-accent-amber); }
+.pwg-entropy-strength.pwg-s-strong { color: var(--pwg-accent-green); border: 1px solid var(--pwg-accent-green); }
+.pwg-entropy-strength.pwg-s-best   { color: var(--pwg-accent-cyan);  border: 1px solid var(--pwg-accent-cyan); }
+
+.pwg-meter-track {
+  height: 6px;
+  background: var(--pwg-bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pwg-meter-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s;
+  background: var(--pwg-accent-green);
+}
+
+.pwg-meter-fill.pwg-m-weak   { background: var(--pwg-accent-red); }
+.pwg-meter-fill.pwg-m-fair   { background: var(--pwg-accent-amber); }
+.pwg-meter-fill.pwg-m-strong { background: var(--pwg-accent-green); }
+.pwg-meter-fill.pwg-m-best   { background: var(--pwg-accent-cyan); }
+
+/* ---- Controls ---- */
+.pwg-controls {
+  background: var(--pwg-bg-card);
+  border: 1px solid var(--pwg-border);
+  border-radius: var(--pwg-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pwg-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pwg-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pwg-text-secondary);
+}
+
+.pwg-label strong {
+  color: var(--pwg-accent-cyan);
+  font-family: var(--pwg-font-mono);
+}
+
+/* Slider */
+.pwg-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pwg-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--pwg-bg-input);
+  outline: none;
+  border: 1px solid var(--pwg-border);
+  cursor: pointer;
+}
+
+.pwg-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pwg-accent-blue);
+  cursor: pointer;
+  border: 2px solid var(--pwg-bg-primary);
+  transition: background 0.15s;
+}
+
+.pwg-slider::-webkit-slider-thumb:hover {
+  background: var(--pwg-accent-cyan);
+}
+
+.pwg-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pwg-accent-blue);
+  cursor: pointer;
+  border: 2px solid var(--pwg-bg-primary);
+}
+
+.pwg-num-input {
+  width: 64px;
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--pwg-text-primary);
+  font-family: var(--pwg-font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.pwg-num-input:focus {
+  border-color: var(--pwg-border-focus);
+}
+
+/* Checkboxes */
+.pwg-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pwg-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--pwg-text-primary);
+  padding: 6px 12px;
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-radius: 6px;
+  transition: border-color 0.15s;
+  user-select: none;
+}
+
+.pwg-check:hover {
+  border-color: var(--pwg-border-focus);
+}
+
+.pwg-check input[type="checkbox"] {
+  accent-color: var(--pwg-accent-blue);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+/* Radio */
+.pwg-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pwg-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--pwg-text-primary);
+  padding: 6px 12px;
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-radius: 6px;
+  transition: border-color 0.15s;
+  user-select: none;
+}
+
+.pwg-radio:hover {
+  border-color: var(--pwg-border-focus);
+}
+
+.pwg-radio input[type="radio"] {
+  accent-color: var(--pwg-accent-blue);
+  cursor: pointer;
+}
+
+/* Code inline */
+.pwg-code {
+  font-family: var(--pwg-font-mono);
+  font-size: 0.82em;
+  color: var(--pwg-accent-amber);
+  background: var(--pwg-bg-primary);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Info row */
+.pwg-info-row {
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-left: 3px solid var(--pwg-accent-blue);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.pwg-info-text {
+  font-size: 0.82rem;
+  color: var(--pwg-text-secondary);
+}
+
+.pwg-info-text strong {
+  color: var(--pwg-accent-cyan);
+}
+
+/* Error */
+.pwg-error-msg {
+  color: var(--pwg-accent-red);
+  font-size: 0.85rem;
+  min-height: 0;
+  display: none;
+}
+
+.pwg-error-msg.pwg-visible {
+  display: block;
+}
+
+/* Buttons */
+.pwg-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.pwg-btn {
+  padding: 11px 22px;
+  border: none;
+  border-radius: var(--pwg-radius);
+  font-family: var(--pwg-font-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.pwg-btn:hover {
+  opacity: 0.88;
+}
+
+.pwg-btn:active {
+  transform: scale(0.97);
+}
+
+.pwg-btn--primary {
+  background: var(--pwg-accent-blue);
+  color: #fff;
+}
+
+.pwg-btn--secondary {
+  background: var(--pwg-bg-secondary);
+  color: var(--pwg-text-secondary);
+  border: 1px solid var(--pwg-border);
+}
+
+.pwg-btn--secondary:hover {
+  color: var(--pwg-text-primary);
+  border-color: var(--pwg-border-focus);
+}
+
+.pwg-btn--icon {
+  padding: 0;
+  width: 48px;
+  min-width: 48px;
+  background: var(--pwg-bg-secondary);
+  color: var(--pwg-text-secondary);
+  border: 1px solid var(--pwg-border);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--pwg-radius);
+}
+
+.pwg-btn--icon:hover {
+  border-color: var(--pwg-accent-cyan);
+  color: var(--pwg-accent-cyan);
+}
+
+/* Batch output */
+.pwg-batch {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pwg-batch-item {
+  background: var(--pwg-bg-input);
+  border: 1px solid var(--pwg-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--pwg-font-mono);
+  font-size: 0.9rem;
+  color: var(--pwg-accent-cyan);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  word-break: break-all;
+}
+
+.pwg-batch-item:hover {
+  border-color: var(--pwg-border-focus);
+}
+
+.pwg-batch-item-copy {
+  margin-left: 10px;
+  font-size: 0.75rem;
+  color: var(--pwg-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Toast */
+.pwg-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--pwg-accent-green);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  z-index: 9999;
+  transition: transform 0.25s ease, opacity 0.25s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pwg-toast.pwg-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Footer */
+.pwg-footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 0.78rem;
+  color: var(--pwg-text-muted);
+}
+
+.pwg-footer-link {
+  color: var(--pwg-accent-blue);
+  text-decoration: none;
+}
+
+.pwg-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .pwg-wrapper {
+    padding: 16px 12px 28px;
+    border-radius: 8px;
+  }
+
+  .pwg-title {
+    font-size: 1.25rem;
+  }
+
+  .pwg-output {
+    font-size: 0.88rem;
+    padding: 11px 12px;
+  }
+
+  .pwg-output--phrase {
+    font-size: 0.82rem;
+  }
+
+  .pwg-controls {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .pwg-checkboxes {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pwg-radio-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pwg-btn-row {
+    flex-direction: column;
+  }
+
+  .pwg-btn {
+    width: 100%;
+  }
+
+  .pwg-slider-row {
+    gap: 8px;
+  }
+
+  .pwg-batch-item {
+    font-size: 0.8rem;
+  }
+}

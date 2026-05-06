@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password &amp; Passphrase Generator — Logs from VahaC</title>
+  <meta name="description" content="Free cryptographically secure password and passphrase generator. Custom length, charset options, EFF-style diceware, entropy in bits. 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="pwg-wrapper">
+
+    <div class="pwg-header">
+      <h1 class="pwg-title">🔐 Password &amp; Passphrase Generator</h1>
+      <p class="pwg-subtitle">Cryptographically secure. 100% client-side. No data leaves your browser.</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="pwg-tabs" role="tablist">
+      <button class="pwg-tab pwg-tab--active" id="pwg-tab-password" role="tab" onclick="pwgSwitchTab('password')">🔑 Password</button>
+      <button class="pwg-tab" id="pwg-tab-passphrase" role="tab" onclick="pwgSwitchTab('passphrase')">📖 Passphrase</button>
+    </div>
+
+    <!-- ===== PASSWORD PANEL ===== -->
+    <div class="pwg-panel" id="pwg-panel-password">
+
+      <!-- Output -->
+      <div class="pwg-output-group">
+        <div class="pwg-output-label">Generated Password</div>
+        <div class="pwg-output-row">
+          <div class="pwg-output" id="pwg-password-output" aria-live="polite" aria-label="Generated password">Click Generate</div>
+          <button class="pwg-btn pwg-btn--icon" id="pwg-copy-pass" onclick="pwgCopyPassword()" title="Copy password" aria-label="Copy password">📋</button>
+        </div>
+      </div>
+
+      <!-- Entropy -->
+      <div class="pwg-entropy-block" id="pwg-pass-entropy-block">
+        <div class="pwg-entropy-row">
+          <span class="pwg-entropy-label">Entropy</span>
+          <span class="pwg-entropy-value" id="pwg-pass-entropy">— bits</span>
+          <span class="pwg-entropy-strength" id="pwg-pass-strength"></span>
+        </div>
+        <div class="pwg-meter-track">
+          <div class="pwg-meter-fill" id="pwg-pass-meter"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="pwg-controls">
+
+        <!-- Length -->
+        <div class="pwg-control-group">
+          <label class="pwg-label" for="pwg-length-range">Length: <strong id="pwg-length-display">20</strong></label>
+          <div class="pwg-slider-row">
+            <input class="pwg-slider" type="range" id="pwg-length-range" min="4" max="128" value="20" oninput="pwgSyncLength(this.value)" onchange="pwgGenPassword()">
+            <input class="pwg-num-input" type="number" id="pwg-length-num" min="4" max="128" value="20" oninput="pwgSyncLengthNum(this.value)">
+          </div>
+        </div>
+
+        <!-- Character sets -->
+        <div class="pwg-control-group">
+          <div class="pwg-label">Character Sets</div>
+          <div class="pwg-checkboxes">
+            <label class="pwg-check"><input type="checkbox" id="pwg-use-upper" checked onchange="pwgGenPassword()"><span>A–Z Uppercase</span></label>
+            <label class="pwg-check"><input type="checkbox" id="pwg-use-lower" checked onchange="pwgGenPassword()"><span>a–z Lowercase</span></label>
+            <label class="pwg-check"><input type="checkbox" id="pwg-use-digits" checked onchange="pwgGenPassword()"><span>0–9 Digits</span></label>
+            <label class="pwg-check"><input type="checkbox" id="pwg-use-symbols" onchange="pwgGenPassword()"><span>!@#$… Symbols</span></label>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="pwg-control-group">
+          <div class="pwg-label">Options</div>
+          <div class="pwg-checkboxes">
+            <label class="pwg-check"><input type="checkbox" id="pwg-excl-ambig" onchange="pwgGenPassword()"><span>Exclude ambiguous chars <code class="pwg-code">lI1O0</code></span></label>
+          </div>
+        </div>
+
+        <div class="pwg-error-msg" id="pwg-pass-error"></div>
+
+        <div class="pwg-btn-row">
+          <button class="pwg-btn pwg-btn--primary" onclick="pwgGenPassword()">⚡ Generate</button>
+          <button class="pwg-btn pwg-btn--secondary" onclick="pwgGenMultiple()">Generate ×5</button>
+        </div>
+      </div>
+
+      <!-- Batch output -->
+      <div class="pwg-batch" id="pwg-batch-out"></div>
+
+    </div><!-- /panel-password -->
+
+    <!-- ===== PASSPHRASE PANEL ===== -->
+    <div class="pwg-panel pwg-panel--hidden" id="pwg-panel-passphrase">
+
+      <!-- Output -->
+      <div class="pwg-output-group">
+        <div class="pwg-output-label">Generated Passphrase</div>
+        <div class="pwg-output-row">
+          <div class="pwg-output pwg-output--phrase" id="pwg-phrase-output" aria-live="polite" aria-label="Generated passphrase">Click Generate</div>
+          <button class="pwg-btn pwg-btn--icon" id="pwg-copy-phrase" onclick="pwgCopyPhrase()" title="Copy passphrase" aria-label="Copy passphrase">📋</button>
+        </div>
+      </div>
+
+      <!-- Entropy -->
+      <div class="pwg-entropy-block" id="pwg-phrase-entropy-block">
+        <div class="pwg-entropy-row">
+          <span class="pwg-entropy-label">Entropy</span>
+          <span class="pwg-entropy-value" id="pwg-phrase-entropy">— bits</span>
+          <span class="pwg-entropy-strength" id="pwg-phrase-strength"></span>
+        </div>
+        <div class="pwg-meter-track">
+          <div class="pwg-meter-fill" id="pwg-phrase-meter"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="pwg-controls">
+
+        <!-- Word count -->
+        <div class="pwg-control-group">
+          <label class="pwg-label" for="pwg-words-range">Word count: <strong id="pwg-words-display">5</strong></label>
+          <div class="pwg-slider-row">
+            <input class="pwg-slider" type="range" id="pwg-words-range" min="2" max="12" value="5" oninput="pwgSyncWords(this.value)" onchange="pwgGenPhrase()">
+            <input class="pwg-num-input" type="number" id="pwg-words-num" min="2" max="12" value="5" oninput="pwgSyncWordsNum(this.value)">
+          </div>
+        </div>
+
+        <!-- Separator -->
+        <div class="pwg-control-group">
+          <div class="pwg-label">Separator</div>
+          <div class="pwg-radio-group">
+            <label class="pwg-radio"><input type="radio" name="pwg-sep" value=" " checked onchange="pwgGenPhrase()"><span>Space</span></label>
+            <label class="pwg-radio"><input type="radio" name="pwg-sep" value="-" onchange="pwgGenPhrase()"><span>Dash  <code class="pwg-code">-</code></span></label>
+            <label class="pwg-radio"><input type="radio" name="pwg-sep" value="." onchange="pwgGenPhrase()"><span>Dot  <code class="pwg-code">.</code></span></label>
+            <label class="pwg-radio"><input type="radio" name="pwg-sep" value="_" onchange="pwgGenPhrase()"><span>Underscore  <code class="pwg-code">_</code></span></label>
+            <label class="pwg-radio"><input type="radio" name="pwg-sep" value="" onchange="pwgGenPhrase()"><span>None</span></label>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="pwg-control-group">
+          <div class="pwg-label">Options</div>
+          <div class="pwg-checkboxes">
+            <label class="pwg-check"><input type="checkbox" id="pwg-capitalize" onchange="pwgGenPhrase()"><span>Capitalize first letter</span></label>
+            <label class="pwg-check"><input type="checkbox" id="pwg-add-number" onchange="pwgGenPhrase()"><span>Append random number</span></label>
+          </div>
+        </div>
+
+        <div class="pwg-info-row">
+          <span class="pwg-info-text">Wordlist: <strong>2048 words</strong> · <strong>11.0 bits/word</strong> · EFF-style diceware</span>
+        </div>
+
+        <div class="pwg-btn-row">
+          <button class="pwg-btn pwg-btn--primary" onclick="pwgGenPhrase()">⚡ Generate</button>
+        </div>
+      </div>
+
+    </div><!-- /panel-passphrase -->
+
+    <!-- Toast -->
+    <div class="pwg-toast" id="pwg-toast">✅ Copied to clipboard!</div>
+
+    <div class="pwg-footer">
+      Built by <a href="https://vahac.com" class="pwg-footer-link">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div><!-- /pwg-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>
