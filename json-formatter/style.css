@@ -1,0 +1,606 @@
+/* ================================================================
+   JSON Formatter & Validator  ·  jsf- namespace
+   All selectors prefixed with .jsf- — zero global pollution
+   ================================================================ */
+
+.jsf-wrapper {
+  /* ── Colour palette ──────────────────────────────────────── */
+  --jsf-bg-primary:    #0a0f1e;
+  --jsf-bg-secondary:  #111827;
+  --jsf-bg-card:       #1a2236;
+  --jsf-bg-input:      #0d1424;
+  --jsf-border:        #2a3a5c;
+  --jsf-border-focus:  #3b82f6;
+  --jsf-text-primary:  #e2e8f0;
+  --jsf-text-secondary:#94a3b8;
+  --jsf-text-muted:    #64748b;
+  --jsf-accent-blue:   #3b82f6;
+  --jsf-accent-cyan:   #22d3ee;
+  --jsf-accent-green:  #10b981;
+  --jsf-accent-amber:  #f59e0b;
+  --jsf-accent-red:    #ef4444;
+  --jsf-font-mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --jsf-font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
+  --jsf-radius:        8px;
+
+  font-family: var(--jsf-font-sans);
+  color:       var(--jsf-text-primary);
+  background:  var(--jsf-bg-primary);
+  line-height: 1.6;
+  max-width:   960px;
+  margin:      0 auto;
+  padding:     2rem 1rem;
+}
+
+.jsf-wrapper *,
+.jsf-wrapper *::before,
+.jsf-wrapper *::after { box-sizing: border-box; }
+
+/* ── Header ─────────────────────────────────────────────────── */
+.jsf-header { margin-bottom: 1.5rem; }
+
+.jsf-title {
+  font-size:   1.75rem;
+  font-weight: 700;
+  margin:      0 0 0.4rem;
+  color:       var(--jsf-text-primary);
+  font-family: var(--jsf-font-sans);
+  line-height: 1.2;
+}
+
+.jsf-subtitle {
+  font-size: 0.95rem;
+  color:     var(--jsf-text-secondary);
+  margin:    0;
+}
+
+/* ── Panels ─────────────────────────────────────────────────── */
+.jsf-panel {
+  background:    var(--jsf-bg-card);
+  border:        1px solid var(--jsf-border);
+  border-radius: var(--jsf-radius);
+  padding:       1.25rem;
+  margin-bottom: 1rem;
+}
+
+.jsf-panel--output { display: none; }   /* shown via JS after first format */
+
+/* ── Panel header row ───────────────────────────────────────── */
+.jsf-panel-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  flex-wrap:       wrap;
+  gap:             0.6rem;
+  margin-bottom:   0.75rem;
+}
+
+.jsf-panel-header-left {
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+  flex-wrap:   wrap;
+}
+
+.jsf-panel-header-right {
+  display: flex;
+  gap:     0.4rem;
+}
+
+.jsf-label {
+  font-size:      0.76rem;
+  font-weight:    700;
+  color:          var(--jsf-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ── Validation indicator dot ───────────────────────────────── */
+.jsf-valid-dot {
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  flex-shrink:   0;
+  transition:    background 0.3s, box-shadow 0.3s;
+}
+
+.jsf-valid-dot--neutral { background: var(--jsf-text-muted); }
+.jsf-valid-dot--ok      { background: var(--jsf-accent-green); box-shadow: 0 0 6px var(--jsf-accent-green); }
+.jsf-valid-dot--error   { background: var(--jsf-accent-red);   box-shadow: 0 0 6px var(--jsf-accent-red); }
+
+.jsf-valid-label {
+  font-size:   0.76rem;
+  font-weight: 600;
+  transition:  color 0.3s;
+  color:       var(--jsf-text-muted);
+}
+
+.jsf-char-count {
+  font-size:   0.72rem;
+  color:       var(--jsf-text-muted);
+  font-family: var(--jsf-font-mono);
+}
+
+/* ── Textarea ────────────────────────────────────────────────── */
+.jsf-textarea {
+  width:         100%;
+  min-height:    280px;
+  padding:       1rem;
+  background:    var(--jsf-bg-input);
+  border:        1px solid var(--jsf-border);
+  border-radius: 6px;
+  color:         var(--jsf-text-primary);
+  font-family:   var(--jsf-font-mono);
+  font-size:     0.875rem;
+  line-height:   1.65;
+  outline:       none;
+  resize:        vertical;
+  display:       block;
+  transition:    border-color 0.2s;
+  margin-bottom: 0.75rem;
+}
+
+.jsf-textarea:focus        { border-color: var(--jsf-border-focus); }
+.jsf-textarea::placeholder { color: var(--jsf-text-muted); }
+
+/* ── Error message ──────────────────────────────────────────── */
+.jsf-error-msg {
+  color:         var(--jsf-accent-red);
+  font-size:     0.82rem;
+  background:    rgba(239, 68, 68, 0.08);
+  border:        1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  padding:       0.65rem 0.9rem;
+  margin-bottom: 0.75rem;
+  display:       none;
+  font-family:   var(--jsf-font-mono);
+  white-space:   pre-wrap;
+  word-break:    break-word;
+}
+
+.jsf-error-msg.jsf-visible { display: block; }
+
+/* ── Action bar ─────────────────────────────────────────────── */
+.jsf-action-bar {
+  display:   flex;
+  gap:       0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.jsf-btn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           0.4rem;
+  padding:       0.6rem 1.25rem;
+  border:        none;
+  border-radius: 6px;
+  font-size:     0.875rem;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    background 0.2s, transform 0.1s, color 0.2s, border-color 0.2s;
+  white-space:   nowrap;
+  font-family:   inherit;
+  min-height:    44px;
+}
+
+.jsf-btn:active { transform: scale(0.97); }
+
+.jsf-btn--primary       { background: var(--jsf-accent-blue); color: #fff; }
+.jsf-btn--primary:hover { background: #2563eb; }
+
+.jsf-btn--secondary       { background: transparent; border: 1px solid var(--jsf-border); color: var(--jsf-text-secondary); }
+.jsf-btn--secondary:hover { background: var(--jsf-bg-secondary); color: var(--jsf-text-primary); }
+
+.jsf-btn--ghost {
+  background:  transparent;
+  border:      1px solid var(--jsf-border);
+  color:       var(--jsf-text-secondary);
+  padding:     0.45rem 0.85rem;
+  font-size:   0.8rem;
+  min-height:  36px;
+}
+
+.jsf-btn--ghost:hover {
+  background:   var(--jsf-bg-secondary);
+  color:        var(--jsf-text-primary);
+  border-color: var(--jsf-text-muted);
+}
+
+.jsf-btn kbd {
+  background:    rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  padding:       0.1rem 0.35rem;
+  font-family:   var(--jsf-font-mono);
+  font-size:     0.68rem;
+  font-weight:   400;
+}
+
+/* ── Stats bar ──────────────────────────────────────────────── */
+.jsf-stats-bar {
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           0.25rem 1.1rem;
+  background:    var(--jsf-bg-secondary);
+  border-radius: 6px;
+  padding:       0.6rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.jsf-stat {
+  display:     flex;
+  align-items: center;
+  gap:         0.35rem;
+}
+
+.jsf-stat-label {
+  font-size:      0.68rem;
+  font-weight:    700;
+  color:          var(--jsf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.jsf-stat-value {
+  font-size:   0.82rem;
+  font-weight: 700;
+  color:       var(--jsf-accent-cyan);
+  font-family: var(--jsf-font-mono);
+}
+
+/* ── Output toolbar ─────────────────────────────────────────── */
+.jsf-output-toolbar {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  flex-wrap:       wrap;
+  gap:             0.75rem;
+  margin-bottom:   0.75rem;
+}
+
+/* ── View tabs ──────────────────────────────────────────────── */
+.jsf-tabs {
+  display:       flex;
+  gap:           0.2rem;
+  background:    var(--jsf-bg-secondary);
+  border-radius: 6px;
+  padding:       0.2rem;
+}
+
+.jsf-tab {
+  padding:       0.35rem 1rem;
+  border:        none;
+  background:    transparent;
+  color:         var(--jsf-text-muted);
+  border-radius: 5px;
+  font-size:     0.82rem;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    background 0.15s, color 0.15s;
+  font-family:   inherit;
+  min-height:    36px;
+}
+
+.jsf-tab:hover      { color: var(--jsf-text-primary); }
+.jsf-tab--active    { background: var(--jsf-bg-card); color: var(--jsf-text-primary); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+
+/* ── Output action buttons ──────────────────────────────────── */
+.jsf-output-btns {
+  display:   flex;
+  gap:       0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Expand / fullscreen toggle button */
+.jsf-btn--expand {
+  padding:   0.45rem 0.7rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ── Fullscreen mode ────────────────────────────────────────── */
+/*
+ * When .jsf-fullscreen is added to the output panel it breaks out of
+ * the wrapper flow and covers the entire viewport.  The code/tree
+ * areas grow to fill all available vertical space.
+ */
+.jsf-panel--fullscreen {
+  position:   fixed !important;
+  inset:      0 !important;            /* top/right/bottom/left = 0 */
+  z-index:    9000;
+  margin:     0 !important;
+  border-radius: 0 !important;
+  max-width:  none !important;
+  display:    flex !important;
+  flex-direction: column;
+  overflow:   hidden;
+}
+
+/* Stretch the code / tree viewers to fill remaining height */
+.jsf-panel--fullscreen .jsf-output-code,
+.jsf-panel--fullscreen .jsf-output-tree {
+  flex:       1 1 auto;
+  max-height: none;
+  border-radius: 0;
+}
+
+/* Prevent body scroll while in fullscreen */
+.jsf-body-noscroll {
+  overflow: hidden;
+}
+
+/* ── Tree controls ──────────────────────────────────────────── */
+.jsf-tree-controls {
+  display:       none;   /* shown via JS in tree mode */
+  align-items:   center;
+  gap:           0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap:     wrap;
+}
+
+.jsf-search-input {
+  flex:          1;
+  min-width:     200px;
+  padding:       0.45rem 0.85rem;
+  background:    var(--jsf-bg-input);
+  border:        1px solid var(--jsf-border);
+  border-radius: 6px;
+  color:         var(--jsf-text-primary);
+  font-family:   var(--jsf-font-sans);
+  font-size:     0.875rem;
+  outline:       none;
+  transition:    border-color 0.2s;
+  min-height:    36px;
+}
+
+.jsf-search-input:focus { border-color: var(--jsf-border-focus); }
+
+.jsf-search-count {
+  font-size:   0.78rem;
+  color:       var(--jsf-accent-amber);
+  font-weight: 600;
+  white-space: nowrap;
+  display:     none;
+}
+
+/* ── Code output (syntax-highlighted pre) ───────────────────── */
+.jsf-output-code {
+  background:   var(--jsf-bg-input);
+  border:       1px solid var(--jsf-border);
+  border-radius:6px;
+  padding:      1rem;
+  font-family:  var(--jsf-font-mono);
+  font-size:    0.855rem;
+  line-height:  1.7;
+  overflow:     auto;
+  max-height:   520px;
+  white-space:  pre;
+  margin:       0;
+  color:        var(--jsf-text-primary);
+  tab-size:     2;
+}
+
+/* Syntax highlight tokens */
+.jsf-hl-key     { color: var(--jsf-accent-blue);  font-weight: 600; }
+.jsf-hl-string  { color: var(--jsf-accent-green); }
+.jsf-hl-number  { color: var(--jsf-accent-cyan);  }
+.jsf-hl-boolean { color: var(--jsf-accent-amber); }
+.jsf-hl-null    { color: var(--jsf-accent-red);   }
+
+/* ── Tree output ─────────────────────────────────────────────── */
+.jsf-output-tree {
+  background:    var(--jsf-bg-input);
+  border:        1px solid var(--jsf-border);
+  border-radius: 6px;
+  padding:       1rem;
+  font-family:   var(--jsf-font-mono);
+  font-size:     0.855rem;
+  line-height:   1.75;
+  overflow:      auto;
+  max-height:    520px;
+}
+
+.jsf-tree-root-label {
+  font-size:      0.68rem;
+  font-weight:    700;
+  color:          var(--jsf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom:  0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom:  1px solid var(--jsf-border);
+}
+
+/* Root-level nodes have no indent */
+.jsf-output-tree > .jsf-tree-node { padding-left: 0; }
+
+.jsf-tree-node { padding-left: 1.15rem; }
+
+.jsf-tree-row {
+  display:      flex;
+  align-items:  baseline;
+  gap:          0.2rem;
+  padding:      0.09rem 0.3rem;
+  border-radius:4px;
+  border-left:  2px solid transparent;
+  transition:   background 0.1s, border-color 0.1s;
+  flex-wrap:    wrap;
+}
+
+.jsf-tree-row:hover                { background: rgba(59, 130, 246, 0.07); }
+.jsf-tree-row.jsf-tree-match       { background: rgba(245, 158, 11, 0.12); border-left-color: var(--jsf-accent-amber); }
+.jsf-tree-row.jsf-tree-dim         { opacity: 0.25; }
+
+/* Toggle arrow icon (▶) */
+.jsf-tree-toggle {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  width:           15px;
+  height:          15px;
+  flex-shrink:     0;
+  font-size:       0.5rem;
+  color:           transparent;   /* invisible spacer for alignment */
+  transition:      transform 0.14s ease, color 0.14s;
+  user-select:     none;
+  align-self:      center;
+}
+
+.jsf-tree-toggle--has            { color: var(--jsf-text-muted); }
+.jsf-tree-toggle--open           { transform: rotate(90deg); color: var(--jsf-accent-blue); }
+
+.jsf-tree-key     { color: var(--jsf-accent-blue); font-weight: 600; }
+.jsf-tree-key--idx{ color: var(--jsf-text-muted);  font-weight: 400; }
+
+.jsf-tree-colon {
+  color:       var(--jsf-text-muted);
+  margin-right:0.1rem;
+  flex-shrink: 0;
+}
+
+.jsf-tree-bracket { color: var(--jsf-text-secondary); }
+
+.jsf-tree-preview {
+  color:      var(--jsf-text-muted);
+  font-size:  0.76rem;
+  font-style: italic;
+}
+
+.jsf-tree-value--string  { color: var(--jsf-accent-green); }
+.jsf-tree-value--number  { color: var(--jsf-accent-cyan);  }
+.jsf-tree-value--boolean { color: var(--jsf-accent-amber); }
+.jsf-tree-value--null    { color: var(--jsf-accent-red);   }
+
+/* Indentation guide line */
+.jsf-tree-children {
+  border-left: 1px dashed rgba(42, 58, 92, 0.65);
+  margin-left: 7px;
+}
+
+.jsf-tree-close {
+  color:        var(--jsf-text-secondary);
+  padding-left: 1.45rem;
+}
+
+/* ── Toast ──────────────────────────────────────────────────── */
+.jsf-toast {
+  position:      fixed;
+  bottom:        2rem;
+  left:          50%;
+  transform:     translateX(-50%) translateY(100px);
+  background:    var(--jsf-accent-green);
+  color:         #fff;
+  padding:       0.6rem 1.3rem;
+  border-radius: 6px;
+  font-size:     0.875rem;
+  font-weight:   600;
+  opacity:       0;
+  transition:    transform 0.3s ease, opacity 0.3s ease;
+  z-index:       10000;
+  pointer-events:none;
+  white-space:   nowrap;
+}
+
+.jsf-toast.jsf-show {
+  transform: translateX(-50%) translateY(0);
+  opacity:   1;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.jsf-footer {
+  text-align:    center;
+  font-size:     0.78rem;
+  color:         var(--jsf-text-muted);
+  margin-top:    1.5rem;
+  margin-bottom: 0;
+}
+
+.jsf-footer a       { color: var(--jsf-accent-blue); text-decoration: none; }
+.jsf-footer a:hover { text-decoration: underline; }
+
+/* ================================================================
+   Responsive breakpoints
+   ================================================================ */
+
+@media (max-width: 768px) {
+  .jsf-wrapper {
+    padding: 1.5rem 0.85rem;
+  }
+
+  .jsf-title {
+    font-size: 1.45rem;
+  }
+
+  .jsf-output-toolbar {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .jsf-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .jsf-title {
+    font-size: 1.2rem;
+  }
+
+  /* Stack panel header vertically */
+  .jsf-panel-header {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+
+  /* Stack action bar */
+  .jsf-action-bar {
+    flex-direction: column;
+  }
+
+  .jsf-btn--primary {
+    width:           100%;
+    justify-content: center;
+  }
+
+  .jsf-textarea {
+    min-height: 200px;
+    font-size:  0.82rem;
+  }
+
+  .jsf-output-code,
+  .jsf-output-tree {
+    font-size:  0.78rem;
+    max-height: 380px;
+  }
+
+  .jsf-output-btns {
+    flex-wrap: wrap;
+  }
+
+  /* Tree controls: stack */
+  .jsf-tree-controls {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+
+  .jsf-search-input {
+    width:     100%;
+    min-width: unset;
+  }
+
+  .jsf-stats-bar {
+    gap: 0.25rem 0.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .jsf-wrapper {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .jsf-btn {
+    font-size: 0.8rem;
+    padding:   0.55rem 0.85rem;
+  }
+}

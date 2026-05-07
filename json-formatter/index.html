@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter &amp; Validator — Logs from VahaC</title>
+  <meta name="description" content="Free online JSON formatter and validator with syntax highlighting, collapsible tree view, key search, and error position detection. 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="jsf-wrapper">
+
+    <!-- Header -->
+    <div class="jsf-header">
+      <h1 class="jsf-title">JSON Formatter &amp; Validator</h1>
+      <p class="jsf-subtitle">Paste your JSON — format, validate, explore tree, search keys, copy or download. Everything runs in your browser, nothing is sent anywhere.</p>
+    </div>
+
+    <!-- Input Panel -->
+    <div class="jsf-panel">
+      <div class="jsf-panel-header">
+        <div class="jsf-panel-header-left">
+          <span class="jsf-label">JSON Input</span>
+          <span class="jsf-valid-dot jsf-valid-dot--neutral" id="jsf-valid-dot"></span>
+          <span class="jsf-valid-label" id="jsf-valid-label">Waiting…</span>
+          <span class="jsf-char-count" id="jsf-char-count">0 chars</span>
+        </div>
+        <div class="jsf-panel-header-right">
+          <button class="jsf-btn jsf-btn--ghost" onclick="jsfLoadSample()">Load Sample</button>
+          <button class="jsf-btn jsf-btn--ghost" onclick="jsfClearAll()">Clear</button>
+        </div>
+      </div>
+
+      <textarea
+        id="jsf-input"
+        class="jsf-textarea"
+        placeholder='Paste JSON here… or click "Load Sample" to try the tool'
+        oninput="jsfValidateLive()"
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+      ></textarea>
+
+      <div class="jsf-error-msg" id="jsf-error-msg"></div>
+
+      <div class="jsf-action-bar">
+        <button class="jsf-btn jsf-btn--primary" onclick="jsfFormat()">
+          ⚡ Format &amp; Validate
+          <kbd>Ctrl+↵</kbd>
+        </button>
+        <button class="jsf-btn jsf-btn--secondary" onclick="jsfMinify()">Minify</button>
+      </div>
+    </div>
+
+    <!-- Output Panel (hidden until first format) -->
+    <div class="jsf-panel jsf-panel--output" id="jsf-output-section">
+
+      <!-- Stats bar -->
+      <div class="jsf-stats-bar">
+        <div class="jsf-stat">
+          <span class="jsf-stat-label">Keys</span>
+          <span class="jsf-stat-value" id="jsf-stat-keys">—</span>
+        </div>
+        <div class="jsf-stat">
+          <span class="jsf-stat-label">Depth</span>
+          <span class="jsf-stat-value" id="jsf-stat-depth">—</span>
+        </div>
+        <div class="jsf-stat">
+          <span class="jsf-stat-label">Size</span>
+          <span class="jsf-stat-value" id="jsf-stat-size">—</span>
+        </div>
+        <div class="jsf-stat">
+          <span class="jsf-stat-label">Strings</span>
+          <span class="jsf-stat-value" id="jsf-stat-strings">—</span>
+        </div>
+        <div class="jsf-stat">
+          <span class="jsf-stat-label">Numbers</span>
+          <span class="jsf-stat-value" id="jsf-stat-numbers">—</span>
+        </div>
+      </div>
+
+      <!-- Output toolbar: tabs + action buttons -->
+      <div class="jsf-output-toolbar">
+        <div class="jsf-tabs">
+          <button class="jsf-tab jsf-tab--active" id="jsf-tab-code" onclick="jsfSetView('code')">⌨ Code</button>
+          <button class="jsf-tab" id="jsf-tab-tree" onclick="jsfSetView('tree')">🌲 Tree</button>
+        </div>
+        <div class="jsf-output-btns">
+          <button class="jsf-btn jsf-btn--ghost" onclick="jsfCopyFormatted()">📋 Copy</button>
+          <button class="jsf-btn jsf-btn--ghost" onclick="jsfCopyMinified()">📋 Minified</button>
+          <button class="jsf-btn jsf-btn--ghost" onclick="jsfDownloadJSON()">⬇ Download</button>
+          <button class="jsf-btn jsf-btn--ghost jsf-btn--expand" id="jsf-expand-btn" onclick="jsfToggleFullscreen()" title="Expand to fullscreen (Esc to exit)">⛶</button>
+        </div>
+      </div>
+
+      <!-- Tree controls (visible only in tree mode) -->
+      <div class="jsf-tree-controls" id="jsf-tree-controls">
+        <input
+          type="text"
+          id="jsf-tree-search"
+          class="jsf-search-input"
+          placeholder="🔍 Search keys or values…"
+          oninput="jsfTreeSearch()"
+        >
+        <span class="jsf-search-count" id="jsf-search-count"></span>
+        <button class="jsf-btn jsf-btn--ghost" onclick="jsfExpandAll()">Expand All</button>
+        <button class="jsf-btn jsf-btn--ghost" onclick="jsfCollapseAll()">Collapse All</button>
+      </div>
+
+      <!-- Code view: syntax-highlighted <pre> -->
+      <pre class="jsf-output-code" id="jsf-output-code"></pre>
+
+      <!-- Tree view: collapsible DOM tree -->
+      <div class="jsf-output-tree" id="jsf-output-tree"></div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="jsf-toast" id="jsf-toast">Copied!</div>
+
+    <!-- Footer -->
+    <p class="jsf-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </p>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

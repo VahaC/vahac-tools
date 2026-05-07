@@ -485,6 +485,17 @@
     min-width: 100%;
   }
 
+  .snc-results-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .snc-results-header .snc-btn {
+    width: 100%;
+    text-align: center;
+  }
+
   .snc-result-row {
     grid-template-columns: 1fr;
   }
@@ -516,5 +527,14 @@
   .snc-cheatsheet-table td {
     padding: 0.35rem 0.5rem;
     font-size: 0.72rem;
+  }
+
+  .snc-cheatsheet-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .snc-cheatsheet-table {
+    min-width: 460px;
   }
 }

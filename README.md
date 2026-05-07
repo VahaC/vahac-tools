@@ -55,3 +55,7 @@ Examples:
 ## Notes
 - Updated: 2026-05-07.
 - Password & Passphrase Generator: fixed mobile layout issue where generated password could wrap vertically one character per line.
+- Subnet Calculator: improved mobile results header layout and added horizontal scroll safety for cheat-sheet table.
+- vCard QR Code Generator: centered QR preview block on tablet/mobile layouts.
+- vCard QR Code Generator: fixed stray ">" markers in mobile settings caused by host-page pseudo-element label styles.
+- vCard QR Code Generator: mobile settings controls now flow in a row with wrap to avoid large empty space on the left.
