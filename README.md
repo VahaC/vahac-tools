@@ -53,4 +53,5 @@ Examples:
 - `password-passphrase-generator/index.html`
 
 ## Notes
-- Updated: 2026-05-06.
+- Updated: 2026-05-07.
+- Password & Passphrase Generator: fixed mobile layout issue where generated password could wrap vertically one character per line.
