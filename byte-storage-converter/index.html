@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Byte &amp; Storage Converter — Logs from VahaC</title>
+  <meta name="description" content="Convert between bytes, KB, MB, GB, TB, PB and binary KiB, MiB, GiB, TiB. Calculate file size from bitrate or required bitrate from file size. Free, 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bsc-wrapper">
+
+    <!-- ==================== HEADER ==================== -->
+    <div class="bsc-header">
+      <div class="bsc-header-icon">💾</div>
+      <h1 class="bsc-title">Byte and Storage Converter</h1>
+      <p class="bsc-subtitle">Decimal (SI) ↔ Binary (IEC) &nbsp;·&nbsp; Bitrate ↔ File Size</p>
+    </div>
+
+    <!-- ==================== STORAGE CONVERTER ==================== -->
+    <section class="bsc-section">
+      <div class="bsc-section-header">
+        <span class="bsc-section-icon">⚖️</span>
+        <h2 class="bsc-section-title">Storage Converter</h2>
+      </div>
+
+      <div class="bsc-input-row">
+        <div class="bsc-input-group bsc-input-main">
+          <label for="bsc-value-input">Value</label>
+          <input type="number" id="bsc-value-input" placeholder="e.g. 1.5" min="0" step="any" oninput="bscConvert()">
+        </div>
+        <div class="bsc-input-group bsc-input-unit">
+          <label for="bsc-unit-select">Unit</label>
+          <select id="bsc-unit-select" onchange="bscConvert()">
+            <optgroup label="Decimal (SI)">
+              <option value="B">B — Byte</option>
+              <option value="KB">KB — Kilobyte (10³)</option>
+              <option value="MB">MB — Megabyte (10⁶)</option>
+              <option value="GB" selected>GB — Gigabyte (10⁹)</option>
+              <option value="TB">TB — Terabyte (10¹²)</option>
+              <option value="PB">PB — Petabyte (10¹⁵)</option>
+            </optgroup>
+            <optgroup label="Binary (IEC)">
+              <option value="KiB">KiB — Kibibyte (2¹⁰)</option>
+              <option value="MiB">MiB — Mebibyte (2²⁰)</option>
+              <option value="GiB">GiB — Gibibyte (2³⁰)</option>
+              <option value="TiB">TiB — Tebibyte (2⁴⁰)</option>
+              <option value="PiB">PiB — Pebibyte (2⁵⁰)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="bsc-input-group bsc-input-actions">
+          <label class="bsc-label-invisible">‎</label>
+          <button class="bsc-btn bsc-btn--clear" onclick="bscClear()">✕ Clear</button>
+        </div>
+      </div>
+
+      <div class="bsc-error-msg" id="bsc-conv-error">Please enter a valid positive number.</div>
+
+      <!-- Two-column results grid: Decimal | Binary -->
+      <div class="bsc-results-grid" id="bsc-results-grid">
+
+        <!-- Decimal (SI) column -->
+        <div class="bsc-results-col">
+          <div class="bsc-results-col-header">
+            <span class="bsc-badge bsc-badge--blue">Decimal (SI)</span>
+            <span class="bsc-col-note">1 KB = 1,000 B</span>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-B">
+            <span class="bsc-result-label">B</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-B">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-B')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-KB">
+            <span class="bsc-result-label">KB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-KB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-KB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-MB">
+            <span class="bsc-result-label">MB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-MB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-MB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-GB">
+            <span class="bsc-result-label">GB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-GB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-GB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-TB">
+            <span class="bsc-result-label">TB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-TB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-TB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-PB">
+            <span class="bsc-result-label">PB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-PB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-PB')" title="Copy">📋</button>
+          </div>
+        </div>
+
+        <!-- Binary (IEC) column -->
+        <div class="bsc-results-col">
+          <div class="bsc-results-col-header">
+            <span class="bsc-badge bsc-badge--cyan">Binary (IEC)</span>
+            <span class="bsc-col-note">1 KiB = 1,024 B</span>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-KiB">
+            <span class="bsc-result-label">KiB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-KiB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-KiB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-MiB">
+            <span class="bsc-result-label">MiB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-MiB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-MiB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-GiB">
+            <span class="bsc-result-label">GiB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-GiB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-GiB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-TiB">
+            <span class="bsc-result-label">TiB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-TiB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-TiB')" title="Copy">📋</button>
+          </div>
+          <div class="bsc-result-row" id="bsc-row-PiB">
+            <span class="bsc-result-label">PiB</span>
+            <span class="bsc-result-value bsc-placeholder" id="bsc-val-PiB">—</span>
+            <button class="bsc-copy-btn" onclick="bscCopyValue('bsc-val-PiB')" title="Copy">📋</button>
+          </div>
+          <!-- Spacer row to align heights visually -->
+          <div class="bsc-result-row bsc-row-spacer" aria-hidden="true">
+            <span class="bsc-result-label"></span>
+            <span class="bsc-result-value"></span>
+            <span></span>
+          </div>
+        </div>
+
+      </div><!-- /bsc-results-grid -->
+
+      <div class="bsc-copy-all-row">
+        <button class="bsc-btn bsc-btn--secondary" onclick="bscCopyAll()">📋 Copy All Results</button>
+      </div>
+    </section>
+
+    <!-- ==================== BITRATE CALCULATOR ==================== -->
+    <section class="bsc-section">
+      <div class="bsc-section-header">
+        <span class="bsc-section-icon">📡</span>
+        <h2 class="bsc-section-title">Bitrate Calculator</h2>
+      </div>
+
+      <!-- Mode tabs -->
+      <div class="bsc-tab-row" role="tablist">
+        <button class="bsc-tab bsc-tab--active" id="bsc-tab-br" role="tab" onclick="bscSwitchTab('br')">
+          📡 Bitrate → File Size
+        </button>
+        <button class="bsc-tab" id="bsc-tab-fs" role="tab" onclick="bscSwitchTab('fs')">
+          💾 File Size → Bitrate
+        </button>
+      </div>
+
+      <!-- Panel A: Bitrate → File Size -->
+      <div class="bsc-tab-panel" id="bsc-panel-br" role="tabpanel">
+        <div class="bsc-input-row">
+          <div class="bsc-input-group bsc-input-main">
+            <label for="bsc-br-value">Bitrate</label>
+            <input type="number" id="bsc-br-value" placeholder="e.g. 25" min="0" step="any" oninput="bscCalcBitrate()">
+          </div>
+          <div class="bsc-input-group bsc-input-unit">
+            <label for="bsc-br-unit">Unit</label>
+            <select id="bsc-br-unit" onchange="bscCalcBitrate()">
+              <option value="bps">bps — bits/sec</option>
+              <option value="Kbps">Kbps — kilobits/sec</option>
+              <option value="Mbps" selected>Mbps — megabits/sec</option>
+              <option value="Gbps">Gbps — gigabits/sec</option>
+            </select>
+          </div>
+        </div>
+        <div class="bsc-duration-label">Duration</div>
+        <div class="bsc-duration-row">
+          <div class="bsc-input-group">
+            <label for="bsc-br-hh">Hours</label>
+            <input type="number" id="bsc-br-hh" placeholder="0" min="0" max="9999" oninput="bscCalcBitrate()">
+          </div>
+          <span class="bsc-duration-sep" aria-hidden="true">:</span>
+          <div class="bsc-input-group">
+            <label for="bsc-br-mm">Minutes</label>
+            <input type="number" id="bsc-br-mm" placeholder="0" min="0" max="59" oninput="bscCalcBitrate()">
+          </div>
+          <span class="bsc-duration-sep" aria-hidden="true">:</span>
+          <div class="bsc-input-group">
+            <label for="bsc-br-ss">Seconds</label>
+            <input type="number" id="bsc-br-ss" placeholder="0" min="0" max="59" oninput="bscCalcBitrate()">
+          </div>
+        </div>
+        <div class="bsc-error-msg" id="bsc-br-error">Enter a valid bitrate and a duration greater than 0.</div>
+        <div class="bsc-bitrate-results" id="bsc-br-results"></div>
+      </div>
+
+      <!-- Panel B: File Size → Bitrate -->
+      <div class="bsc-tab-panel bsc-hidden" id="bsc-panel-fs" role="tabpanel">
+        <div class="bsc-input-row">
+          <div class="bsc-input-group bsc-input-main">
+            <label for="bsc-fs-value">File Size</label>
+            <input type="number" id="bsc-fs-value" placeholder="e.g. 10.5" min="0" step="any" oninput="bscCalcFileSize()">
+          </div>
+          <div class="bsc-input-group bsc-input-unit">
+            <label for="bsc-fs-unit">Unit</label>
+            <select id="bsc-fs-unit" onchange="bscCalcFileSize()">
+              <optgroup label="Decimal (SI)">
+                <option value="MB">MB</option>
+                <option value="GB" selected>GB</option>
+                <option value="TB">TB</option>
+              </optgroup>
+              <optgroup label="Binary (IEC)">
+                <option value="MiB">MiB</option>
+                <option value="GiB">GiB</option>
+                <option value="TiB">TiB</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div class="bsc-duration-label">Duration</div>
+        <div class="bsc-duration-row">
+          <div class="bsc-input-group">
+            <label for="bsc-fs-hh">Hours</label>
+            <input type="number" id="bsc-fs-hh" placeholder="1" min="0" max="9999" oninput="bscCalcFileSize()">
+          </div>
+          <span class="bsc-duration-sep" aria-hidden="true">:</span>
+          <div class="bsc-input-group">
+            <label for="bsc-fs-mm">Minutes</label>
+            <input type="number" id="bsc-fs-mm" placeholder="0" min="0" max="59" oninput="bscCalcFileSize()">
+          </div>
+          <span class="bsc-duration-sep" aria-hidden="true">:</span>
+          <div class="bsc-input-group">
+            <label for="bsc-fs-ss">Seconds</label>
+            <input type="number" id="bsc-fs-ss" placeholder="0" min="0" max="59" oninput="bscCalcFileSize()">
+          </div>
+        </div>
+        <div class="bsc-error-msg" id="bsc-fs-error">Enter a valid file size and a duration greater than 0.</div>
+        <div class="bsc-bitrate-results" id="bsc-fs-results"></div>
+      </div>
+
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <div class="bsc-footer">
+      Built by <a href="https://vahac.com" class="bsc-footer-link">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+    <!-- Toast notification -->
+    <div class="bsc-toast" id="bsc-toast">✓ Copied!</div>
+
+  </div><!-- /bsc-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>

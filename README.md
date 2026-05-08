@@ -7,55 +7,87 @@ Main tools page:
 
 ## Project Structure
 
-- `vcard-qr-code-generator` - a vCard and QR code generator for fast contact sharing.
-- `subnet-calculator` - an IP subnet calculator for planning and validating network addressing.
-- `password-passphrase-generator` - a secure password and passphrase generator.
+- `byte-storage-converter` - convert between SI/IEC storage units and calculate bitrate or file size.
+- `image-compressor-resizer` - compress and resize images directly in the browser.
+- `json-formatter` - format, validate, and clean JSON input.
+- `password-passphrase-generator` - generate strong passwords and passphrases.
+- `subnet-calculator` - calculate IP subnet details for planning and validation.
+- `vcard-qr-code-generator` - build vCards and generate QR codes for contact sharing.
 
-## Tool Pages
+## Tool Overview
 
-### 1) vCard QR Code Generator
-
-Description:
-- Builds a vCard 3.0 payload from contact fields (name, company, title, phone, email, URL).
-- Generates a QR code based on the vCard payload.
-- Supports export to `VCF`, `PNG`, `SVG`, and clipboard copy.
-
-Link:
-- [vahac.com/tools/vcard-qr-code-generator](https://vahac.com/tools/vcard-qr-code-generator/?utm_source=github)
-
-### 2) IP Subnet Calculator
+### 1) Byte and Storage Converter
 
 Description:
-- Calculates network details: network address, broadcast address, host range, subnet mask, and CIDR.
-- Helps quickly verify network segmentation and addressing plans.
-- Useful for administration, DevOps workflows, and learning scenarios.
+- Converts values between Decimal (SI) and Binary (IEC) byte units.
+- Includes Bitrate -> File Size and File Size -> Bitrate calculator modes.
+- Supports quick copy for individual values and full result sets.
 
-Link:
-- [vahac.com/tools/ip-subnet-calculator-tool](https://vahac.com/tools/ip-subnet-calculator-tool/?utm_source=github)
+Path:
+- `byte-storage-converter/index.html`
 
-### 3) Secure Password and Passphrase Generator
+### 2) Image Compressor and Resizer
+
+Description:
+- Compresses image files on the client side.
+- Resizes images while preserving quality controls.
+- Keeps processing local in the browser.
+
+Path:
+- `image-compressor-resizer/index.html`
+
+### 3) JSON Formatter and Validator
+
+Description:
+- Formats JSON for readability.
+- Validates JSON syntax and helps detect input errors.
+- Useful for debugging API payloads and config blocks.
+
+Path:
+- `json-formatter/index.html`
+
+### 4) Password and Passphrase Generator
 
 Description:
 - Generates strong passwords and memorable passphrases.
 - Allows control over complexity and length settings.
 - Focused on practical account security improvement.
 
-Link:
-- [vahac.com/tools/secure-password-and-passphrase-generator](https://vahac.com/tools/secure-password-and-passphrase-generator/?utm_source=github)
+Path:
+- `password-passphrase-generator/index.html`
+
+### 5) IP Subnet Calculator
+
+Description:
+- Calculates network details: network address, broadcast address, host range, subnet mask, and CIDR.
+- Helps quickly verify network segmentation and addressing plans.
+- Useful for administration, DevOps workflows, and learning scenarios.
+
+Path:
+- `subnet-calculator/index.html`
+
+### 6) vCard QR Code Generator
+
+Description:
+- Builds a vCard 3.0 payload from contact fields (name, company, title, phone, email, URL).
+- Generates a QR code based on the vCard payload.
+- Supports export to `VCF`, `PNG`, `SVG`, and clipboard copy.
+
+Path:
+- `vcard-qr-code-generator/index.html`
 
 ## Local Run
 
 Since these are static tools, you can run them by opening the relevant `index.html` file in a browser.
 
 Examples:
+- `byte-storage-converter/index.html`
+- `image-compressor-resizer/index.html`
+- `json-formatter/index.html`
 - `vcard-qr-code-generator/index.html`
 - `subnet-calculator/index.html`
 - `password-passphrase-generator/index.html`
 
-## Notes
-- Updated: 2026-05-07.
-- Password & Passphrase Generator: fixed mobile layout issue where generated password could wrap vertically one character per line.
-- Subnet Calculator: improved mobile results header layout and added horizontal scroll safety for cheat-sheet table.
-- vCard QR Code Generator: centered QR preview block on tablet/mobile layouts.
-- vCard QR Code Generator: fixed stray ">" markers in mobile settings caused by host-page pseudo-element label styles.
-- vCard QR Code Generator: mobile settings controls now flow in a row with wrap to avoid large empty space on the left.
+## Styling Template
+
+- `css-template.md` contains shared styling guidance and can be reused when adding or redesigning tools.
