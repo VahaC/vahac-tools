@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compressor and Resizer — Logs from VahaC</title>
+  <meta name="description" content="Free browser-based image compressor and resizer. Drop images, adjust quality, resize, convert PNG/JPEG/WebP — zero uploads, fully client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="icr-wrapper">
+
+    <div class="icr-header">
+      <h1 class="icr-title">🖼️ Image Compressor &amp; Resizer</h1>
+      <p class="icr-subtitle">Compress · Resize · Convert — everything runs in your browser. No uploads, no cloud, no tracking.</p>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="icr-dropzone" id="icr-dropzone" role="button" tabindex="0" aria-label="Drop images here or click to browse">
+      <span class="icr-dz-icon">📂</span>
+      <p class="icr-dz-text">Drag &amp; drop images here</p>
+      <p class="icr-dz-sub">or <span class="icr-browse-link" id="icr-browse-link">click to browse</span></p>
+      <p class="icr-dz-hint">PNG · JPEG · WebP · GIF · BMP</p>
+      <input type="file" id="icr-file-input" accept="image/*" multiple>
+    </div>
+
+    <!-- Settings panel (shown after first file is added) -->
+    <div class="icr-panel" id="icr-panel" aria-hidden="true">
+
+      <div class="icr-panel-row">
+        <!-- Output format -->
+        <div class="icr-panel-group">
+          <div class="icr-panel-label">Output Format</div>
+          <div class="icr-fmt-tabs" role="group" aria-label="Output format">
+            <button class="icr-fmt-tab icr-fmt-active" data-fmt="original" onclick="icrSetFormat(this)">Original</button>
+            <button class="icr-fmt-tab" data-fmt="image/jpeg" onclick="icrSetFormat(this)">JPEG</button>
+            <button class="icr-fmt-tab" data-fmt="image/png" onclick="icrSetFormat(this)">PNG</button>
+            <button class="icr-fmt-tab" data-fmt="image/webp" onclick="icrSetFormat(this)">WebP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resize row -->
+      <div class="icr-panel-row">
+        <div class="icr-panel-group icr-panel-group--full">
+          <div class="icr-panel-label">Resize <span class="icr-label-muted">(leave 0 or empty to keep original size)</span></div>
+          <div class="icr-resize-row">
+            <div class="icr-field">
+              <label class="icr-field-label" for="icr-w-input">Width (px)</label>
+              <input type="number" id="icr-w-input" class="icr-num-input" min="1" max="16000" placeholder="0">
+            </div>
+            <button class="icr-lock-btn icr-lock-on" id="icr-lock-btn" onclick="icrToggleLock()" title="Toggle aspect ratio lock">
+              <span id="icr-lock-icon">🔒</span>
+            </button>
+            <div class="icr-field">
+              <label class="icr-field-label" for="icr-h-input">Height (px)</label>
+              <input type="number" id="icr-h-input" class="icr-num-input" min="1" max="16000" placeholder="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="icr-actions-row">
+        <button class="icr-btn icr-btn--primary" id="icr-process-btn" onclick="icrProcessAll()">⚡ Process All</button>
+        <button class="icr-btn icr-btn--success" id="icr-zip-btn" onclick="icrDownloadZip()" disabled>📦 Download ZIP</button>
+        <button class="icr-btn icr-btn--secondary" onclick="icrClearAll()">🗑️ Clear All</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="icr-progress-wrap" id="icr-progress-wrap">
+        <div class="icr-progress-track">
+          <div class="icr-progress-bar" id="icr-progress-bar"></div>
+        </div>
+        <div class="icr-progress-text" id="icr-progress-text"></div>
+      </div>
+
+    </div><!-- /.icr-panel -->
+
+    <!-- File queue -->
+    <div class="icr-queue" id="icr-queue" role="list" aria-label="Image queue"></div>
+
+    <!-- Footer -->
+    <div class="icr-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, nothing uploaded.
+      &nbsp;·&nbsp; Uses <a href="https://stuk.github.io/jszip/" target="_blank" rel="noopener">JSZip</a> (MIT) for ZIP downloads.
+    </div>
+
+    <!-- Toast notification -->
+    <div class="icr-toast" id="icr-toast" role="status" aria-live="polite"></div>
+
+    <!-- Image preview modal -->
+    <div class="icr-modal-overlay" id="icr-modal-overlay" onclick="icrCloseModal()" hidden>
+      <div class="icr-modal-box" id="icr-modal-box" onclick="event.stopPropagation()">
+        <button class="icr-modal-close" onclick="icrCloseModal()" aria-label="Close preview">&#10005;</button>
+        <div class="icr-modal-img-wrap" id="icr-modal-img-wrap">
+          <img class="icr-modal-img" id="icr-modal-img" src="" alt="">
+        </div>
+        <div class="icr-modal-footer">
+          <span class="icr-modal-info" id="icr-modal-info"></span>
+          <!-- Quality re-compress controls — shown only for Result previews -->
+          <div class="icr-modal-qual-wrap" id="icr-modal-qual-wrap">
+            <div class="icr-modal-qual-row">
+              <span class="icr-modal-qual-label">Quality &mdash; <span id="icr-modal-qual-num">82</span>%</span>
+              <input type="range" id="icr-modal-qual-slider" class="icr-slider" min="1" max="100" value="82">
+            </div>
+            <div class="icr-modal-size-text" id="icr-modal-size-text"></div>
+          </div>
+          <button class="icr-btn icr-btn--secondary icr-btn--sm" id="icr-modal-size-btn"
+                  onclick="icrToggleModalFit()">View actual size</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.icr-wrapper -->
+
+  <!-- JSZip (MIT License) — batch ZIP export only -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
