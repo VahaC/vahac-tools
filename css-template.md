@@ -246,5 +246,9 @@ Keep this list updated to avoid prefix collisions:
 
 | Prefix | Tool                     | Status   |
 |--------|--------------------------|----------|
+| `bsc`  | Byte & Storage Converter | Built    |
+| `icr`  | Image Compressor/Resizer | Built    |
+| `jsf`  | JSON Formatter           | Built    |
+| `pwg`  | Password Generator       | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |
