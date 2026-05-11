@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hash Generator — Logs from VahaC</title>
+  <meta name="description" content="Instantly compute MD5, SHA-1, SHA-256 and SHA-512 hashes for text or any file. 100% client-side — no data ever leaves your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hsg-wrapper">
+
+    <div class="hsg-header">
+      <h1 class="hsg-title">Hash Generator for Files and Text</h1>
+      <p class="hsg-subtitle">MD5 · SHA-1 · SHA-256 · SHA-512 — text or file, instant results, nothing leaves your browser</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="hsg-tabs" role="tablist">
+      <button class="hsg-tab hsg-tab--active" id="hsg-tab-text"
+              role="tab" aria-selected="true" aria-controls="hsg-section-text"
+              onclick="hsgSwitchTab('text')">
+        <span class="hsg-tab-icon">📝</span> Text
+      </button>
+      <button class="hsg-tab" id="hsg-tab-file"
+              role="tab" aria-selected="false" aria-controls="hsg-section-file"
+              onclick="hsgSwitchTab('file')">
+        <span class="hsg-tab-icon">📁</span> File
+      </button>
+    </div>
+
+    <!-- ── TEXT SECTION ── -->
+    <div class="hsg-section" id="hsg-section-text" role="tabpanel">
+      <div class="hsg-input-group">
+        <label for="hsg-text-input">Input text</label>
+        <textarea id="hsg-text-input" class="hsg-textarea"
+                  rows="6"
+                  placeholder="Type or paste your text here — hashes update instantly…"
+                  oninput="hsgHashText()" onkeydown="hsgTextKey(event)"></textarea>
+      </div>
+      <div class="hsg-text-actions">
+        <span class="hsg-char-count" id="hsg-char-count">0 characters</span>
+        <button class="hsg-btn hsg-btn--secondary hsg-btn--small" onclick="hsgClearText()">✕ Clear</button>
+      </div>
+    </div>
+
+    <!-- ── FILE SECTION ── -->
+    <div class="hsg-section hsg-hidden" id="hsg-section-file" role="tabpanel">
+
+      <!-- Drop zone -->
+      <div class="hsg-drop-zone" id="hsg-drop-zone"
+           onclick="hsgTriggerFile()"
+           ondragover="hsgDragOver(event)"
+           ondragleave="hsgDragLeave(event)"
+           ondrop="hsgDrop(event)"
+           tabindex="0"
+           role="button"
+           aria-label="Click or drag a file here">
+        <div class="hsg-drop-icon">📂</div>
+        <div class="hsg-drop-primary">Drag &amp; drop a file here</div>
+        <div class="hsg-drop-secondary">or click to browse — any file type, any size</div>
+      </div>
+      <input type="file" id="hsg-file-input" class="hsg-file-input-hidden"
+             onchange="hsgFileChosen(this.files[0])">
+
+      <!-- File info (shown after selection) -->
+      <div class="hsg-file-info hsg-hidden" id="hsg-file-info">
+        <span class="hsg-file-thumb" id="hsg-file-thumb">📄</span>
+        <div class="hsg-file-details">
+          <span class="hsg-file-name" id="hsg-file-name"></span>
+          <span class="hsg-file-meta" id="hsg-file-meta"></span>
+        </div>
+        <button class="hsg-btn hsg-btn--secondary hsg-btn--small hsg-file-clear-btn"
+                onclick="hsgClearFile()" title="Remove file">✕</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="hsg-progress-wrap hsg-hidden" id="hsg-progress-wrap">
+        <div class="hsg-progress-track">
+          <div class="hsg-progress-fill" id="hsg-progress-fill"></div>
+        </div>
+        <span class="hsg-progress-pct" id="hsg-progress-pct">0%</span>
+      </div>
+
+    </div>
+
+    <!-- ── OPTIONS BAR ── -->
+    <div class="hsg-options-bar">
+      <label class="hsg-toggle-label" for="hsg-uppercase" title="Toggle uppercase output">
+        <input type="checkbox" id="hsg-uppercase" class="hsg-toggle-input" onchange="hsgToggleCase()">
+        <span class="hsg-toggle-track"><span class="hsg-toggle-thumb"></span></span>
+        <span class="hsg-toggle-text">UPPERCASE</span>
+      </label>
+      <button class="hsg-btn hsg-btn--secondary hsg-btn--small"
+              id="hsg-copy-all-btn"
+              onclick="hsgCopyAll()"
+              disabled>📋 Copy All</button>
+    </div>
+
+    <!-- ── HASH RESULT CARDS ── -->
+    <div class="hsg-results" id="hsg-results">
+
+      <!-- MD5 -->
+      <div class="hsg-result-card" id="hsg-card-md5">
+        <div class="hsg-result-header">
+          <span class="hsg-algo-badge hsg-algo-md5">MD5</span>
+          <span class="hsg-algo-meta">128-bit · 32 chars</span>
+          <button class="hsg-btn hsg-btn--secondary hsg-btn--small hsg-copy-btn"
+                  id="hsg-copy-md5"
+                  onclick="hsgCopy('md5')"
+                  disabled
+                  title="Copy MD5 hash">📋</button>
+        </div>
+        <div class="hsg-hash-value hsg-mono" id="hsg-hash-md5">—</div>
+        <div class="hsg-verify-badge-wrap">
+          <span class="hsg-verify-badge hsg-hidden" id="hsg-verify-badge-md5"></span>
+        </div>
+      </div>
+
+      <!-- SHA-1 -->
+      <div class="hsg-result-card" id="hsg-card-sha1">
+        <div class="hsg-result-header">
+          <span class="hsg-algo-badge hsg-algo-sha1">SHA-1</span>
+          <span class="hsg-algo-meta">160-bit · 40 chars</span>
+          <button class="hsg-btn hsg-btn--secondary hsg-btn--small hsg-copy-btn"
+                  id="hsg-copy-sha1"
+                  onclick="hsgCopy('sha1')"
+                  disabled
+                  title="Copy SHA-1 hash">📋</button>
+        </div>
+        <div class="hsg-hash-value hsg-mono" id="hsg-hash-sha1">—</div>
+        <div class="hsg-verify-badge-wrap">
+          <span class="hsg-verify-badge hsg-hidden" id="hsg-verify-badge-sha1"></span>
+        </div>
+      </div>
+
+      <!-- SHA-256 -->
+      <div class="hsg-result-card" id="hsg-card-sha256">
+        <div class="hsg-result-header">
+          <span class="hsg-algo-badge hsg-algo-sha256">SHA-256</span>
+          <span class="hsg-algo-meta">256-bit · 64 chars</span>
+          <button class="hsg-btn hsg-btn--secondary hsg-btn--small hsg-copy-btn"
+                  id="hsg-copy-sha256"
+                  onclick="hsgCopy('sha256')"
+                  disabled
+                  title="Copy SHA-256 hash">📋</button>
+        </div>
+        <div class="hsg-hash-value hsg-mono" id="hsg-hash-sha256">—</div>
+        <div class="hsg-verify-badge-wrap">
+          <span class="hsg-verify-badge hsg-hidden" id="hsg-verify-badge-sha256"></span>
+        </div>
+      </div>
+
+      <!-- SHA-512 -->
+      <div class="hsg-result-card" id="hsg-card-sha512">
+        <div class="hsg-result-header">
+          <span class="hsg-algo-badge hsg-algo-sha512">SHA-512</span>
+          <span class="hsg-algo-meta">512-bit · 128 chars</span>
+          <button class="hsg-btn hsg-btn--secondary hsg-btn--small hsg-copy-btn"
+                  id="hsg-copy-sha512"
+                  onclick="hsgCopy('sha512')"
+                  disabled
+                  title="Copy SHA-512 hash">📋</button>
+        </div>
+        <div class="hsg-hash-value hsg-mono" id="hsg-hash-sha512">—</div>
+        <div class="hsg-verify-badge-wrap">
+          <span class="hsg-verify-badge hsg-hidden" id="hsg-verify-badge-sha512"></span>
+        </div>
+      </div>
+
+    </div><!-- /.hsg-results -->
+
+    <!-- ── VERIFY SECTION ── -->
+    <div class="hsg-verify-section">
+      <div class="hsg-input-group">
+        <label for="hsg-verify-input">🔍 Verify — paste a known hash to compare</label>
+        <div class="hsg-verify-row">
+          <input type="text" id="hsg-verify-input" class="hsg-input hsg-mono"
+                 placeholder="Paste MD5 (32), SHA-1 (40), SHA-256 (64) or SHA-512 (128) hex hash…"
+                 oninput="hsgRunVerify()"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="hsg-btn hsg-btn--secondary hsg-btn--small"
+                  onclick="hsgClearVerify()" title="Clear verify input">✕</button>
+        </div>
+        <span class="hsg-verify-hint" id="hsg-verify-hint"></span>
+      </div>
+    </div>
+
+    <p class="hsg-footer">
+      Built by <a href="https://vahac.com" class="hsg-link">VahaC</a> —
+      100% client-side, no data sent anywhere.
+    </p>
+
+    <div class="hsg-toast" id="hsg-toast">✅ Copied!</div>
+  </div><!-- /.hsg-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chmod Permission Calculator — Linux File Permissions Tool — Logs from VahaC</title>
+  <meta name="description" content="Interactive Linux chmod permission calculator. Toggle read/write/execute checkboxes to get numeric (755) and symbolic (rwxr-xr-x) values instantly.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="chm-wrapper">
+
+    <div class="chm-header">
+      <div class="chm-header-icon">🔐</div>
+      <h1>chmod Permission Calculator</h1>
+      <p class="chm-subtitle">Toggle checkboxes or type a value — everything syncs instantly</p>
+    </div>
+
+    <!-- Output card -->
+    <div class="chm-output-card">
+      <div class="chm-output-row">
+        <div class="chm-output-group">
+          <label class="chm-field-label" for="chm-numeric">Numeric (Octal)</label>
+          <input
+            type="text"
+            id="chm-numeric"
+            class="chm-output-input chm-mono"
+            maxlength="4"
+            placeholder="755"
+            autocomplete="off"
+            spellcheck="false"
+            oninput="chmFromNumeric()"
+          >
+        </div>
+        <div class="chm-output-sep">⟺</div>
+        <div class="chm-output-group">
+          <label class="chm-field-label" for="chm-symbolic">Symbolic</label>
+          <input
+            type="text"
+            id="chm-symbolic"
+            class="chm-output-input chm-mono"
+            maxlength="10"
+            placeholder="rwxr-xr-x"
+            autocomplete="off"
+            spellcheck="false"
+            oninput="chmFromSymbolic()"
+          >
+        </div>
+      </div>
+
+      <div class="chm-cmd-row">
+        <span class="chm-cmd-pill">$</span>
+        <span class="chm-cmd-preview chm-mono" id="chm-cmd-preview">chmod 755 &lt;filename&gt;</span>
+        <button class="chm-btn chm-btn--secondary chm-copy-icon" onclick="chmCopyCmd()" title="Copy command">📋</button>
+      </div>
+
+      <div class="chm-copy-row">
+        <button class="chm-btn chm-btn--secondary" onclick="chmCopyNumeric()">📋 Numeric</button>
+        <button class="chm-btn chm-btn--secondary" onclick="chmCopySymbolic()">📋 Symbolic</button>
+        <button class="chm-btn chm-btn--secondary" onclick="chmCopyCmd()">📋 Command</button>
+      </div>
+    </div>
+
+    <!-- Permission matrix -->
+    <div class="chm-matrix-card">
+      <div class="chm-matrix">
+
+        <!-- Header row (5 items) -->
+        <div class="chm-mhdr chm-mhdr-corner"></div>
+        <div class="chm-mhdr chm-read-hdr">
+          <span class="chm-hdr-letter">r</span>
+          <span class="chm-hdr-sub">Read = 4</span>
+        </div>
+        <div class="chm-mhdr chm-write-hdr">
+          <span class="chm-hdr-letter">w</span>
+          <span class="chm-hdr-sub">Write = 2</span>
+        </div>
+        <div class="chm-mhdr chm-exec-hdr">
+          <span class="chm-hdr-letter">x</span>
+          <span class="chm-hdr-sub">Exec = 1</span>
+        </div>
+        <div class="chm-mhdr chm-val-hdr">Value</div>
+
+        <!-- Owner row (5 items) -->
+        <div class="chm-mlabel">
+          <span class="chm-entity-icon">👤</span>
+          <span class="chm-entity-name">Owner</span>
+          <span class="chm-entity-code">(u)</span>
+        </div>
+        <div class="chm-mcell chm-read-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-owner-r" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-read"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-write-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-owner-w" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-write"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-exec-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-owner-x" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-exec"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-val-cell">
+          <span class="chm-digit" id="chm-val-owner">7</span>
+        </div>
+
+        <!-- Group row (5 items) -->
+        <div class="chm-mlabel">
+          <span class="chm-entity-icon">👥</span>
+          <span class="chm-entity-name">Group</span>
+          <span class="chm-entity-code">(g)</span>
+        </div>
+        <div class="chm-mcell chm-read-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-group-r" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-read"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-write-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-group-w" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-write"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-exec-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-group-x" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-exec"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-val-cell">
+          <span class="chm-digit" id="chm-val-group">5</span>
+        </div>
+
+        <!-- Other row (5 items) -->
+        <div class="chm-mlabel">
+          <span class="chm-entity-icon">🌍</span>
+          <span class="chm-entity-name">Other</span>
+          <span class="chm-entity-code">(o)</span>
+        </div>
+        <div class="chm-mcell chm-read-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-other-r" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-read"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-write-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-other-w" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-write"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-exec-cell">
+          <label class="chm-cb-label">
+            <input type="checkbox" id="chm-other-x" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-exec"></span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-val-cell">
+          <span class="chm-digit" id="chm-val-other">5</span>
+        </div>
+
+        <!-- Special bits row (3 items: label + span-3 cell + value) -->
+        <div class="chm-mlabel chm-mlabel-special">
+          <span class="chm-entity-icon">⚡</span>
+          <span class="chm-entity-name">Special</span>
+          <span class="chm-entity-code">bits</span>
+        </div>
+        <div class="chm-special-cell">
+          <label class="chm-special-cb-label">
+            <input type="checkbox" id="chm-setuid" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-special"></span>
+            <span class="chm-special-name">Setuid (4)</span>
+          </label>
+          <label class="chm-special-cb-label">
+            <input type="checkbox" id="chm-setgid" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-special"></span>
+            <span class="chm-special-name">Setgid (2)</span>
+          </label>
+          <label class="chm-special-cb-label">
+            <input type="checkbox" id="chm-sticky" onchange="chmFromCheckboxes()">
+            <span class="chm-cb-custom chm-cb-special"></span>
+            <span class="chm-special-name">Sticky (1)</span>
+          </label>
+        </div>
+        <div class="chm-mcell chm-val-cell">
+          <span class="chm-digit chm-digit-special" id="chm-val-special">0</span>
+        </div>
+
+      </div><!-- /.chm-matrix -->
+    </div><!-- /.chm-matrix-card -->
+
+    <!-- Human-readable description -->
+    <div class="chm-desc-card">
+      <div class="chm-desc-text" id="chm-desc-text"></div>
+    </div>
+
+    <!-- Common presets -->
+    <div class="chm-presets-card">
+      <div class="chm-presets-title">⚡ Common Presets</div>
+      <div class="chm-presets-grid">
+        <button class="chm-preset-btn" data-preset="755" onclick="chmSetPreset('755')">
+          <span class="chm-preset-num">755</span>
+          <span class="chm-preset-sym">rwxr-xr-x</span>
+          <span class="chm-preset-desc">Scripts / dirs</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="644" onclick="chmSetPreset('644')">
+          <span class="chm-preset-num">644</span>
+          <span class="chm-preset-sym">rw-r--r--</span>
+          <span class="chm-preset-desc">Web files</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="600" onclick="chmSetPreset('600')">
+          <span class="chm-preset-num">600</span>
+          <span class="chm-preset-sym">rw-------</span>
+          <span class="chm-preset-desc">SSH keys</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="700" onclick="chmSetPreset('700')">
+          <span class="chm-preset-num">700</span>
+          <span class="chm-preset-sym">rwx------</span>
+          <span class="chm-preset-desc">Private scripts</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="664" onclick="chmSetPreset('664')">
+          <span class="chm-preset-num">664</span>
+          <span class="chm-preset-sym">rw-rw-r--</span>
+          <span class="chm-preset-desc">Shared files</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="775" onclick="chmSetPreset('775')">
+          <span class="chm-preset-num">775</span>
+          <span class="chm-preset-sym">rwxrwxr-x</span>
+          <span class="chm-preset-desc">Group exec</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="444" onclick="chmSetPreset('444')">
+          <span class="chm-preset-num">444</span>
+          <span class="chm-preset-sym">r--r--r--</span>
+          <span class="chm-preset-desc">Read-only all</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="400" onclick="chmSetPreset('400')">
+          <span class="chm-preset-num">400</span>
+          <span class="chm-preset-sym">r--------</span>
+          <span class="chm-preset-desc">Owner read-only</span>
+        </button>
+        <button class="chm-preset-btn" data-preset="750" onclick="chmSetPreset('750')">
+          <span class="chm-preset-num">750</span>
+          <span class="chm-preset-sym">rwxr-x---</span>
+          <span class="chm-preset-desc">App exec</span>
+        </button>
+        <button class="chm-preset-btn chm-preset-btn--danger" data-preset="777" onclick="chmSetPreset('777')">
+          <span class="chm-preset-num">777</span>
+          <span class="chm-preset-sym">rwxrwxrwx</span>
+          <span class="chm-preset-desc">All perms ⚠️</span>
+        </button>
+        <button class="chm-preset-btn chm-preset-btn--special" data-preset="4755" onclick="chmSetPreset('4755')">
+          <span class="chm-preset-num">4755</span>
+          <span class="chm-preset-sym">rwsr-xr-x</span>
+          <span class="chm-preset-desc">Setuid binary</span>
+        </button>
+        <button class="chm-preset-btn chm-preset-btn--special" data-preset="1777" onclick="chmSetPreset('1777')">
+          <span class="chm-preset-num">1777</span>
+          <span class="chm-preset-sym">rwxrwxrwt</span>
+          <span class="chm-preset-desc">/tmp sticky</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chm-toast" id="chm-toast">✅ Copied!</div>
+
+    <footer class="chm-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+  </div><!-- /.chm-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vahac Tools</title>
+  <meta name="description" content="Local index page for all tools in the vahac-tools repository.">
+  <style>
+    body {
+      margin: 0;
+      background: #0a0f1e;
+    }
+
+    .hub-wrapper {
+      --hub-bg-primary: #0a0f1e;
+      --hub-bg-secondary: #111827;
+      --hub-bg-card: #1a2236;
+      --hub-bg-input: #0d1424;
+      --hub-border: #2a3a5c;
+      --hub-border-focus: #3b82f6;
+      --hub-text-primary: #e2e8f0;
+      --hub-text-secondary: #94a3b8;
+      --hub-text-muted: #64748b;
+      --hub-accent-blue: #3b82f6;
+      --hub-accent-cyan: #22d3ee;
+      --hub-accent-green: #10b981;
+      --hub-accent-amber: #f59e0b;
+      --hub-accent-red: #ef4444;
+      --hub-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+      --hub-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --hub-radius: 8px;
+
+      font-family: var(--hub-font-sans);
+      color: var(--hub-text-primary);
+      line-height: 1.6;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+      box-sizing: border-box;
+    }
+
+    .hub-wrapper *,
+    .hub-wrapper *::before,
+    .hub-wrapper *::after {
+      box-sizing: border-box;
+    }
+
+    .hub-header {
+      background: linear-gradient(135deg, #111827, #1a2236 45%, #0d1424);
+      border: 1px solid var(--hub-border);
+      border-radius: var(--hub-radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .hub-title {
+      margin: 0;
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }
+
+    .hub-subtitle {
+      margin: 0.5rem 0 0;
+      color: var(--hub-text-secondary);
+      max-width: 70ch;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .hub-card {
+      background: var(--hub-bg-card);
+      border: 1px solid var(--hub-border);
+      border-radius: var(--hub-radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      min-height: 168px;
+    }
+
+    .hub-card h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.25;
+    }
+
+    .hub-card p {
+      margin: 0;
+      color: var(--hub-text-secondary);
+      flex: 1;
+    }
+
+    .hub-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      text-decoration: none;
+      padding: 0.65rem 1rem;
+      background: var(--hub-accent-blue);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .hub-btn:hover {
+      background: #2563eb;
+    }
+
+    .hub-btn:active {
+      transform: scale(0.97);
+    }
+
+    .hub-footer {
+      margin-top: 1rem;
+      color: var(--hub-text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .hub-wrapper {
+        padding: 1rem 0.75rem 2rem;
+      }
+
+      .hub-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="hub-wrapper">
+    <header class="hub-header">
+      <h1 class="hub-title">Vahac Tools</h1>
+      <p class="hub-subtitle">
+        Quick access page for all tools in this repository.
+        Each tool runs as a standalone frontend page.
+      </p>
+    </header>
+
+    <section class="hub-grid" aria-label="Tools list">
+      <article class="hub-card">
+        <h2>Byte Storage Converter</h2>
+        <p>Convert SI and IEC units and calculate bitrate or file size.</p>
+        <a class="hub-btn" href="byte-storage-converter/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Chmod File Permission Calculator</h2>
+        <p>Convert Unix-like permissions between symbolic and octal forms.</p>
+        <a class="hub-btn" href="chmod-file-permission-calculator/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Cron Expression Generator</h2>
+        <p>Build cron expressions with guided scheduling options.</p>
+        <a class="hub-btn" href="cron-expression-generator/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Hash Generator for Files and Text</h2>
+        <p>Generate hashes for text input and uploaded files.</p>
+        <a class="hub-btn" href="hash-generator-for-files-and-text/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Image Compressor Resizer</h2>
+        <p>Compress and resize images directly in the browser.</p>
+        <a class="hub-btn" href="image-compressor-resizer/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>JSON Formatter</h2>
+        <p>Format and validate JSON for cleaner reading and debugging.</p>
+        <a class="hub-btn" href="json-formatter/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Password Passphrase Generator</h2>
+        <p>Create strong passwords and passphrases with configurable rules.</p>
+        <a class="hub-btn" href="password-passphrase-generator/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>Subnet Calculator</h2>
+        <p>Calculate IPv4 subnet details for planning and validation.</p>
+        <a class="hub-btn" href="subnet-calculator/index.html">Open tool</a>
+      </article>
+
+      <article class="hub-card">
+        <h2>vCard QR Code Generator</h2>
+        <p>Create vCard data and export QR code outputs.</p>
+        <a class="hub-btn" href="vcard-qr-code-generator/index.html">Open tool</a>
+      </article>
+    </section>
+
+    <p class="hub-footer">Local repository index page</p>
+  </main>
+</body>
+</html>

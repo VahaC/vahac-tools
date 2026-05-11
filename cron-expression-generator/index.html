@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cron Expression Generator &amp; Parser — Logs from VahaC</title>
+  <meta name="description" content="Parse any cron expression into plain English or build one visually. See the next 10 execution times instantly. Free, 100% client-side, no signup.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="crn-wrapper">
+
+    <div class="crn-header">
+      <h1 class="crn-title">Cron Expression Generator &amp; Parser</h1>
+      <p class="crn-subtitle">Decode any cron expression into plain English — or build one by clicking. No syntax memorising required.</p>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="crn-tabs" role="tablist">
+      <button class="crn-tab crn-tab--active" data-tab="parse"
+              onclick="crnSwitchTab('parse')" role="tab" aria-selected="true">
+        <span class="crn-tab-icon">🔍</span> Parse
+      </button>
+      <button class="crn-tab" data-tab="build"
+              onclick="crnSwitchTab('build')" role="tab" aria-selected="false">
+        <span class="crn-tab-icon">🔧</span> Build
+      </button>
+    </div>
+
+    <!-- PARSE PANEL -->
+    <div id="crn-parse-panel" class="crn-panel crn-panel--active">
+
+      <div class="crn-section">
+        <label class="crn-label" for="crn-expr-input">Cron Expression</label>
+        <div class="crn-expr-wrap">
+          <input
+            type="text"
+            id="crn-expr-input"
+            class="crn-expr-input"
+            placeholder="* * * * *"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+          >
+          <button class="crn-btn crn-btn--icon" onclick="crnClearParse()"
+                  title="Clear" aria-label="Clear input">✕</button>
+        </div>
+        <div class="crn-field-pos" aria-hidden="true">
+          <span class="crn-fp crn-fp--min">minute<br><small>0–59</small></span>
+          <span class="crn-fp crn-fp--hour">hour<br><small>0–23</small></span>
+          <span class="crn-fp crn-fp--dom">day of month<br><small>1–31</small></span>
+          <span class="crn-fp crn-fp--mon">month<br><small>1–12</small></span>
+          <span class="crn-fp crn-fp--dow">day of week<br><small>0–6</small></span>
+        </div>
+        <div id="crn-parse-error" class="crn-error-msg" role="alert"></div>
+      </div>
+
+      <div class="crn-section">
+        <div class="crn-section-label">⚡ Quick examples</div>
+        <div id="crn-examples-grid" class="crn-examples-grid"></div>
+      </div>
+
+      <div id="crn-parse-results" class="crn-parse-results crn-hidden">
+        <div class="crn-result-card">
+          <div class="crn-result-header">
+            <span>📖 Human-readable description</span>
+            <button class="crn-btn crn-btn--sm crn-btn--secondary"
+                    onclick="crnCopyExpr()">📋 Copy expression</button>
+          </div>
+          <p id="crn-description" class="crn-description"></p>
+          <div id="crn-field-breakdown" class="crn-field-breakdown"></div>
+        </div>
+        <div class="crn-result-card">
+          <div class="crn-result-header">🗓 Next 5 scheduled runs</div>
+          <div id="crn-dates-list" class="crn-dates-list"></div>
+        </div>
+      </div>
+
+    </div><!-- end parse panel -->
+
+    <!-- BUILD PANEL -->
+    <div id="crn-build-panel" class="crn-panel">
+
+      <div id="crn-fields-grid" class="crn-fields-grid"></div>
+
+      <div class="crn-build-output">
+        <div class="crn-output-card">
+          <div class="crn-output-label">Generated Expression</div>
+          <div class="crn-output-row">
+            <code id="crn-output-expr" class="crn-output-expr">* * * * *</code>
+            <div class="crn-output-actions">
+              <button class="crn-btn" onclick="crnCopyBuilt()">📋 Copy</button>
+              <button class="crn-btn crn-btn--secondary" onclick="crnSendToParse()">→ Parse</button>
+              <button class="crn-btn crn-btn--ghost" onclick="crnResetBuild()">↺ Reset</button>
+            </div>
+          </div>
+          <div id="crn-build-desc" class="crn-build-desc"></div>
+        </div>
+        <div class="crn-result-card">
+          <div class="crn-result-header">🗓 Next 5 scheduled runs</div>
+          <div id="crn-build-dates-list" class="crn-dates-list"></div>
+        </div>
+      </div>
+
+    </div><!-- end build panel -->
+
+    <div id="crn-toast" class="crn-toast" role="status" aria-live="polite"></div>
+
+    <div class="crn-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div><!-- end crn-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>
