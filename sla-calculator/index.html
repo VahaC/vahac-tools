@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uptime / SLA Calculator — Logs from VahaC</title>
+  <meta name="description" content="Free SLA uptime downtime calculator. Convert any SLA % to allowed downtime per year, month, week, and day — or reverse-calculate SLA from a known downtime budget.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sla-wrapper">
+
+    <div class="sla-header">
+      <h1>Uptime / SLA Calculator</h1>
+      <p class="sla-header-sub">Convert SLA percentages ↔ downtime budgets instantly. No server. No tracking.</p>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="sla-mode-toggle" role="tablist">
+      <button class="sla-mode-btn sla-active" id="sla-tab-sla" role="tab" aria-selected="true" onclick="slaSwitchMode('sla')">
+        📊 SLA → Downtime
+      </button>
+      <button class="sla-mode-btn" id="sla-tab-dt" role="tab" aria-selected="false" onclick="slaSwitchMode('dt')">
+        ⏱ Downtime → SLA
+      </button>
+    </div>
+
+    <!-- Panel: SLA → Downtime -->
+    <div class="sla-panel" id="sla-panel-sla" role="tabpanel">
+      <div class="sla-presets">
+        <span class="sla-presets-label">Quick:</span>
+        <button class="sla-preset-btn" onclick="slaSetPreset(90)">90%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99)">99%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.5)">99.5%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.9)">99.9%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.95)">99.95%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.99)">99.99%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.999)">99.999%</button>
+        <button class="sla-preset-btn" onclick="slaSetPreset(99.9999)">99.9999%</button>
+      </div>
+      <div class="sla-input-row">
+        <div class="sla-input-group">
+          <label for="sla-sla-input">SLA Percentage</label>
+          <div class="sla-input-with-suffix">
+            <input type="number" id="sla-sla-input" min="0" max="100" step="0.0001" value="99.9" placeholder="99.9" autocomplete="off">
+            <span class="sla-suffix">%</span>
+          </div>
+        </div>
+      </div>
+      <button class="sla-btn" onclick="slaCalcFromSla()">Calculate Downtime Budget</button>
+    </div>
+
+    <!-- Panel: Downtime → SLA -->
+    <div class="sla-panel sla-hidden" id="sla-panel-dt" role="tabpanel">
+      <div class="sla-input-row">
+        <div class="sla-input-group">
+          <label for="sla-dt-amount">Downtime Amount</label>
+          <input type="number" id="sla-dt-amount" min="0" step="any" value="1" placeholder="e.g. 1" autocomplete="off">
+        </div>
+        <div class="sla-input-group">
+          <label for="sla-dt-unit">Unit</label>
+          <select id="sla-dt-unit">
+            <option value="s">Seconds (s)</option>
+            <option value="m" selected>Minutes (m)</option>
+            <option value="h">Hours (h)</option>
+            <option value="d">Days (d)</option>
+          </select>
+        </div>
+        <div class="sla-input-group">
+          <label for="sla-dt-period">Per Period</label>
+          <select id="sla-dt-period">
+            <option value="day">Day (24h)</option>
+            <option value="week">Week (7d)</option>
+            <option value="month">Month (30.44d avg)</option>
+            <option value="year" selected>Year (365.25d)</option>
+          </select>
+        </div>
+      </div>
+      <button class="sla-btn" onclick="slaCalcFromDowntime()">Calculate SLA</button>
+    </div>
+
+    <!-- Error -->
+    <p class="sla-error-msg" id="sla-error-msg"></p>
+
+    <!-- Result card -->
+    <div class="sla-result-card sla-hidden" id="sla-result-card">
+      <div class="sla-result-top">
+        <div class="sla-result-left">
+          <div class="sla-result-badge" id="sla-result-badge"></div>
+          <div class="sla-result-subtitle" id="sla-result-subtitle"></div>
+        </div>
+        <div class="sla-result-right">
+          <div class="sla-nines-dots" id="sla-nines-dots"></div>
+          <div class="sla-nines-label" id="sla-nines-label"></div>
+        </div>
+      </div>
+      <div class="sla-result-grid" id="sla-result-grid"></div>
+      <div class="sla-result-actions">
+        <button class="sla-btn sla-btn--secondary" onclick="slaCopyResult()">📋 Copy Result</button>
+      </div>
+    </div>
+
+    <!-- Reference table -->
+    <div class="sla-ref-section">
+      <h2 class="sla-ref-title">📊 Standard SLA Reference Table</h2>
+      <p class="sla-ref-desc">Common SLA tiers with allowed downtime. Uses 365.25d/year and 30.44d/month averages.</p>
+      <div class="sla-table-wrap">
+        <table class="sla-table">
+          <thead>
+            <tr>
+              <th>SLA</th>
+              <th>Nines</th>
+              <th>Per Year</th>
+              <th>Per Month</th>
+              <th>Per Week</th>
+              <th>Per Day</th>
+            </tr>
+          </thead>
+          <tbody id="sla-ref-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="sla-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+    <div class="sla-toast" id="sla-toast">Copied to clipboard!</div>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+/* === sla- prefix: Uptime / SLA Calculator — vahac.com/tools/ === */
+
+.sla-wrapper {
+  --sla-bg-primary:    #0a0f1e;
+  --sla-bg-secondary:  #111827;
+  --sla-bg-card:       #1a2236;
+  --sla-bg-input:      #0d1424;
+  --sla-border:        #2a3a5c;
+  --sla-border-focus:  #3b82f6;
+  --sla-text-primary:  #e2e8f0;
+  --sla-text-secondary:#94a3b8;
+  --sla-text-muted:    #64748b;
+  --sla-accent-blue:   #3b82f6;
+  --sla-accent-cyan:   #22d3ee;
+  --sla-accent-green:  #10b981;
+  --sla-accent-amber:  #f59e0b;
+  --sla-accent-red:    #ef4444;
+  --sla-font-mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --sla-font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
+  --sla-radius:        8px;
+
+  font-family: var(--sla-font-sans);
+  color: var(--sla-text-primary);
+  background: var(--sla-bg-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.sla-wrapper *,
+.sla-wrapper *::before,
+.sla-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header ─────────────────────────────────────── */
+.sla-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sla-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: var(--sla-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.sla-header-sub {
+  color: var(--sla-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Mode toggle ─────────────────────────────────── */
+.sla-mode-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--sla-border);
+  border-radius: var(--sla-radius);
+  overflow: hidden;
+}
+
+.sla-mode-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: var(--sla-bg-secondary);
+  color: var(--sla-text-secondary);
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: inherit;
+  min-height: 48px;
+}
+
+.sla-mode-btn:first-child {
+  border-right: 1px solid var(--sla-border);
+}
+
+.sla-mode-btn.sla-active {
+  background: var(--sla-accent-blue);
+  color: #fff;
+}
+
+.sla-mode-btn:not(.sla-active):hover {
+  background: var(--sla-bg-card);
+  color: var(--sla-text-primary);
+}
+
+/* ── Panel ───────────────────────────────────────── */
+.sla-panel {
+  background: var(--sla-bg-card);
+  border: 1px solid var(--sla-border);
+  border-radius: var(--sla-radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.sla-hidden {
+  display: none !important;
+}
+
+/* ── Presets ─────────────────────────────────────── */
+.sla-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+}
+
+.sla-presets-label {
+  font-size: 0.75rem;
+  color: var(--sla-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 0.2rem;
+  white-space: nowrap;
+}
+
+.sla-preset-btn {
+  padding: 0.3rem 0.7rem;
+  background: var(--sla-bg-input);
+  color: var(--sla-accent-cyan);
+  border: 1px solid var(--sla-border);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: var(--sla-font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  min-height: 30px;
+}
+
+.sla-preset-btn:hover {
+  background: var(--sla-bg-secondary);
+  border-color: var(--sla-accent-cyan);
+  color: #fff;
+}
+
+/* ── Input row & groups ──────────────────────────── */
+.sla-input-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.sla-input-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.sla-input-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--sla-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+
+.sla-input-group input,
+.sla-input-group select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: var(--sla-bg-input);
+  border: 1px solid var(--sla-border);
+  border-radius: 6px;
+  color: var(--sla-text-primary);
+  font-family: var(--sla-font-mono);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 44px;
+}
+
+.sla-input-group input:focus,
+.sla-input-group select:focus {
+  border-color: var(--sla-border-focus);
+}
+
+.sla-input-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.2rem;
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+.sla-input-with-suffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sla-input-with-suffix input {
+  padding-right: 2.4rem;
+}
+
+.sla-suffix {
+  position: absolute;
+  right: 0.85rem;
+  color: var(--sla-text-muted);
+  font-family: var(--sla-font-mono);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* ── Buttons ─────────────────────────────────────── */
+.sla-btn {
+  padding: 0.65rem 1.6rem;
+  background: var(--sla-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  min-height: 44px;
+}
+
+.sla-btn:hover   { background: #2563eb; }
+.sla-btn:active  { transform: scale(0.97); }
+
+.sla-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--sla-border);
+  color: var(--sla-text-secondary);
+}
+
+.sla-btn--secondary:hover {
+  background: var(--sla-bg-secondary);
+  color: var(--sla-text-primary);
+  border-color: var(--sla-text-muted);
+}
+
+/* ── Error ───────────────────────────────────────── */
+.sla-error-msg {
+  color: var(--sla-accent-red);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+  display: none;
+}
+
+.sla-error-msg.sla-visible {
+  display: block;
+}
+
+/* ── Result card ─────────────────────────────────── */
+.sla-result-card {
+  background: var(--sla-bg-card);
+  border: 1px solid var(--sla-border);
+  border-radius: var(--sla-radius);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.3s;
+}
+
+.sla-result-card.sla-color-green { border-color: var(--sla-accent-green); }
+.sla-result-card.sla-color-cyan  { border-color: var(--sla-accent-cyan);  }
+.sla-result-card.sla-color-amber { border-color: var(--sla-accent-amber); }
+.sla-result-card.sla-color-red   { border-color: var(--sla-accent-red);   }
+
+.sla-result-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.sla-result-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sla-result-badge {
+  font-size: 2.6rem;
+  font-weight: 700;
+  font-family: var(--sla-font-mono);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.sla-result-badge.sla-color-green { color: var(--sla-accent-green); }
+.sla-result-badge.sla-color-cyan  { color: var(--sla-accent-cyan);  }
+.sla-result-badge.sla-color-amber { color: var(--sla-accent-amber); }
+.sla-result-badge.sla-color-red   { color: var(--sla-accent-red);   }
+
+.sla-result-subtitle {
+  font-size: 0.78rem;
+  color: var(--sla-text-muted);
+  font-family: var(--sla-font-mono);
+}
+
+.sla-result-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.sla-nines-dots {
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.sla-dot-full  { color: var(--sla-accent-green); }
+.sla-dot-half  { color: var(--sla-accent-amber); }
+.sla-dot-empty { color: var(--sla-border); }
+
+.sla-nines-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--sla-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Result grid ─────────────────────────────────── */
+.sla-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.sla-result-row {
+  background: var(--sla-bg-input);
+  border: 1px solid var(--sla-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.sla-result-period {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--sla-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.2rem;
+}
+
+.sla-result-value {
+  font-family: var(--sla-font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sla-text-primary);
+  word-break: break-all;
+}
+
+.sla-result-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Reference section ───────────────────────────── */
+.sla-ref-section {
+  margin-top: 1.5rem;
+}
+
+.sla-ref-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: var(--sla-text-primary);
+}
+
+.sla-ref-desc {
+  font-size: 0.83rem;
+  color: var(--sla-text-muted);
+  margin: 0 0 0.85rem;
+}
+
+.sla-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--sla-radius);
+  border: 1px solid var(--sla-border);
+  background: var(--sla-bg-secondary);
+}
+
+.sla-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+.sla-table th {
+  background: var(--sla-bg-secondary);
+  color: var(--sla-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--sla-border);
+  white-space: nowrap;
+}
+
+.sla-table td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--sla-border);
+  color: var(--sla-text-secondary);
+  font-family: var(--sla-font-mono);
+  font-size: 0.83rem;
+  white-space: nowrap;
+}
+
+.sla-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sla-table tbody tr:hover td {
+  background: var(--sla-bg-card);
+  color: var(--sla-text-primary);
+}
+
+.sla-table td:first-child {
+  font-weight: 700;
+  color: var(--sla-text-primary);
+  font-size: 0.88rem;
+}
+
+.sla-table td:nth-child(2) {
+  color: var(--sla-text-muted);
+  font-size: 0.78rem;
+  font-family: var(--sla-font-sans);
+}
+
+/* Row color accents */
+.sla-row-green td:first-child { color: var(--sla-accent-green); }
+.sla-row-cyan  td:first-child { color: var(--sla-accent-cyan);  }
+.sla-row-amber td:first-child { color: var(--sla-accent-amber); }
+.sla-row-red   td:first-child { color: var(--sla-accent-red);   }
+
+/* Highlighted row (current result match) */
+.sla-row-highlight td {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.sla-row-highlight td:first-child {
+  color: var(--sla-accent-blue);
+}
+
+/* ── Footer ──────────────────────────────────────── */
+.sla-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--sla-text-muted);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sla-border);
+}
+
+.sla-footer a {
+  color: var(--sla-accent-blue);
+  text-decoration: none;
+}
+
+.sla-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Toast ───────────────────────────────────────── */
+.sla-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--sla-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.sla-toast.sla-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .sla-wrapper {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sla-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .sla-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .sla-input-row {
+    flex-direction: column;
+  }
+
+  .sla-input-group {
+    min-width: 100%;
+  }
+
+  .sla-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sla-result-badge {
+    font-size: 2rem;
+  }
+
+  .sla-panel {
+    padding: 1rem;
+  }
+
+  .sla-result-card {
+    padding: 1rem;
+  }
+
+  .sla-result-top {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .sla-result-right {
+    text-align: left;
+  }
+
+  .sla-nines-dots {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .sla-wrapper {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .sla-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .sla-presets {
+    gap: 0.35rem;
+  }
+}

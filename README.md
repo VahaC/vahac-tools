@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-05-11
+- Last updated: 2026-05-13
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -14,12 +14,16 @@ Documentation status:
 - `byte-storage-converter/` - SI/IEC storage unit conversion and bitrate/file size calculations.
 - `chmod-file-permission-calculator/` - symbolic/octal permission conversion for Unix-like file modes.
 - `cron-expression-generator/` - assisted cron expression builder for common scheduling patterns.
+- `docker-compose-validator-formatter/` - validation, formatting, and docker run to Compose conversion for Compose YAML.
+- `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
 - `image-compressor-resizer/` - client-side image compression and resizing.
 - `json-formatter/` - JSON formatting and validation.
 - `password-passphrase-generator/` - secure password and passphrase generation.
+- `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
 - `subnet-calculator/` - IPv4 subnet calculation and network planning.
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
+- `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
 ## Tool Overview
@@ -64,7 +68,27 @@ Features:
 - Useful for integrity checks and comparison workflows.
 - Runs directly in the browser without server-side processing.
 
-### 5) Image Compressor and Resizer
+### 5) Docker Compose Validator and Formatter
+
+Path:
+- `docker-compose-validator-formatter/index.html`
+
+Features:
+- Validates Compose YAML structure and syntax directly in the browser.
+- Formats Compose files for readability and consistency.
+- Converts common `docker run` command patterns into Compose blocks.
+
+### 6) Favicon Generator
+
+Path:
+- `favicon-generator/index.html`
+
+Features:
+- Generates favicon assets from uploaded source images.
+- Exports common icon sizes and formats for modern platforms.
+- Helps produce a ready-to-use favicon package and markup.
+
+### 7) Image Compressor and Resizer
 
 Path:
 - `image-compressor-resizer/index.html`
@@ -74,7 +98,7 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 6) JSON Formatter and Validator
+### 8) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -84,7 +108,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 7) Password and Passphrase Generator
+### 9) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -94,7 +118,17 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 8) IP Subnet Calculator
+### 10) Uptime / SLA Calculator
+
+Path:
+- `sla-calculator/index.html`
+
+Features:
+- Converts SLA percentages into allowed downtime windows.
+- Supports yearly, monthly, weekly, and daily breakdowns.
+- Includes reverse calculations from known downtime budgets.
+
+### 11) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -104,7 +138,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 9) vCard QR Code Generator
+### 12) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -113,6 +147,16 @@ Features:
 - Builds vCard 3.0 payloads from contact fields.
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
+
+### 13) YAML JSON TOML Converter
+
+Path:
+- `yaml-json-toml-converter/index.html`
+
+Features:
+- Converts data between YAML, JSON, and TOML formats.
+- Useful for infra, app config, and serialization workflows.
+- Runs fully client-side without backend processing.
 
 ## Local Usage
 
@@ -129,12 +173,16 @@ Then open:
 - `http://localhost:8080/byte-storage-converter/`
 - `http://localhost:8080/chmod-file-permission-calculator/`
 - `http://localhost:8080/cron-expression-generator/`
+- `http://localhost:8080/docker-compose-validator-formatter/`
+- `http://localhost:8080/favicon-generator/`
 - `http://localhost:8080/hash-generator-for-files-and-text/`
 - `http://localhost:8080/image-compressor-resizer/`
 - `http://localhost:8080/json-formatter/`
 - `http://localhost:8080/password-passphrase-generator/`
+- `http://localhost:8080/sla-calculator/`
 - `http://localhost:8080/subnet-calculator/`
 - `http://localhost:8080/vcard-qr-code-generator/`
+- `http://localhost:8080/yaml-json-toml-converter/`
 
 ## Notes
 

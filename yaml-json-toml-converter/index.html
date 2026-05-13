@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YAML JSON TOML Converter — Logs from VahaC</title>
+  <meta name="description" content="Convert between YAML, JSON, and TOML instantly in your browser. Perfect for Docker Compose, Traefik, Hugo, Kubernetes configs. 100% client-side, no data sent anywhere.">
+  <!-- js-yaml 4.1.0 (MIT) — https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <!-- TOML: minimal inline parser/serializer embedded in script.js, no external dependency -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="yjt-wrapper">
+
+    <div class="yjt-header">
+      <div class="yjt-header-badges">
+        <span class="yjt-badge yjt-badge--yaml">YAML</span>
+        <span class="yjt-arrow">⇄</span>
+        <span class="yjt-badge yjt-badge--json">JSON</span>
+        <span class="yjt-arrow">⇄</span>
+        <span class="yjt-badge yjt-badge--toml">TOML</span>
+      </div>
+      <h1 class="yjt-title">YAML ↔ JSON ↔ TOML Converter</h1>
+      <p class="yjt-subtitle">Edit any panel — the other two update automatically. No server, no upload, no tracking.</p>
+    </div>
+
+    <div class="yjt-toolbar">
+      <div class="yjt-toolbar-group">
+        <span class="yjt-toolbar-label">Load sample:</span>
+        <button class="yjt-btn yjt-btn--secondary yjt-btn--sm" onclick="yjtLoadSample('docker')" title="Docker Compose nginx example">🐳 Docker Compose</button>
+        <button class="yjt-btn yjt-btn--secondary yjt-btn--sm" onclick="yjtLoadSample('traefik')" title="Traefik static configuration">🔀 Traefik Config</button>
+        <button class="yjt-btn yjt-btn--secondary yjt-btn--sm" onclick="yjtLoadSample('app')" title="Generic app config">⚙️ App Config</button>
+      </div>
+      <div class="yjt-toolbar-right">
+        <button class="yjt-btn yjt-btn--sm" onclick="yjtConvertNow()" title="Convert from last edited panel (or press Enter in any textarea)">▶ Convert</button>
+        <button class="yjt-btn yjt-btn--ghost yjt-btn--sm" onclick="yjtClearAll()" title="Clear all panels">✕ Clear All</button>
+      </div>
+    </div>
+
+    <div class="yjt-panels">
+
+      <!-- YAML Panel -->
+      <div class="yjt-panel" id="yjt-panel-yaml">
+        <div class="yjt-panel-header">
+          <div class="yjt-panel-header-left">
+            <span class="yjt-badge yjt-badge--yaml">YAML</span>
+            <span class="yjt-panel-hint">Docker Compose · Ansible · Kubernetes</span>
+          </div>
+          <div class="yjt-panel-actions">
+            <button class="yjt-icon-btn" onclick="yjtPrettify('yaml')" title="Format / prettify YAML">✨</button>
+            <button class="yjt-icon-btn" onclick="yjtCopyPanel('yaml')" title="Copy YAML">📋</button>
+          </div>
+        </div>
+        <div class="yjt-panel-body">
+          <textarea
+            id="yjt-input-yaml"
+            class="yjt-textarea"
+            placeholder="Paste YAML here, or pick a sample above…"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            oninput="yjtOnInput('yaml')"
+          ></textarea>
+        </div>
+        <div class="yjt-panel-footer">
+          <span id="yjt-status-yaml" class="yjt-status"></span>
+          <span id="yjt-error-yaml" class="yjt-error-inline"></span>
+        </div>
+      </div>
+
+      <!-- JSON Panel -->
+      <div class="yjt-panel" id="yjt-panel-json">
+        <div class="yjt-panel-header">
+          <div class="yjt-panel-header-left">
+            <span class="yjt-badge yjt-badge--json">JSON</span>
+            <span class="yjt-panel-hint">APIs · package.json · config.json</span>
+          </div>
+          <div class="yjt-panel-actions">
+            <button class="yjt-icon-btn" onclick="yjtPrettify('json')" title="Format / prettify JSON">✨</button>
+            <button class="yjt-icon-btn" onclick="yjtCopyPanel('json')" title="Copy JSON">📋</button>
+          </div>
+        </div>
+        <div class="yjt-panel-body">
+          <textarea
+            id="yjt-input-json"
+            class="yjt-textarea"
+            placeholder="Paste JSON here, or pick a sample above…"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            oninput="yjtOnInput('json')"
+          ></textarea>
+        </div>
+        <div class="yjt-panel-footer">
+          <span id="yjt-status-json" class="yjt-status"></span>
+          <span id="yjt-error-json" class="yjt-error-inline"></span>
+        </div>
+      </div>
+
+      <!-- TOML Panel -->
+      <div class="yjt-panel" id="yjt-panel-toml">
+        <div class="yjt-panel-header">
+          <div class="yjt-panel-header-left">
+            <span class="yjt-badge yjt-badge--toml">TOML</span>
+            <span class="yjt-panel-hint">Traefik · Hugo · Cargo.toml · Gitea</span>
+          </div>
+          <div class="yjt-panel-actions">
+            <button class="yjt-icon-btn" onclick="yjtPrettify('toml')" title="Format / prettify TOML">✨</button>
+            <button class="yjt-icon-btn" onclick="yjtCopyPanel('toml')" title="Copy TOML">📋</button>
+          </div>
+        </div>
+        <div class="yjt-panel-body">
+          <textarea
+            id="yjt-input-toml"
+            class="yjt-textarea"
+            placeholder="Paste TOML here, or pick a sample above…"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            oninput="yjtOnInput('toml')"
+          ></textarea>
+        </div>
+        <div class="yjt-panel-footer">
+          <span id="yjt-status-toml" class="yjt-status"></span>
+          <span id="yjt-error-toml" class="yjt-error-inline"></span>
+        </div>
+      </div>
+
+    </div><!-- /.yjt-panels -->
+
+    <div id="yjt-toast" class="yjt-toast">Copied!</div>
+
+    <p class="yjt-footer-note">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+      Uses <a href="https://github.com/nodeca/js-yaml" target="_blank" rel="noopener">js-yaml</a> for YAML and a hand-written TOML parser.
+    </p>
+
+  </div><!-- /.yjt-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>

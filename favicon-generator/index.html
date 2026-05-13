@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favicon Generator — Logs from VahaC</title>
+  <meta name="description" content="Free browser favicon generator for websites. Upload any image and get a complete .ico, Apple touch icon, Android icons + HTML snippet. 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="fvg-wrapper">
+
+    <!-- Header -->
+    <div class="fvg-header">
+      <h1 class="fvg-title">🖼 Favicon Generator</h1>
+      <p class="fvg-subtitle">Upload an image → get a complete favicon pack with HTML snippet in seconds</p>
+    </div>
+
+    <!-- Upload zone (visible before image loaded) -->
+    <div id="fvg-dropzone" class="fvg-dropzone">
+      <div class="fvg-drop-icon">📂</div>
+      <div class="fvg-drop-text">Drop your image here or click to browse</div>
+      <div class="fvg-drop-hint">SVG · PNG · JPG · WEBP &nbsp;—&nbsp; ideally square, min 512×512 px</div>
+      <div class="fvg-drop-hint fvg-drop-hint--small">or paste with Ctrl+V</div>
+      <input type="file" class="fvg-hidden-input" id="fvg-file-input" accept="image/*">
+    </div>
+
+    <!-- Options panel (hidden until image loaded) -->
+    <div id="fvg-panel" class="fvg-panel fvg-hidden">
+      <div class="fvg-panel-img-row">
+        <div class="fvg-source-info">
+          <div class="fvg-source-thumb-wrap">
+            <img id="fvg-source-thumb" class="fvg-source-thumb" alt="Source image">
+          </div>
+          <div class="fvg-source-meta">
+            <div id="fvg-source-name" class="fvg-source-name"></div>
+            <div id="fvg-source-dims" class="fvg-source-dims"></div>
+          </div>
+        </div>
+        <button class="fvg-btn fvg-btn--secondary fvg-btn--sm" onclick="fvgReset()">↩ Change image</button>
+      </div>
+
+      <div class="fvg-options-row">
+        <div class="fvg-input-group">
+          <label for="fvg-bg-select">Background</label>
+          <select id="fvg-bg-select" onchange="fvgOnBgChange()">
+            <option value="transparent">Transparent</option>
+            <option value="#ffffff">White</option>
+            <option value="#000000">Black</option>
+            <option value="custom">Custom color…</option>
+          </select>
+        </div>
+
+        <div id="fvg-color-wrap" class="fvg-input-group fvg-hidden">
+          <label for="fvg-color-input">Pick color</label>
+          <input type="color" id="fvg-color-input" class="fvg-color-swatch" value="#3b82f6" oninput="fvgUpdatePreviews()">
+        </div>
+
+        <div class="fvg-input-group">
+          <label for="fvg-padding-select">Padding</label>
+          <select id="fvg-padding-select" onchange="fvgUpdatePreviews()">
+            <option value="0">None (0%)</option>
+            <option value="10" selected>Small (10%)</option>
+            <option value="20">Medium (20%)</option>
+            <option value="30">Large (30%)</option>
+          </select>
+        </div>
+
+        <div class="fvg-input-group">
+          <label for="fvg-shape-select">Shape</label>
+          <select id="fvg-shape-select" onchange="fvgUpdatePreviews()">
+            <option value="0">Square</option>
+            <option value="15">Slightly rounded</option>
+            <option value="50">Rounded</option>
+            <option value="100">Circle</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div id="fvg-error-msg" class="fvg-error-msg"></div>
+
+    <!-- Preview section (hidden until image loaded) -->
+    <div id="fvg-preview-section" class="fvg-preview-section fvg-hidden">
+
+      <div class="fvg-section-header">
+        <h2 class="fvg-section-title">Preview</h2>
+        <div class="fvg-bg-toggle">
+          <button class="fvg-bg-toggle-btn fvg-active" id="fvg-toggle-checker" onclick="fvgSetPreviewBg('checker')">Checker</button>
+          <button class="fvg-bg-toggle-btn" id="fvg-toggle-light"   onclick="fvgSetPreviewBg('light')">Light</button>
+          <button class="fvg-bg-toggle-btn" id="fvg-toggle-dark"    onclick="fvgSetPreviewBg('dark')">Dark</button>
+        </div>
+      </div>
+
+      <!-- Preview grid populated by JS -->
+      <div class="fvg-preview-grid" id="fvg-preview-grid"></div>
+
+      <!-- HTML Snippet -->
+      <div class="fvg-snippet">
+        <div class="fvg-snippet-header">
+          <span class="fvg-snippet-title">&lt;head&gt; HTML snippet</span>
+          <button class="fvg-btn fvg-btn--secondary fvg-btn--sm" onclick="fvgCopySnippet()">📋 Copy</button>
+        </div>
+        <pre id="fvg-snippet-code" class="fvg-snippet-code"></pre>
+      </div>
+
+      <!-- Download -->
+      <button id="fvg-download-btn" class="fvg-btn fvg-btn--download" onclick="fvgDownload()">
+        <span id="fvg-download-label">⬇️ Download favicon-pack.zip</span>
+      </button>
+      <div class="fvg-download-info">
+        Includes: <code>favicon.ico</code> (16×16 + 32×32) · <code>apple-touch-icon.png</code> (180×180) ·
+        <code>android-chrome-192x192.png</code> · <code>android-chrome-512x512.png</code> · <code>site.webmanifest</code> · <code>README.txt</code>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="fvg-toast" class="fvg-toast">✅ Copied!</div>
+
+    <footer class="fvg-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+          integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="script.js"></script>
+</body>
+</html>

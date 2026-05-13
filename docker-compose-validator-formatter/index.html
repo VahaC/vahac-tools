@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Compose Validator &amp; Formatter — Logs from VahaC</title>
+  <meta name="description" content="Validate and format docker-compose.yml files, detect errors and warnings, and convert docker run commands to Compose format — 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+</head>
+<body>
+  <div class="dcv-wrapper">
+
+    <div class="dcv-header">
+      <h1 class="dcv-title">Docker Compose Validator &amp; Formatter</h1>
+      <p class="dcv-subtitle">
+        Validate, lint &amp; format <code class="dcv-mono-inline">docker-compose.yml</code>
+        — or convert <code class="dcv-mono-inline">docker run</code> to Compose
+        &nbsp;·&nbsp; <kbd class="dcv-kbd">Ctrl+Enter</kbd> to run
+      </p>
+    </div>
+
+    <div class="dcv-tabs" role="tablist">
+      <button class="dcv-tab dcv-tab--active" id="dcv-tab-validate"
+              role="tab" aria-selected="true" onclick="dcvSwitchTab('validate')">
+        ⚙️ Validate &amp; Format
+      </button>
+      <button class="dcv-tab" id="dcv-tab-convert"
+              role="tab" aria-selected="false" onclick="dcvSwitchTab('convert')">
+        🔄 docker run → Compose
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PANE: Validate & Format
+    ══════════════════════════════════════════════ -->
+    <div class="dcv-pane" id="dcv-pane-validate" role="tabpanel">
+      <div class="dcv-two-col">
+
+        <!-- Left: Input -->
+        <div class="dcv-col-input">
+          <div class="dcv-panel-hdr">
+            <span class="dcv-panel-title">docker-compose.yml</span>
+            <span id="dcv-linecount" class="dcv-linecount">0 lines</span>
+          </div>
+          <textarea
+            id="dcv-yaml-input"
+            class="dcv-editor"
+            placeholder="Paste your docker-compose.yml here…"
+            spellcheck="false"
+            autocorrect="off"
+            autocapitalize="off"
+          ></textarea>
+          <div class="dcv-action-bar">
+            <button class="dcv-btn" onclick="dcvValidate()">✅ Validate</button>
+            <button class="dcv-btn dcv-btn--secondary" onclick="dcvFormat()">🎨 Format</button>
+            <button class="dcv-btn dcv-btn--secondary" onclick="dcvLoadExample()">📋 Example</button>
+            <button class="dcv-btn dcv-btn--ghost" onclick="dcvClear()">🗑 Clear</button>
+          </div>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="dcv-col-results">
+
+          <!-- Filter chips -->
+          <div class="dcv-filters">
+            <span class="dcv-filters-label">Show:</span>
+            <label class="dcv-chip dcv-chip--error" id="dcv-chip-error">
+              <input type="checkbox" id="dcv-chk-error" checked onchange="dcvApplyFilter()">
+              🔴 Errors <span class="dcv-cnt" id="dcv-cnt-error">0</span>
+            </label>
+            <label class="dcv-chip dcv-chip--warning" id="dcv-chip-warning">
+              <input type="checkbox" id="dcv-chk-warning" checked onchange="dcvApplyFilter()">
+              🟡 Warnings <span class="dcv-cnt" id="dcv-cnt-warning">0</span>
+            </label>
+            <label class="dcv-chip dcv-chip--hint" id="dcv-chip-hint">
+              <input type="checkbox" id="dcv-chk-hint" onchange="dcvApplyFilter()">
+              🔵 Hints <span class="dcv-cnt" id="dcv-cnt-hint">0</span>
+            </label>
+          </div>
+
+          <!-- Status bar -->
+          <div class="dcv-status-bar dcv-hidden" id="dcv-status-bar"></div>
+
+          <!-- Issues -->
+          <div class="dcv-issues" id="dcv-issues"></div>
+
+          <!-- Placeholder -->
+          <div class="dcv-placeholder" id="dcv-placeholder">
+            <div class="dcv-placeholder-icon">🐋</div>
+            <p>Paste your <code class="dcv-mono-inline">docker-compose.yml</code> and click <strong>Validate</strong></p>
+            <p class="dcv-placeholder-hint">Tip: press <kbd class="dcv-kbd">Ctrl+Enter</kbd> to validate instantly</p>
+          </div>
+
+          <!-- Formatted output -->
+          <div class="dcv-output-wrap dcv-hidden" id="dcv-output-wrap">
+            <div class="dcv-panel-hdr">
+              <span class="dcv-panel-title">Formatted Output</span>
+              <div class="dcv-panel-actions">
+                <button class="dcv-btn dcv-btn--sm dcv-btn--secondary" onclick="dcvCopyOutput()">📋 Copy</button>
+                <button class="dcv-btn dcv-btn--sm dcv-btn--secondary" onclick="dcvDownloadOutput()">⬇️ .yml</button>
+              </div>
+            </div>
+            <pre id="dcv-output" class="dcv-pre"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PANE: docker run → Compose
+    ══════════════════════════════════════════════ -->
+    <div class="dcv-pane dcv-hidden" id="dcv-pane-convert" role="tabpanel">
+      <div class="dcv-two-col">
+
+        <!-- Left: Input -->
+        <div class="dcv-col-input">
+          <div class="dcv-panel-hdr">
+            <span class="dcv-panel-title">docker run command</span>
+          </div>
+          <textarea
+            id="dcv-run-input"
+            class="dcv-editor dcv-editor--run"
+            placeholder="docker run -d -p 8080:80 --name my-app -e SECRET=value --restart unless-stopped nginx:latest"
+            spellcheck="false"
+            autocorrect="off"
+          ></textarea>
+          <div class="dcv-action-bar">
+            <button class="dcv-btn" onclick="dcvConvert()">🔄 Convert</button>
+            <button class="dcv-btn dcv-btn--secondary" onclick="dcvRunExample()">📋 Example</button>
+            <button class="dcv-btn dcv-btn--ghost" onclick="dcvClearRun()">🗑 Clear</button>
+          </div>
+          <div id="dcv-run-warns" class="dcv-run-warns dcv-hidden"></div>
+        </div>
+
+        <!-- Right: Output -->
+        <div class="dcv-col-results">
+          <div class="dcv-placeholder" id="dcv-run-placeholder">
+            <div class="dcv-placeholder-icon">🐳</div>
+            <p>Paste a <code class="dcv-mono-inline">docker run</code> command and click <strong>Convert</strong></p>
+            <p class="dcv-placeholder-hint">Supports: -p -v -e --env-file --name --network --restart --memory --cpus --entrypoint --health-cmd and many more</p>
+          </div>
+          <div class="dcv-output-wrap dcv-hidden" id="dcv-run-output-wrap">
+            <div class="dcv-panel-hdr">
+              <span class="dcv-panel-title">docker-compose.yml</span>
+              <div class="dcv-panel-actions">
+                <button class="dcv-btn dcv-btn--sm dcv-btn--secondary" onclick="dcvCopyRun()">📋 Copy</button>
+                <button class="dcv-btn dcv-btn--sm dcv-btn--secondary" onclick="dcvDownloadRun()">⬇️ .yml</button>
+                <button class="dcv-btn dcv-btn--sm" onclick="dcvSendToValidator()">✅ Validate</button>
+              </div>
+            </div>
+            <pre id="dcv-run-output" class="dcv-pre"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dcv-toast" class="dcv-toast">✅ Copied!</div>
+
+    <div class="dcv-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a>
+      — 100% client-side, no data sent anywhere.
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
