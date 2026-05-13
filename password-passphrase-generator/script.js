@@ -550,4 +550,23 @@ var PWG_WORDLIST = [
   window.pwgSyncWords    = syncWords;
   window.pwgSyncWordsNum = syncWordsNum;
 
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      PWG_WORDLIST: PWG_WORDLIST,
+      CHARS_UPPER: CHARS_UPPER,
+      CHARS_LOWER: CHARS_LOWER,
+      CHARS_DIGITS: CHARS_DIGITS,
+      CHARS_SYMBOLS: CHARS_SYMBOLS,
+      AMBIGUOUS: AMBIGUOUS,
+      BITS_PER_WORD: BITS_PER_WORD,
+      randomInt: randomInt,
+      calcPasswordEntropy: calcPasswordEntropy,
+      calcPhraseEntropy: calcPhraseEntropy,
+      strengthClass: strengthClass,
+      strengthLabel: strengthLabel,
+      meterWidth: meterWidth
+    };
+  }
+
 })();

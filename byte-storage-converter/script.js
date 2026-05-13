@@ -414,7 +414,20 @@
   window.bscCalcFileSize  = bscCalcFileSize;
   window.bscCopyBrValue   = bscCopyBrValue;
 
-  /* ─── Bootstrap ───────────────────────────────────────────── */
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      BYTES: BYTES,
+      BPS: BPS,
+      DECIMAL_UNITS: DECIMAL_UNITS,
+      BINARY_UNITS: BINARY_UNITS,
+      ALL_UNITS: ALL_UNITS,
+      smartFormat: smartFormat,
+      formatStorage: formatStorage
+    };
+    return;
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

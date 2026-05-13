@@ -1,0 +1,65 @@
+name: Tests
+
+# Tests are opt-in: this workflow only runs when triggered manually from the
+# GitHub Actions tab ("Run workflow"). It is NOT wired to push/pull_request,
+# so day-to-day commits do not consume CI minutes.
+on:
+  workflow_dispatch:
+    inputs:
+      node-version:
+        description: 'Node.js version (blank = full 20+22 matrix)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - '20'
+          - '22'
+      os:
+        description: 'Runner OS (blank = full Ubuntu/Windows/macOS matrix)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - 'ubuntu-latest'
+          - 'windows-latest'
+          - 'macos-latest'
+
+jobs:
+  matrix-setup:
+    name: Build matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - id: set
+        shell: bash
+        env:
+          IN_NODE: ${{ github.event.inputs.node-version }}
+          IN_OS:   ${{ github.event.inputs.os }}
+        run: |
+          NODES='["20","22"]'
+          OSES='["ubuntu-latest","windows-latest","macos-latest"]'
+          [ -n "$IN_NODE" ] && NODES="[\"$IN_NODE\"]"
+          [ -n "$IN_OS" ]   && OSES="[\"$IN_OS\"]"
+          echo "matrix={\"node-version\":$NODES,\"os\":$OSES}" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: matrix-setup
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.matrix-setup.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run unit tests
+        run: npm test

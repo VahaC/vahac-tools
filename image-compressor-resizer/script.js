@@ -1143,8 +1143,19 @@
     }, 350);
   };
 
-  /* ── Bootstrap ───────────────────────────────────────── */
-  if (document.readyState === 'loading') {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      arrFind: arrFind,
+      arrFindIdx: arrFindIdx,
+      arrSome: arrSome,
+      parseExifOrientation: parseExifOrientation,
+      outputFilename: outputFilename,
+      formatSize: formatSize,
+      mimeToExt: mimeToExt,
+      truncateName: truncateName,
+      escHtml: escHtml
+    };
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();

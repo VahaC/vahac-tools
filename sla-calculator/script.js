@@ -79,7 +79,12 @@
     var frac = 1 - sla / 100;
     if (frac <= 0) return 9;
     if (frac >= 1) return 0;
-    return -Math.log10(frac);
+    var n = -Math.log10(frac);
+    // Snap to the nearest integer when extremely close, to avoid
+    // floating-point artefacts (e.g. countNines(99) returning 1.9999999…
+    // which would otherwise floor to 1 and display "One Nine" for 99%).
+    var nearest = Math.round(n);
+    return Math.abs(n - nearest) < 1e-9 ? nearest : n;
   }
 
   /** Map SLA to a color key */
@@ -386,6 +391,25 @@
   window.slaSwitchMode       = slaSwitchMode;
   window.slaCopyResult       = slaCopyResult;
 
-  init();
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      YEAR_SECS: YEAR_SECS,
+      MONTH_SECS: MONTH_SECS,
+      WEEK_SECS: WEEK_SECS,
+      DAY_SECS: DAY_SECS,
+      REF_TIERS: REF_TIERS,
+      NINES_NAMES: NINES_NAMES,
+      formatSecs: formatSecs,
+      formatSla: formatSla,
+      countNines: countNines,
+      getColor: getColor,
+      buildDots: buildDots,
+      ninesLabel: ninesLabel,
+      downtimesFor: downtimesFor
+    };
+  } else {
+    init();
+  }
 
 })();

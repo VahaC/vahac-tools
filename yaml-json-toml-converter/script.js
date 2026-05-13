@@ -750,8 +750,15 @@ var TomlMini = (function () {
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-  } else {
+  } else if (typeof module === 'undefined' || !module.exports) {
     init();
+  }
+
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      TomlMini: TomlMini
+    };
   }
 
 }());

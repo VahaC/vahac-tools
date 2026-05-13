@@ -358,6 +358,19 @@
   window.sncCopyAll = copyAll;
   window.sncToggleCheatsheet = toggleCheatsheet;
 
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      ipToLong: ipToLong,
+      longToIp: longToIp,
+      longToBinary: longToBinary,
+      getIpClass: getIpClass,
+      getIpType: getIpType,
+      validateIp: validateIp
+    };
+    return;
+  }
+
   // ========== INIT ==========
 
   buildQuickMasks();

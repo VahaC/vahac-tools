@@ -893,4 +893,26 @@
     initFromHash();
   });
 
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      FIELD_CFG: FIELD_CFG,
+      FIELD_ORDER: FIELD_ORDER,
+      MON_SHORT: MON_SHORT,
+      MON_LONG: MON_LONG,
+      DOW_SHORT: DOW_SHORT,
+      DOW_LONG: DOW_LONG,
+      EXAMPLES: EXAMPLES,
+      parseField: parseField,
+      parseCron: parseCron,
+      cronToHuman: cronToHuman,
+      getNextDates: getNextDates,
+      ordinal: ordinal,
+      isConsecutive: isConsecutive,
+      findNext: findNext,
+      pad2: pad2,
+      formatDate: formatDate
+    };
+  }
+
 })();

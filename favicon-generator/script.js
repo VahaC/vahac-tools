@@ -613,6 +613,10 @@
     });
   }
 
-  init();
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SIZES: SIZES, buildIco: buildIco, roundedRectPath: roundedRectPath };
+  } else {
+    init();
+  }
 
 })();

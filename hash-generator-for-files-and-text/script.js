@@ -493,4 +493,13 @@
     $('hsg-char-count').textContent = '0 characters';
   });
 
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      md5String: md5String,
+      md5Buffer: md5Buffer,
+      LENGTH_MAP: LENGTH_MAP
+    };
+  }
+
 })();

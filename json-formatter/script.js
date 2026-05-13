@@ -649,13 +649,15 @@
   //  INITIALISE
   // ==========================================================================
 
-  (function init() {
-    $('jsf-output-section').style.display = 'none';
-    $('jsf-tree-controls').style.display  = 'none';
-    $('jsf-output-code').style.display    = 'block';
-    $('jsf-output-tree').style.display    = 'none';
-    setIndicator(null);
-  }());
+  if (typeof module === 'undefined' || !module.exports) {
+    (function init() {
+      $('jsf-output-section').style.display = 'none';
+      $('jsf-tree-controls').style.display  = 'none';
+      $('jsf-output-code').style.display    = 'block';
+      $('jsf-output-tree').style.display    = 'none';
+      setIndicator(null);
+    }());
+  }
 
   // ==========================================================================
   //  EXPOSE TO GLOBAL SCOPE  (required for onclick= attributes in HTML)
@@ -674,5 +676,18 @@
   window.jsfCollapseAll   = jsfCollapseAll;
   window.jsfSetView       = jsfSetView;
   window.jsfToggleFullscreen = jsfToggleFullscreen;
+
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      parseJSON: parseJSON,
+      computeStats: computeStats,
+      extractErrorInfo: extractErrorInfo,
+      syntaxHighlight: syntaxHighlight,
+      fmtBytes: fmtBytes,
+      getType: getType,
+      fmtPrimitive: fmtPrimitive
+    };
+  }
 
 }());

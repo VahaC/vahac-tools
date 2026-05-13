@@ -184,6 +184,30 @@ Then open:
 - `http://localhost:8080/vcard-qr-code-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
 
+## Tests
+
+The repository ships with a unit-test suite covering the core logic of every
+tool (163 tests across 10 modules), powered by the built-in Node.js test runner
+— no external dependencies required.
+
+Requirements: Node.js 20 or newer.
+
+```powershell
+npm test
+```
+
+The suite covers byte/storage conversion, chmod permissions, cron parsing and
+scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
+password/passphrase entropy, vCard generation, TOML round-tripping, and MD5
+hashing (verified against `node:crypto`).
+
+Tests run on demand via GitHub Actions
+(`.github/workflows/test.yml`) — the workflow uses `workflow_dispatch` only, so
+nothing executes automatically on push or pull request. Trigger it manually
+from the **Actions** tab in GitHub ("Run workflow"); inputs let you pick a
+specific Node version (20 / 22) or runner OS (Ubuntu / Windows / macOS), or
+leave both blank to run the full matrix.
+
 ## Notes
 
 - All tools are frontend-only and designed for straightforward local execution.

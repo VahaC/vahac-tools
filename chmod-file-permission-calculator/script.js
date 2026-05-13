@@ -363,6 +363,18 @@
     window.chmSetPreset('755');
   }
 
-  init();
+  /* Node test export (no effect in browsers) */
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      triplet: triplet,
+      stateToNumeric: stateToNumeric,
+      stateToSymbolic: stateToSymbolic,
+      numericToState: numericToState,
+      symbolicToState: symbolicToState,
+      PRESET_HINTS: PRESET_HINTS
+    };
+  } else {
+    init();
+  }
 
 })();
