@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Run ↔ Docker Compose Converter — Logs from VahaC</title>
+  <meta name="description" content="Convert docker run commands to docker-compose.yml and back, instantly, in your browser. No signup, no data sent anywhere.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+</head>
+<body>
+  <div class="drc-wrapper">
+    <header class="drc-header">
+      <h1>Docker Run ↔ Docker Compose Converter</h1>
+      <p class="drc-subtitle">
+        Paste a <code>docker run</code> command or a <code>docker-compose.yml</code> file and convert
+        between the two formats instantly. Runs entirely in your browser — nothing is uploaded.
+      </p>
+    </header>
+
+    <div class="drc-toggle" role="tablist" aria-label="Conversion direction">
+      <button
+        type="button"
+        id="drc-dir-run2compose"
+        class="drc-toggle-btn drc-toggle-btn--active"
+        role="tab"
+        aria-selected="true"
+        onclick="drcSetDirection('run2compose')"
+      >docker run → Compose</button>
+      <button
+        type="button"
+        id="drc-dir-compose2run"
+        class="drc-toggle-btn"
+        role="tab"
+        aria-selected="false"
+        onclick="drcSetDirection('compose2run')"
+      >Compose → docker run</button>
+    </div>
+
+    <div class="drc-panels">
+      <section class="drc-panel">
+        <div class="drc-panel-head">
+          <label id="drc-input-label" for="drc-input">docker run command</label>
+          <span id="drc-input-count" class="drc-linecount">0 lines</span>
+        </div>
+        <textarea
+          id="drc-input"
+          class="drc-textarea"
+          spellcheck="false"
+          placeholder="docker run -d --name webapp -p 8080:80 -e NODE_ENV=production nginx:1.27-alpine"
+        ></textarea>
+        <div class="drc-panel-actions">
+          <button type="button" class="drc-btn" onclick="drcConvert()">Convert</button>
+          <button type="button" class="drc-btn drc-btn--secondary" onclick="drcLoadExample()">Load example</button>
+          <button type="button" class="drc-btn drc-btn--secondary" onclick="drcClear()">Clear</button>
+        </div>
+      </section>
+
+      <div class="drc-swap-col">
+        <button type="button" class="drc-swap-btn" onclick="drcSwap()" title="Swap direction and reuse output as input" aria-label="Swap direction">⇄</button>
+      </div>
+
+      <section class="drc-panel">
+        <div class="drc-panel-head">
+          <label id="drc-output-label" for="drc-output">docker-compose.yml</label>
+          <span id="drc-output-count" class="drc-linecount">0 lines</span>
+        </div>
+        <textarea
+          id="drc-output"
+          class="drc-textarea"
+          spellcheck="false"
+          readonly
+          placeholder="Converted output will appear here."
+        ></textarea>
+        <div class="drc-panel-actions">
+          <button type="button" class="drc-btn drc-btn--secondary" onclick="drcCopyOutput()">📋 Copy</button>
+          <button type="button" class="drc-btn drc-btn--secondary" onclick="drcDownloadOutput()">⬇ Download</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="drc-warnings" class="drc-warnings drc-hidden" aria-live="polite"></div>
+
+    <section class="drc-info">
+      <h2>Supported flags &amp; fields</h2>
+      <p>
+        Handles the common flags you'll actually run into: <code>-p/--publish</code>, <code>-v/--volume</code>,
+        <code>-e/--env</code>, <code>--env-file</code>, <code>--name</code>, <code>--network</code>,
+        <code>--restart</code>, <code>-u/--user</code>, <code>-w/--workdir</code>, <code>--entrypoint</code>,
+        <code>--label</code>, <code>--cap-add/--cap-drop</code>, <code>--dns</code>, <code>--add-host</code>,
+        <code>--device</code>, <code>-m/--memory</code>, <code>--cpus</code>, <code>--health-*</code>,
+        <code>--log-driver/--log-opt</code>, <code>--ulimit</code> and more. Anything that has no equivalent
+        on the other side is flagged as a warning instead of silently dropped. Compose files with several
+        services convert into several <code>docker run</code> commands (and vice versa) — separate multiple
+        <code>docker run</code> commands with a blank line to convert them together.
+      </p>
+    </section>
+
+    <footer class="drc-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+  </div>
+
+  <div id="drc-toast" class="drc-toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
