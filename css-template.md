@@ -250,5 +250,6 @@ Keep this list updated to avoid prefix collisions:
 | `icr`  | Image Compressor/Resizer | Built    |
 | `jsf`  | JSON Formatter           | Built    |
 | `pwg`  | Password Generator       | Built    |
+| `rgx`  | Regex Tester             | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |

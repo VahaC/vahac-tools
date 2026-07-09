@@ -1,0 +1,951 @@
+=====================================================================
+REGEX TESTER — поля для блоку vahac/tool-embed (post ID 1772)
+Вставляти вручну через wp-admin Block Editor, атрибути блоку Tool Embed.
+=====================================================================
+
+---------------------------------------------------------------------
+toolFilename
+---------------------------------------------------------------------
+regex-tester
+
+---------------------------------------------------------------------
+htmlContent
+(вміст <body> від <div class="rgx-wrapper"> до відповідного закриваючого </div>,
+без тега <script src="script.js"></script>)
+---------------------------------------------------------------------
+<div class="rgx-wrapper">
+
+    <!-- Header -->
+    <div class="rgx-header">
+      <h1 class="rgx-title">Regex Tester &amp; Debugger</h1>
+      <p class="rgx-subtitle">Write a pattern, paste your text, see matches highlighted live. Runs entirely in your browser — nothing is sent anywhere.</p>
+    </div>
+
+    <!-- Pattern Panel -->
+    <div class="rgx-panel">
+      <div class="rgx-pattern-row">
+        <div class="rgx-pattern-group">
+          <label for="rgx-pattern">Regular Expression</label>
+          <div class="rgx-pattern-input-wrap">
+            <span class="rgx-slash">/</span>
+            <input
+              type="text"
+              id="rgx-pattern"
+              class="rgx-pattern-input"
+              placeholder="e.g. \b[\w.-]+@[\w.-]+\.\w+\b"
+              oninput="rgxRun()"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            >
+            <span class="rgx-slash">/</span>
+            <input
+              type="text"
+              id="rgx-flags"
+              class="rgx-flags-input"
+              value="g"
+              maxlength="6"
+              placeholder="flags"
+              oninput="rgxRun()"
+              spellcheck="false"
+              autocomplete="off"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="rgx-flags-toggles" id="rgx-flags-toggles">
+        <label class="rgx-flag-chip"><input type="checkbox" data-flag="g" checked onchange="rgxToggleFlag(this)"> g <span>global</span></label>
+        <label class="rgx-flag-chip"><input type="checkbox" data-flag="i" onchange="rgxToggleFlag(this)"> i <span>ignore case</span></label>
+        <label class="rgx-flag-chip"><input type="checkbox" data-flag="m" onchange="rgxToggleFlag(this)"> m <span>multiline</span></label>
+        <label class="rgx-flag-chip"><input type="checkbox" data-flag="s" onchange="rgxToggleFlag(this)"> s <span>dotAll</span></label>
+        <label class="rgx-flag-chip"><input type="checkbox" data-flag="u" onchange="rgxToggleFlag(this)"> u <span>unicode</span></label>
+      </div>
+
+      <div class="rgx-error-msg" id="rgx-error-msg"></div>
+
+      <div class="rgx-status-bar" id="rgx-status-bar">
+        <span class="rgx-valid-dot rgx-valid-dot--neutral" id="rgx-valid-dot"></span>
+        <span id="rgx-status-text">Waiting for a pattern…</span>
+      </div>
+    </div>
+
+    <!-- Test String Panel -->
+    <div class="rgx-panel">
+      <div class="rgx-panel-header">
+        <span class="rgx-label">Test String</span>
+        <div class="rgx-panel-header-right">
+          <button class="rgx-btn rgx-btn--ghost" onclick="rgxLoadSample()">Load Sample</button>
+          <button class="rgx-btn rgx-btn--ghost" onclick="rgxClearAll()">Clear</button>
+        </div>
+      </div>
+      <textarea
+        id="rgx-test-string"
+        class="rgx-textarea"
+        placeholder="Paste the text you want to test the pattern against…"
+        oninput="rgxRun()"
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+      ></textarea>
+    </div>
+
+    <!-- Highlighted Preview -->
+    <div class="rgx-panel">
+      <div class="rgx-panel-header">
+        <span class="rgx-label">Highlighted Matches</span>
+        <span class="rgx-match-count" id="rgx-match-count">0 matches</span>
+      </div>
+      <div class="rgx-highlight-output" id="rgx-highlight-output">
+        <span class="rgx-placeholder">Matches will be highlighted here…</span>
+      </div>
+    </div>
+
+    <!-- Match List -->
+    <div class="rgx-panel" id="rgx-matches-section">
+      <div class="rgx-panel-header">
+        <span class="rgx-label">Match Details</span>
+        <button class="rgx-btn rgx-btn--ghost" onclick="rgxCopyMatches()">📋 Copy All</button>
+      </div>
+      <div class="rgx-match-list" id="rgx-match-list">
+        <p class="rgx-empty-note">No matches yet.</p>
+      </div>
+    </div>
+
+    <!-- Replace Panel -->
+    <div class="rgx-panel">
+      <div class="rgx-panel-header">
+        <span class="rgx-label">Replace</span>
+      </div>
+      <input
+        type="text"
+        id="rgx-replace-input"
+        class="rgx-replace-input"
+        placeholder="Replacement string — use $1, $2… for capture groups"
+        oninput="rgxRun()"
+        spellcheck="false"
+        autocomplete="off"
+      >
+      <div class="rgx-panel-header rgx-panel-header--sub">
+        <span class="rgx-label">Result</span>
+        <button class="rgx-btn rgx-btn--ghost" onclick="rgxCopyReplaced()">📋 Copy</button>
+      </div>
+      <textarea id="rgx-replace-output" class="rgx-textarea" readonly placeholder="Replacement result will appear here…"></textarea>
+    </div>
+
+    <!-- Cheat Sheet -->
+    <div class="rgx-panel">
+      <button class="rgx-cheatsheet-toggle" onclick="rgxToggleCheatsheet()">
+        <span>📘 Common Patterns Cheat Sheet</span>
+        <span class="rgx-chevron" id="rgx-chevron">▾</span>
+      </button>
+      <div class="rgx-cheatsheet" id="rgx-cheatsheet">
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('\\b[\\w.-]+@[\\w.-]+\\.\\w+\\b')">
+          <span class="rgx-cheat-name">Email</span>
+          <code class="rgx-cheat-pattern">\b[\w.-]+@[\w.-]+\.\w+\b</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('https?:\\/\\/[^\\s]+')">
+          <span class="rgx-cheat-name">URL</span>
+          <code class="rgx-cheat-pattern">https?:\/\/[^\s]+</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('\\b\\d{1,3}(\\.\\d{1,3}){3}\\b')">
+          <span class="rgx-cheat-name">IPv4 Address</span>
+          <code class="rgx-cheat-pattern">\b\d{1,3}(\.\d{1,3}){3}\b</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('^\\d{4}-\\d{2}-\\d{2}$')">
+          <span class="rgx-cheat-name">Date (YYYY-MM-DD)</span>
+          <code class="rgx-cheat-pattern">^\d{4}-\d{2}-\d{2}$</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('\\+?\\d[\\d\\s()-]{7,}\\d')">
+          <span class="rgx-cheat-name">Phone Number</span>
+          <code class="rgx-cheat-pattern">\+?\d[\d\s()-]{7,}\d</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('#[0-9a-fA-F]{6}\\b')">
+          <span class="rgx-cheat-name">Hex Color</span>
+          <code class="rgx-cheat-pattern">#[0-9a-fA-F]{6}\b</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$')">
+          <span class="rgx-cheat-name">Strong Password</span>
+          <code class="rgx-cheat-pattern">^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$</code>
+        </div>
+        <div class="rgx-cheat-item" onclick="rgxUsePattern('<\\/?[a-zA-Z][^>]*>')">
+          <span class="rgx-cheat-name">HTML Tag</span>
+          <code class="rgx-cheat-pattern">&lt;\/?[a-zA-Z][^&gt;]*&gt;</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="rgx-toast" id="rgx-toast">Copied!</div>
+
+    <!-- Footer -->
+    <p class="rgx-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </p>
+
+  </div>
+
+---------------------------------------------------------------------
+cssContent  (повний вміст style.css, без змін)
+---------------------------------------------------------------------
+.rgx-wrapper {
+  --rgx-bg-primary: #0a0f1e;
+  --rgx-bg-secondary: #111827;
+  --rgx-bg-card: #1a2236;
+  --rgx-bg-input: #0d1424;
+  --rgx-border: #2a3a5c;
+  --rgx-border-focus: #3b82f6;
+  --rgx-text-primary: #e2e8f0;
+  --rgx-text-secondary: #94a3b8;
+  --rgx-text-muted: #64748b;
+  --rgx-accent-blue: #3b82f6;
+  --rgx-accent-cyan: #22d3ee;
+  --rgx-accent-green: #10b981;
+  --rgx-accent-amber: #f59e0b;
+  --rgx-accent-red: #ef4444;
+  --rgx-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --rgx-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rgx-radius: 8px;
+
+  font-family: var(--rgx-font-sans);
+  color: var(--rgx-text-primary);
+  background: var(--rgx-bg-primary);
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.rgx-wrapper *,
+.rgx-wrapper *::before,
+.rgx-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* Header */
+.rgx-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.rgx-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.rgx-subtitle {
+  color: var(--rgx-text-secondary);
+  font-size: 0.95rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Panels */
+.rgx-panel {
+  background: var(--rgx-bg-card);
+  border: 1px solid var(--rgx-border);
+  border-radius: var(--rgx-radius);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.rgx-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rgx-panel-header--sub {
+  margin-top: 1rem;
+}
+
+.rgx-panel-header-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rgx-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rgx-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Pattern input */
+.rgx-pattern-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rgx-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.rgx-pattern-input-wrap {
+  display: flex;
+  align-items: stretch;
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rgx-pattern-input-wrap:focus-within {
+  border-color: var(--rgx-border-focus);
+}
+
+.rgx-slash {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  color: var(--rgx-text-muted);
+  font-family: var(--rgx-font-mono);
+  font-size: 1.1rem;
+  user-select: none;
+}
+
+.rgx-pattern-input,
+.rgx-flags-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--rgx-text-primary);
+  font-family: var(--rgx-font-mono);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.25rem;
+}
+
+.rgx-pattern-input-wrap .rgx-pattern-input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+.rgx-pattern-input-wrap .rgx-flags-input {
+  width: 4.5rem;
+  flex: none;
+  border-left: 1px solid var(--rgx-border);
+}
+
+/* Flag toggles */
+.rgx-flags-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.rgx-flag-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-family: var(--rgx-font-mono);
+  font-size: 0.8rem;
+  color: var(--rgx-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rgx-flag-chip input {
+  accent-color: var(--rgx-accent-blue);
+  cursor: pointer;
+}
+
+.rgx-flag-chip span {
+  color: var(--rgx-text-muted);
+  font-family: var(--rgx-font-sans);
+  font-size: 0.72rem;
+}
+
+/* Status bar */
+.rgx-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--rgx-text-secondary);
+}
+
+.rgx-valid-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rgx-valid-dot--neutral { background: var(--rgx-text-muted); }
+.rgx-valid-dot--valid { background: var(--rgx-accent-green); }
+.rgx-valid-dot--invalid { background: var(--rgx-accent-red); }
+
+/* Error */
+.rgx-error-msg {
+  color: var(--rgx-accent-red);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  display: none;
+  font-family: var(--rgx-font-mono);
+  word-break: break-word;
+}
+
+.rgx-error-msg.rgx-visible {
+  display: block;
+}
+
+/* Textareas / inputs */
+.rgx-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 0.75rem;
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  color: var(--rgx-text-primary);
+  font-family: var(--rgx-font-mono);
+  font-size: 0.9rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.rgx-textarea:focus {
+  border-color: var(--rgx-border-focus);
+}
+
+.rgx-replace-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  color: var(--rgx-text-primary);
+  font-family: var(--rgx-font-mono);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.rgx-replace-input:focus {
+  border-color: var(--rgx-border-focus);
+}
+
+/* Buttons */
+.rgx-btn {
+  padding: 0.5rem 1rem;
+  background: var(--rgx-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  min-height: 36px;
+}
+
+.rgx-btn:hover { background: #2563eb; }
+.rgx-btn:active { transform: scale(0.97); }
+
+.rgx-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--rgx-border);
+  color: var(--rgx-text-secondary);
+}
+
+.rgx-btn--ghost:hover {
+  background: var(--rgx-bg-secondary);
+  color: var(--rgx-text-primary);
+}
+
+/* Highlighted output */
+.rgx-highlight-output {
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  padding: 0.85rem;
+  font-family: var(--rgx-font-mono);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 80px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.rgx-placeholder {
+  color: var(--rgx-text-muted);
+}
+
+.rgx-mark {
+  background: rgba(59, 130, 246, 0.35);
+  border: 1px solid var(--rgx-accent-blue);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.rgx-mark--alt {
+  background: rgba(34, 211, 238, 0.3);
+  border-color: var(--rgx-accent-cyan);
+}
+
+.rgx-match-count {
+  font-size: 0.8rem;
+  color: var(--rgx-text-secondary);
+  font-family: var(--rgx-font-mono);
+}
+
+/* Match list */
+.rgx-match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.rgx-empty-note {
+  color: var(--rgx-text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.rgx-match-card {
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+}
+
+.rgx-match-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--rgx-text-muted);
+  margin-bottom: 0.3rem;
+  font-family: var(--rgx-font-mono);
+}
+
+.rgx-match-card-value {
+  font-family: var(--rgx-font-mono);
+  font-size: 0.9rem;
+  word-break: break-all;
+  color: var(--rgx-accent-cyan);
+}
+
+.rgx-match-groups {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--rgx-text-secondary);
+  font-family: var(--rgx-font-mono);
+  word-break: break-all;
+}
+
+.rgx-match-groups span {
+  display: block;
+}
+
+/* Cheat sheet */
+.rgx-cheatsheet-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  color: var(--rgx-text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.rgx-chevron {
+  transition: transform 0.2s;
+  color: var(--rgx-text-secondary);
+}
+
+.rgx-chevron.rgx-rotated {
+  transform: rotate(180deg);
+}
+
+.rgx-cheatsheet {
+  display: none;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.rgx-cheatsheet.rgx-open {
+  display: grid;
+}
+
+.rgx-cheat-item {
+  background: var(--rgx-bg-input);
+  border: 1px solid var(--rgx-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.rgx-cheat-item:hover {
+  border-color: var(--rgx-border-focus);
+  background: var(--rgx-bg-secondary);
+}
+
+.rgx-cheat-name {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rgx-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.rgx-cheat-pattern {
+  font-family: var(--rgx-font-mono);
+  font-size: 0.78rem;
+  color: var(--rgx-accent-amber);
+  word-break: break-all;
+}
+
+/* Toast */
+.rgx-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--rgx-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.rgx-toast.rgx-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Footer */
+.rgx-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--rgx-text-muted);
+  margin-top: 1.5rem;
+}
+
+.rgx-footer a {
+  color: var(--rgx-accent-blue);
+  text-decoration: none;
+}
+
+.rgx-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rgx-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .rgx-title {
+    font-size: 1.4rem;
+  }
+
+  .rgx-pattern-input-wrap {
+    flex-wrap: wrap;
+  }
+
+  .rgx-pattern-input-wrap .rgx-flags-input {
+    border-left: none;
+    border-top: 1px solid var(--rgx-border);
+    width: 100%;
+  }
+
+  .rgx-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rgx-panel-header-right {
+    width: 100%;
+  }
+
+  .rgx-panel-header-right .rgx-btn {
+    flex: 1;
+  }
+
+  .rgx-cheatsheet {
+    grid-template-columns: 1fr;
+  }
+
+  .rgx-btn {
+    min-height: 44px;
+  }
+}
+
+---------------------------------------------------------------------
+jsContent  (повний вміст script.js, без змін)
+---------------------------------------------------------------------
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function showError(msg) {
+    var el = $('rgx-error-msg');
+    el.textContent = msg;
+    el.classList.add('rgx-visible');
+  }
+
+  function hideError() {
+    $('rgx-error-msg').classList.remove('rgx-visible');
+  }
+
+  function showToast() {
+    var toast = $('rgx-toast');
+    toast.classList.add('rgx-show');
+    setTimeout(function () { toast.classList.remove('rgx-show'); }, 2000);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(showToast).catch(fallback);
+    } else {
+      fallback();
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast();
+    }
+  }
+
+  function setStatus(state, text) {
+    var dot = $('rgx-valid-dot');
+    dot.className = 'rgx-valid-dot rgx-valid-dot--' + state;
+    $('rgx-status-text').textContent = text;
+  }
+
+  function toggleFlag(checkbox) {
+    var flagsInput = $('rgx-flags');
+    var flags = flagsInput.value.split('').filter(function (f) { return f !== checkbox.getAttribute('data-flag'); });
+    if (checkbox.checked) flags.push(checkbox.getAttribute('data-flag'));
+    flagsInput.value = flags.join('');
+    run();
+  }
+
+  function syncFlagChips() {
+    var flags = $('rgx-flags').value;
+    var chips = document.querySelectorAll('#rgx-flags-toggles input[data-flag]');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].checked = flags.indexOf(chips[i].getAttribute('data-flag')) !== -1;
+    }
+  }
+
+  function buildRegex(patternStr, flagsStr) {
+    var cleanFlags = flagsStr.replace(/[^gimsuy]/g, '');
+    if (cleanFlags.indexOf('g') === -1) cleanFlags += 'g'; // internal always-global for match scanning
+    return new RegExp(patternStr, cleanFlags);
+  }
+
+  function run() {
+    var patternStr = $('rgx-pattern').value;
+    var flagsStr = $('rgx-flags').value;
+    var testStr = $('rgx-test-string').value;
+    var replaceStr = $('rgx-replace-input').value;
+
+    syncFlagChips();
+    hideError();
+
+    var outputEl = $('rgx-highlight-output');
+    var matchListEl = $('rgx-match-list');
+    var countEl = $('rgx-match-count');
+    var replaceOutputEl = $('rgx-replace-output');
+
+    if (!patternStr) {
+      setStatus('neutral', 'Waiting for a pattern…');
+      outputEl.innerHTML = '<span class="rgx-placeholder">Matches will be highlighted here…</span>';
+      matchListEl.innerHTML = '<p class="rgx-empty-note">No matches yet.</p>';
+      countEl.textContent = '0 matches';
+      replaceOutputEl.value = '';
+      return;
+    }
+
+    var regex;
+    try {
+      regex = buildRegex(patternStr, flagsStr);
+    } catch (e) {
+      setStatus('invalid', 'Invalid pattern');
+      showError(e.message);
+      outputEl.innerHTML = '<span class="rgx-placeholder">Fix the pattern to see matches…</span>';
+      matchListEl.innerHTML = '<p class="rgx-empty-note">No matches yet.</p>';
+      countEl.textContent = '0 matches';
+      replaceOutputEl.value = '';
+      return;
+    }
+
+    setStatus('valid', 'Pattern is valid');
+
+    if (!testStr) {
+      outputEl.innerHTML = '<span class="rgx-placeholder">Paste text above to test the pattern…</span>';
+      matchListEl.innerHTML = '<p class="rgx-empty-note">No matches yet.</p>';
+      countEl.textContent = '0 matches';
+      replaceOutputEl.value = '';
+      return;
+    }
+
+    var matches = [];
+    var m;
+    var lastIndex = -1;
+    var guard = 0;
+    while ((m = regex.exec(testStr)) !== null && guard < 5000) {
+      matches.push(m);
+      if (m.index === regex.lastIndex) regex.lastIndex++;
+      guard++;
+    }
+
+    // Build highlighted HTML
+    var html = '';
+    var cursor = 0;
+    for (var i = 0; i < matches.length; i++) {
+      var mm = matches[i];
+      html += escapeHtml(testStr.slice(cursor, mm.index));
+      var cls = (i % 2 === 0) ? 'rgx-mark' : 'rgx-mark rgx-mark--alt';
+      html += '<mark class="' + cls + '" title="Match ' + (i + 1) + '">' + escapeHtml(mm[0]) + '</mark>';
+      cursor = mm.index + mm[0].length;
+    }
+    html += escapeHtml(testStr.slice(cursor));
+    outputEl.innerHTML = html || '<span class="rgx-placeholder">No matches found.</span>';
+
+    countEl.textContent = matches.length + (matches.length === 1 ? ' match' : ' matches');
+
+    // Build match detail list
+    if (matches.length === 0) {
+      matchListEl.innerHTML = '<p class="rgx-empty-note">No matches found.</p>';
+    } else {
+      var listHtml = '';
+      for (var j = 0; j < matches.length; j++) {
+        var match = matches[j];
+        listHtml += '<div class="rgx-match-card">';
+        listHtml += '<div class="rgx-match-card-head"><span>Match ' + (j + 1) + '</span><span>index ' + match.index + '</span></div>';
+        listHtml += '<div class="rgx-match-card-value">' + escapeHtml(match[0]) + '</div>';
+        if (match.length > 1) {
+          var groupsHtml = '<div class="rgx-match-groups">';
+          for (var g = 1; g < match.length; g++) {
+            groupsHtml += '<span>Group ' + g + ': ' + (match[g] !== undefined ? escapeHtml(match[g]) : '<em>undefined</em>') + '</span>';
+          }
+          if (match.groups) {
+            for (var name in match.groups) {
+              if (Object.prototype.hasOwnProperty.call(match.groups, name)) {
+                groupsHtml += '<span>Group &lt;' + escapeHtml(name) + '&gt;: ' + escapeHtml(String(match.groups[name])) + '</span>';
+              }
+            }
+          }
+          groupsHtml += '</div>';
+          listHtml += groupsHtml;
+        }
+        listHtml += '</div>';
+      }
+      matchListEl.innerHTML = listHtml;
+    }
+
+    // Replace preview
+    if (replaceStr !== '') {
+      try {
+        var replaceRegex = buildRegex(patternStr, flagsStr);
+        replaceOutputEl.value = testStr.replace(replaceRegex, replaceStr);
+      } catch (e) {
+        replaceOutputEl.value = '';
+      }
+    } else {
+      replaceOutputEl.value = testStr;
+    }
+  }
+
+  function loadSample() {
+    $('rgx-pattern').value = '\\b[\\w.-]+@[\\w.-]+\\.\\w+\\b';
+    $('rgx-flags').value = 'g';
+    $('rgx-test-string').value = 'Contact us at support@vahac.com or sales@example.org for more info.\nInvalid: not-an-email';
+    run();
+  }
+
+  function clearAll() {
+    $('rgx-pattern').value = '';
+    $('rgx-flags').value = 'g';
+    $('rgx-test-string').value = '';
+    $('rgx-replace-input').value = '';
+    run();
+  }
+
+  function usePattern(pattern) {
+    $('rgx-pattern').value = pattern;
+    run();
+    $('rgx-pattern').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function toggleCheatsheet() {
+    var panel = $('rgx-cheatsheet');
+    var chevron = $('rgx-chevron');
+    panel.classList.toggle('rgx-open');
+    chevron.classList.toggle('rgx-rotated');
+  }
+
+  function copyMatches() {
+    var cards = document.querySelectorAll('#rgx-match-list .rgx-match-card-value');
+    var lines = [];
+    for (var i = 0; i < cards.length; i++) lines.push(cards[i].textContent);
+    if (lines.length === 0) return;
+    copyText(lines.join('\n'));
+  }
+
+  function copyReplaced() {
+    var val = $('rgx-replace-output').value;
+    if (!val) return;
+    copyText(val);
+  }
+
+  // Expose to global scope for onclick handlers
+  window.rgxRun = run;
+  window.rgxToggleFlag = toggleFlag;
+  window.rgxLoadSample = loadSample;
+  window.rgxClearAll = clearAll;
+  window.rgxUsePattern = usePattern;
+  window.rgxToggleCheatsheet = toggleCheatsheet;
+  window.rgxCopyMatches = copyMatches;
+  window.rgxCopyReplaced = copyReplaced;
+})();
