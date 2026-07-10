@@ -21,11 +21,10 @@ pipeline {
 
         stage('Test') {
             agent {
-                docker { image 'node:22-alpine' }
+                docker { image 'node:20-alpine' }
             }
             steps {
                 unstash 'source'
-                sh 'pwd; whoami; ls -la; echo ---TESTS---; ls -la tests || echo MISSING_TESTS_DIR'
                 sh 'npm install'
                 sh 'npm test'
             }
