@@ -25,6 +25,7 @@ pipeline {
             }
             steps {
                 unstash 'source'
+                sh 'pwd; whoami; ls -la; echo ---TESTS---; ls -la tests || echo MISSING_TESTS_DIR'
                 sh 'npm install'
                 sh 'npm test'
             }
