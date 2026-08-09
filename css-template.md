@@ -260,6 +260,7 @@ Keep this list updated to avoid prefix collisions:
 | `rgx`  | Regex Tester             | Built    |
 | `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
+| `urc`  | URL Encoder / Decoder    | Built    |
 | `uts`  | Unix Timestamp Converter | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |
 | `yjt`  | YAML / JSON / TOML Conv. | Built    |

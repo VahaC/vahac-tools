@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Encoder / Decoder — Logs from VahaC</title>
+  <meta name="description" content="Percent-encode and decode URLs and query strings — component, full URL, form and strict RFC 3986 modes, plus a URL inspector. 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="urc-wrapper">
+
+    <div class="urc-header">
+      <h1 class="urc-title">URL Encoder / Decoder</h1>
+      <p class="urc-subtitle">Percent-encoding for query values, full URLs and form data — plus a URL inspector that splits any link into its parts</p>
+    </div>
+
+    <!-- Direction switch -->
+    <div class="urc-dir" role="group" aria-label="Direction">
+      <button class="urc-dir-btn urc-dir-btn--active" id="urc-dir-encode"
+              onclick="urcSetDirection('encode')" aria-pressed="true">→ Encode</button>
+      <button class="urc-dir-btn" id="urc-dir-decode"
+              onclick="urcSetDirection('decode')" aria-pressed="false">← Decode</button>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="urc-tabs" role="tablist">
+      <button class="urc-tab urc-tab--active" id="urc-tab-text"
+              role="tab" aria-selected="true" aria-controls="urc-section-text"
+              onclick="urcSwitchTab('text')">
+        <span class="urc-tab-icon">📝</span> Text
+      </button>
+      <button class="urc-tab" id="urc-tab-url"
+              role="tab" aria-selected="false" aria-controls="urc-section-url"
+              onclick="urcSwitchTab('url')">
+        <span class="urc-tab-icon">🔗</span> URL inspector
+      </button>
+    </div>
+
+    <!-- ══ TEXT SECTION ══ -->
+    <div class="urc-section" id="urc-section-text" role="tabpanel">
+
+      <!-- ── Encoding mode selector ── -->
+      <div class="urc-options-bar" id="urc-encode-options">
+        <span class="urc-options-label">Mode</span>
+        <div class="urc-mode-group" role="group" aria-label="Encoding mode">
+          <button class="urc-mode-btn urc-mode-btn--active" id="urc-mode-component"
+                  onclick="urcSetMode('component')" aria-pressed="true">Component</button>
+          <button class="urc-mode-btn" id="urc-mode-uri"
+                  onclick="urcSetMode('uri')" aria-pressed="false">Full URL</button>
+          <button class="urc-mode-btn" id="urc-mode-form"
+                  onclick="urcSetMode('form')" aria-pressed="false">Form</button>
+          <button class="urc-mode-btn" id="urc-mode-strict"
+                  onclick="urcSetMode('strict')" aria-pressed="false">RFC 3986</button>
+        </div>
+      </div>
+
+      <!-- ── Decode options ── -->
+      <div class="urc-options-bar urc-hidden" id="urc-decode-options">
+        <label class="urc-toggle-label" for="urc-opt-plus" title="Query strings from HTML forms use + for spaces">
+          <input type="checkbox" id="urc-opt-plus" class="urc-toggle-input" checked onchange="urcOptionChanged()">
+          <span class="urc-toggle-track"><span class="urc-toggle-thumb"></span></span>
+          <span class="urc-toggle-text">+ MEANS SPACE</span>
+        </label>
+      </div>
+
+      <p class="urc-mode-desc" id="urc-mode-desc"></p>
+
+      <div class="urc-input-group">
+        <label for="urc-text-input" id="urc-text-input-label">Plain text</label>
+        <textarea id="urc-text-input" class="urc-textarea"
+                  rows="6"
+                  placeholder="Type or paste your text here — output updates instantly…"
+                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                  oninput="urcConvertText()"></textarea>
+      </div>
+
+      <div class="urc-meta-row">
+        <span class="urc-stat" id="urc-input-stats">0 characters · 0 bytes</span>
+        <button class="urc-btn urc-btn--secondary urc-btn--small" onclick="urcClearText()">✕ Clear</button>
+      </div>
+
+      <div class="urc-input-group urc-output-group">
+        <label for="urc-text-output" id="urc-text-output-label">Encoded output</label>
+        <textarea id="urc-text-output" class="urc-textarea urc-mono urc-textarea--output"
+                  rows="6" readonly
+                  placeholder="Result appears here…"
+                  spellcheck="false"></textarea>
+      </div>
+
+      <div class="urc-meta-row">
+        <span class="urc-stat" id="urc-output-stats">0 characters</span>
+        <div class="urc-actions">
+          <button class="urc-btn urc-btn--secondary urc-btn--small" id="urc-swap-btn"
+                  onclick="urcSwap()" title="Move output into input and flip direction">⇅ Swap</button>
+          <button class="urc-btn urc-btn--small" id="urc-copy-text-btn"
+                  onclick="urcCopyText()" disabled>📋 Copy</button>
+        </div>
+      </div>
+
+      <p class="urc-error-msg" id="urc-error-msg"></p>
+      <p class="urc-note" id="urc-text-note"></p>
+
+    </div><!-- /#urc-section-text -->
+
+    <!-- ══ URL INSPECTOR SECTION ══ -->
+    <div class="urc-section urc-hidden" id="urc-section-url" role="tabpanel">
+
+      <div class="urc-input-group">
+        <label for="urc-url-input">URL or query string</label>
+        <textarea id="urc-url-input" class="urc-textarea urc-mono"
+                  rows="3"
+                  placeholder="https://vahac.com/search?q=home+lab&amp;tag=self%20hosted#results"
+                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                  oninput="urcParseUrl()"></textarea>
+      </div>
+
+      <div class="urc-meta-row">
+        <span class="urc-stat" id="urc-url-stats">No URL parsed yet</span>
+        <button class="urc-btn urc-btn--secondary urc-btn--small" onclick="urcClearUrl()">✕ Clear</button>
+      </div>
+
+      <p class="urc-error-msg" id="urc-url-error"></p>
+
+      <div class="urc-block urc-hidden" id="urc-parts-block">
+        <h2 class="urc-block-title">Components</h2>
+        <div class="urc-parts" id="urc-parts"></div>
+      </div>
+
+      <div class="urc-block urc-hidden" id="urc-params-block">
+        <h2 class="urc-block-title">Query parameters <span class="urc-block-hint">(decoded — edit any field to rebuild the URL)</span></h2>
+        <div class="urc-params" id="urc-params-list"></div>
+        <p class="urc-params-empty urc-hidden" id="urc-params-empty">This URL has no query parameters.</p>
+        <button class="urc-btn urc-btn--secondary urc-btn--small urc-add-param-btn"
+                onclick="urcAddParam()">＋ Add parameter</button>
+      </div>
+
+      <div class="urc-input-group urc-output-group urc-hidden" id="urc-url-output-group">
+        <label for="urc-url-output">Rebuilt URL</label>
+        <textarea id="urc-url-output" class="urc-textarea urc-mono urc-textarea--output"
+                  rows="3" readonly
+                  placeholder="The normalised URL appears here…"
+                  spellcheck="false"></textarea>
+      </div>
+
+      <div class="urc-meta-row urc-hidden" id="urc-url-actions-row">
+        <span class="urc-stat" id="urc-url-output-stats">0 characters</span>
+        <div class="urc-actions">
+          <button class="urc-btn urc-btn--secondary urc-btn--small"
+                  onclick="urcUseRebuilt()" title="Load the rebuilt URL back into the input">↺ Use as input</button>
+          <button class="urc-btn urc-btn--small" id="urc-copy-url-btn"
+                  onclick="urcCopyUrl()" disabled>📋 Copy</button>
+        </div>
+      </div>
+
+    </div><!-- /#urc-section-url -->
+
+    <p class="urc-footer">
+      Built by <a href="https://vahac.com" class="urc-link">VahaC</a> —
+      100% client-side, no data sent anywhere.
+    </p>
+
+    <div class="urc-toast" id="urc-toast">✅ Copied!</div>
+  </div><!-- /.urc-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>
