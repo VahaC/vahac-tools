@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64 Encode / Decode — Logs from VahaC</title>
+  <meta name="description" content="Encode and decode Base64 for text or any file — URL-safe alphabet, MIME line wrapping, data URI output. 100% client-side, nothing leaves your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="b64-wrapper">
+
+    <div class="b64-header">
+      <h1 class="b64-title">Base64 Encode / Decode</h1>
+      <p class="b64-subtitle">Text · files · data URIs — standard and URL-safe alphabets, instant results, nothing leaves your browser</p>
+    </div>
+
+    <!-- Direction switch -->
+    <div class="b64-dir" role="group" aria-label="Direction">
+      <button class="b64-dir-btn b64-dir-btn--active" id="b64-dir-encode"
+              onclick="b64SetDirection('encode')" aria-pressed="true">→ Encode</button>
+      <button class="b64-dir-btn" id="b64-dir-decode"
+              onclick="b64SetDirection('decode')" aria-pressed="false">← Decode</button>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="b64-tabs" role="tablist">
+      <button class="b64-tab b64-tab--active" id="b64-tab-text"
+              role="tab" aria-selected="true" aria-controls="b64-section-text"
+              onclick="b64SwitchTab('text')">
+        <span class="b64-tab-icon">📝</span> Text
+      </button>
+      <button class="b64-tab" id="b64-tab-file"
+              role="tab" aria-selected="false" aria-controls="b64-section-file"
+              onclick="b64SwitchTab('file')">
+        <span class="b64-tab-icon">📁</span> File
+      </button>
+    </div>
+
+    <!-- ── OPTIONS BAR (encoding options) ── -->
+    <div class="b64-options-bar" id="b64-options-bar">
+      <label class="b64-toggle-label" for="b64-opt-urlsafe" title="Use the URL-safe alphabet: - and _ instead of + and /">
+        <input type="checkbox" id="b64-opt-urlsafe" class="b64-toggle-input" onchange="b64OptionChanged()">
+        <span class="b64-toggle-track"><span class="b64-toggle-thumb"></span></span>
+        <span class="b64-toggle-text">URL-SAFE</span>
+      </label>
+
+      <label class="b64-toggle-label" for="b64-opt-nopad" title="Strip the trailing = padding characters">
+        <input type="checkbox" id="b64-opt-nopad" class="b64-toggle-input" onchange="b64OptionChanged()">
+        <span class="b64-toggle-track"><span class="b64-toggle-thumb"></span></span>
+        <span class="b64-toggle-text">NO PADDING</span>
+      </label>
+
+      <label class="b64-toggle-label" for="b64-opt-wrap" title="Wrap output at 76 characters per line (MIME / RFC 2045)">
+        <input type="checkbox" id="b64-opt-wrap" class="b64-toggle-input" onchange="b64OptionChanged()">
+        <span class="b64-toggle-track"><span class="b64-toggle-thumb"></span></span>
+        <span class="b64-toggle-text">WRAP 76</span>
+      </label>
+
+      <label class="b64-toggle-label b64-hidden" id="b64-datauri-label" for="b64-opt-datauri" title="Prefix the output with data:&lt;mime&gt;;base64,">
+        <input type="checkbox" id="b64-opt-datauri" class="b64-toggle-input" onchange="b64OptionChanged()">
+        <span class="b64-toggle-track"><span class="b64-toggle-thumb"></span></span>
+        <span class="b64-toggle-text">DATA URI</span>
+      </label>
+    </div>
+
+    <p class="b64-decode-hint b64-hidden" id="b64-decode-hint">
+      ℹ Decoding accepts both alphabets, missing padding, line breaks and <code class="b64-code">data:</code> URIs — no options needed.
+    </p>
+
+    <!-- ══ TEXT SECTION ══ -->
+    <div class="b64-section" id="b64-section-text" role="tabpanel">
+
+      <div class="b64-input-group">
+        <label for="b64-text-input" id="b64-text-input-label">Plain text</label>
+        <textarea id="b64-text-input" class="b64-textarea"
+                  rows="6"
+                  placeholder="Type or paste your text here — output updates instantly…"
+                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                  oninput="b64ConvertText()"></textarea>
+      </div>
+
+      <div class="b64-meta-row">
+        <span class="b64-stat" id="b64-input-stats">0 characters · 0 bytes</span>
+        <button class="b64-btn b64-btn--secondary b64-btn--small" onclick="b64ClearText()">✕ Clear</button>
+      </div>
+
+      <div class="b64-input-group b64-output-group">
+        <label for="b64-text-output" id="b64-text-output-label">Base64 output</label>
+        <textarea id="b64-text-output" class="b64-textarea b64-mono b64-textarea--output"
+                  rows="6" readonly
+                  placeholder="Result appears here…"
+                  spellcheck="false"></textarea>
+      </div>
+
+      <div class="b64-meta-row">
+        <span class="b64-stat" id="b64-output-stats">0 characters</span>
+        <div class="b64-actions">
+          <button class="b64-btn b64-btn--secondary b64-btn--small" id="b64-swap-btn"
+                  onclick="b64Swap()" title="Move output into input and flip direction">⇅ Swap</button>
+          <button class="b64-btn b64-btn--small" id="b64-copy-text-btn"
+                  onclick="b64CopyText()" disabled>📋 Copy</button>
+        </div>
+      </div>
+
+      <p class="b64-error-msg" id="b64-error-msg"></p>
+      <p class="b64-note" id="b64-text-note"></p>
+
+    </div><!-- /#b64-section-text -->
+
+    <!-- ══ FILE SECTION ══ -->
+    <div class="b64-section b64-hidden" id="b64-section-file" role="tabpanel">
+
+      <!-- ── FILE → BASE64 ── -->
+      <div id="b64-file-encode-block">
+
+        <div class="b64-drop-zone" id="b64-drop-zone"
+             onclick="b64TriggerFile()"
+             ondragover="b64DragOver(event)"
+             ondragleave="b64DragLeave(event)"
+             ondrop="b64Drop(event)"
+             tabindex="0"
+             role="button"
+             aria-label="Click or drag a file here">
+          <div class="b64-drop-icon">📂</div>
+          <div class="b64-drop-primary">Drag &amp; drop a file here</div>
+          <div class="b64-drop-secondary">or click to browse — any file type</div>
+        </div>
+        <input type="file" id="b64-file-input" class="b64-file-input-hidden"
+               onchange="b64FileChosen(this.files[0])">
+
+        <div class="b64-file-info b64-hidden" id="b64-file-info">
+          <span class="b64-file-thumb" id="b64-file-thumb">📄</span>
+          <div class="b64-file-details">
+            <span class="b64-file-name" id="b64-file-name"></span>
+            <span class="b64-file-meta" id="b64-file-meta"></span>
+          </div>
+          <button class="b64-btn b64-btn--secondary b64-btn--small b64-file-clear-btn"
+                  onclick="b64ClearFile()" title="Remove file">✕</button>
+        </div>
+
+        <div class="b64-progress-wrap b64-hidden" id="b64-progress-wrap">
+          <div class="b64-progress-track">
+            <div class="b64-progress-fill" id="b64-progress-fill"></div>
+          </div>
+          <span class="b64-progress-pct" id="b64-progress-pct">0%</span>
+        </div>
+
+        <div class="b64-input-group b64-output-group">
+          <label for="b64-file-output">Base64 output</label>
+          <textarea id="b64-file-output" class="b64-textarea b64-mono b64-textarea--output"
+                    rows="8" readonly
+                    placeholder="Drop a file above to get its Base64 representation…"
+                    spellcheck="false"></textarea>
+        </div>
+
+        <div class="b64-meta-row">
+          <span class="b64-stat" id="b64-file-output-stats">0 characters</span>
+          <div class="b64-actions">
+            <button class="b64-btn b64-btn--secondary b64-btn--small" id="b64-download-b64-btn"
+                    onclick="b64DownloadBase64()" disabled>⬇ Save .txt</button>
+            <button class="b64-btn b64-btn--small" id="b64-copy-file-btn"
+                    onclick="b64CopyFile()" disabled>📋 Copy</button>
+          </div>
+        </div>
+
+        <p class="b64-note" id="b64-file-note"></p>
+
+      </div><!-- /#b64-file-encode-block -->
+
+      <!-- ── BASE64 → FILE ── -->
+      <div class="b64-hidden" id="b64-file-decode-block">
+
+        <div class="b64-input-group">
+          <label for="b64-decode-input">Base64 or data URI</label>
+          <textarea id="b64-decode-input" class="b64-textarea b64-mono"
+                    rows="8"
+                    placeholder="Paste Base64 here — data:image/png;base64,… is accepted too…"
+                    spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                    oninput="b64DecodeToFile()"></textarea>
+        </div>
+
+        <div class="b64-meta-row">
+          <span class="b64-stat" id="b64-decode-stats">0 bytes decoded</span>
+          <button class="b64-btn b64-btn--secondary b64-btn--small" onclick="b64ClearDecode()">✕ Clear</button>
+        </div>
+
+        <div class="b64-preview-wrap b64-hidden" id="b64-preview-wrap">
+          <img class="b64-preview-img" id="b64-preview-img" alt="Decoded image preview">
+        </div>
+
+        <div class="b64-download-row">
+          <div class="b64-input-group b64-filename-group">
+            <label for="b64-decode-filename">Save as</label>
+            <input type="text" id="b64-decode-filename" class="b64-input b64-mono"
+                   value="decoded.bin" spellcheck="false" autocomplete="off">
+          </div>
+          <button class="b64-btn b64-download-btn" id="b64-decode-download-btn"
+                  onclick="b64DownloadDecoded()" disabled>⬇ Download file</button>
+        </div>
+
+        <p class="b64-error-msg" id="b64-decode-error"></p>
+
+      </div><!-- /#b64-file-decode-block -->
+
+    </div><!-- /#b64-section-file -->
+
+    <p class="b64-footer">
+      Built by <a href="https://vahac.com" class="b64-link">VahaC</a> —
+      100% client-side, no data sent anywhere.
+    </p>
+
+    <div class="b64-toast" id="b64-toast">✅ Copied!</div>
+  </div><!-- /.b64-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

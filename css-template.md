@@ -246,10 +246,20 @@ Keep this list updated to avoid prefix collisions:
 
 | Prefix | Tool                     | Status   |
 |--------|--------------------------|----------|
+| `b64`  | Base64 Encode / Decode   | Built    |
 | `bsc`  | Byte & Storage Converter | Built    |
+| `chm`  | Chmod Permission Calc    | Built    |
+| `crn`  | Cron Expression Generator| Built    |
+| `dcv`  | Docker Compose Validator | Built    |
+| `drc`  | Docker Run ↔ Compose     | Built    |
+| `fvg`  | Favicon Generator        | Built    |
+| `hsg`  | Hash Generator           | Built    |
 | `icr`  | Image Compressor/Resizer | Built    |
 | `jsf`  | JSON Formatter           | Built    |
 | `pwg`  | Password Generator       | Built    |
 | `rgx`  | Regex Tester             | Built    |
+| `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
+| `uts`  | Unix Timestamp Converter | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |
+| `yjt`  | YAML / JSON / TOML Conv. | Built    |
