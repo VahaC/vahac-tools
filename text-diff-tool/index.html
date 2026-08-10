@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Diff Tool — Logs from VahaC</title>
+  <meta name="description" content="Compare two texts and see the differences instantly — line, word, or character diff, ignore whitespace/case, copy the result. 100% client-side, nothing leaves your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="tdf-wrapper">
+
+    <div class="tdf-header">
+      <h1 class="tdf-title">Text Diff Tool</h1>
+      <p class="tdf-subtitle">Compare two blocks of text and instantly see what changed — line, word, or character level, entirely in your browser</p>
+    </div>
+
+    <!-- Options -->
+    <div class="tdf-options">
+      <div class="tdf-option-group">
+        <label for="tdf-mode-select">Compare by</label>
+        <select id="tdf-mode-select" onchange="tdfOnOptionsChange()">
+          <option value="line" selected>Lines</option>
+          <option value="word">Words</option>
+          <option value="char">Characters</option>
+        </select>
+      </div>
+      <label class="tdf-checkbox">
+        <input type="checkbox" id="tdf-opt-ignorews" onchange="tdfOnOptionsChange()">
+        <span>Ignore whitespace</span>
+      </label>
+      <label class="tdf-checkbox">
+        <input type="checkbox" id="tdf-opt-ignorecase" onchange="tdfOnOptionsChange()">
+        <span>Ignore case</span>
+      </label>
+      <label class="tdf-checkbox">
+        <input type="checkbox" id="tdf-opt-live" checked>
+        <span>Live compare</span>
+      </label>
+    </div>
+
+    <!-- Inputs -->
+    <div class="tdf-input-row">
+      <div class="tdf-input-group">
+        <div class="tdf-input-label-row">
+          <label for="tdf-input-original">Original text</label>
+          <span class="tdf-meta" id="tdf-meta-original">0 lines · 0 chars</span>
+        </div>
+        <textarea id="tdf-input-original" class="tdf-textarea" placeholder="Paste the original text here…" spellcheck="false"></textarea>
+      </div>
+      <div class="tdf-input-group">
+        <div class="tdf-input-label-row">
+          <label for="tdf-input-changed">Changed text</label>
+          <span class="tdf-meta" id="tdf-meta-changed">0 lines · 0 chars</span>
+        </div>
+        <textarea id="tdf-input-changed" class="tdf-textarea" placeholder="Paste the changed text here…" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="tdf-actions">
+      <button class="tdf-btn" onclick="tdfCompare()">Compare</button>
+      <button class="tdf-btn tdf-btn--secondary" onclick="tdfSwap()">⇄ Swap</button>
+      <button class="tdf-btn tdf-btn--secondary" onclick="tdfLoadSample()">Load sample</button>
+      <button class="tdf-btn tdf-btn--secondary" onclick="tdfClear()">Clear</button>
+    </div>
+
+    <p class="tdf-error-msg" id="tdf-error-msg"></p>
+
+    <!-- Stats -->
+    <div class="tdf-stats" id="tdf-stats">
+      <span class="tdf-stat tdf-stat--add" id="tdf-stat-add">+0</span>
+      <span class="tdf-stat tdf-stat--del" id="tdf-stat-del">-0</span>
+      <span class="tdf-stat tdf-stat--sim" id="tdf-stat-sim">100% similar</span>
+      <span class="tdf-stat tdf-stat--nodiff" id="tdf-stat-nodiff">No differences found</span>
+    </div>
+
+    <!-- Output -->
+    <div class="tdf-output-header">
+      <h2 class="tdf-output-title">Diff result</h2>
+      <button class="tdf-btn tdf-btn--secondary tdf-btn--small" onclick="tdfCopyDiff()">📋 Copy diff</button>
+    </div>
+
+    <p class="tdf-empty-state tdf-visible" id="tdf-empty-state">Enter text on both sides and click Compare (or just start typing — live compare is on).</p>
+    <div class="tdf-diff-output" id="tdf-diff-output"></div>
+
+    <div class="tdf-toast" id="tdf-toast">Copied to clipboard!</div>
+
+    <p class="tdf-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

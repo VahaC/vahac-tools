@@ -6,29 +6,45 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-05-13
+- Last updated: 2026-08-10
 - Scope synchronized with current repository structure
 
 ## Repository Structure
 
+- `base64-encode-decode/` - Base64 encoding and decoding for text and files, with URL-safe and data URI output.
 - `byte-storage-converter/` - SI/IEC storage unit conversion and bitrate/file size calculations.
 - `chmod-file-permission-calculator/` - symbolic/octal permission conversion for Unix-like file modes.
 - `cron-expression-generator/` - assisted cron expression builder for common scheduling patterns.
 - `docker-compose-validator-formatter/` - validation, formatting, and docker run to Compose conversion for Compose YAML.
+- `docker-run-compose-converter/` - converts `docker run` commands to `docker-compose.yml` and back.
 - `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
 - `image-compressor-resizer/` - client-side image compression and resizing.
 - `json-formatter/` - JSON formatting and validation.
 - `password-passphrase-generator/` - secure password and passphrase generation.
+- `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
 - `subnet-calculator/` - IPv4 subnet calculation and network planning.
+- `text-diff-tool/` - line/word/character text comparison with diff highlighting.
+- `unix-timestamp-converter/` - Unix epoch to ISO/UTC/local date conversion and back.
+- `url-encoder-decoder/` - percent-encoding and decoding for URLs, query strings, and form data.
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
 ## Tool Overview
 
-### 1) Byte and Storage Converter
+### 1) Base64 Encode / Decode
+
+Path:
+- `base64-encode-decode/index.html`
+
+Features:
+- Encodes and decodes Base64 for text or any file.
+- Supports the standard and URL-safe alphabets, plus MIME line wrapping.
+- Produces data URI output for quick embedding.
+
+### 2) Byte and Storage Converter
 
 Path:
 - `byte-storage-converter/index.html`
@@ -38,7 +54,7 @@ Features:
 - Includes Bitrate -> File Size and File Size -> Bitrate modes.
 - Provides fast copy actions for outputs.
 
-### 2) Chmod File Permission Calculator
+### 3) Chmod File Permission Calculator
 
 Path:
 - `chmod-file-permission-calculator/index.html`
@@ -48,7 +64,7 @@ Features:
 - Helps verify read/write/execute combinations for owner/group/others.
 - Useful for server, DevOps, and terminal workflows.
 
-### 3) Cron Expression Generator
+### 4) Cron Expression Generator
 
 Path:
 - `cron-expression-generator/index.html`
@@ -57,16 +73,6 @@ Features:
 - Builds cron expressions from guided input fields.
 - Supports frequent scheduling patterns for automation tasks.
 - Reduces manual errors when composing cron syntax.
-
-### 4) Hash Generator for Files and Text
-
-Path:
-- `hash-generator-for-files-and-text/index.html`
-
-Features:
-- Generates hashes from plain text input and files.
-- Useful for integrity checks and comparison workflows.
-- Runs directly in the browser without server-side processing.
 
 ### 5) Docker Compose Validator and Formatter
 
@@ -78,7 +84,17 @@ Features:
 - Formats Compose files for readability and consistency.
 - Converts common `docker run` command patterns into Compose blocks.
 
-### 6) Favicon Generator
+### 6) Docker Run to Compose Converter
+
+Path:
+- `docker-run-compose-converter/index.html`
+
+Features:
+- Converts `docker run` commands into `docker-compose.yml`, and back again.
+- Flags unsupported or ambiguous flags with warnings instead of silently dropping them.
+- Runs entirely client-side, no signup or data upload.
+
+### 7) Favicon Generator
 
 Path:
 - `favicon-generator/index.html`
@@ -88,7 +104,17 @@ Features:
 - Exports common icon sizes and formats for modern platforms.
 - Helps produce a ready-to-use favicon package and markup.
 
-### 7) Image Compressor and Resizer
+### 8) Hash Generator for Files and Text
+
+Path:
+- `hash-generator-for-files-and-text/index.html`
+
+Features:
+- Generates hashes from plain text input and files.
+- Useful for integrity checks and comparison workflows.
+- Runs directly in the browser without server-side processing.
+
+### 9) Image Compressor and Resizer
 
 Path:
 - `image-compressor-resizer/index.html`
@@ -98,7 +124,7 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 8) JSON Formatter and Validator
+### 10) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -108,7 +134,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 9) Password and Passphrase Generator
+### 11) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -118,7 +144,17 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 10) Uptime / SLA Calculator
+### 12) Regex Tester
+
+Path:
+- `regex-tester/index.html`
+
+Features:
+- Live match highlighting with capture group inspection.
+- Replace preview for testing substitution patterns.
+- Includes a common patterns cheat sheet.
+
+### 13) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -128,7 +164,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 11) IP Subnet Calculator
+### 14) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -138,7 +174,37 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 12) vCard QR Code Generator
+### 15) Text Diff Tool
+
+Path:
+- `text-diff-tool/index.html`
+
+Features:
+- Compares two texts at line, word, or character granularity.
+- Options to ignore whitespace or case differences.
+- Collapses long unchanged runs and copies the diff as plain text.
+
+### 16) Unix Timestamp Converter
+
+Path:
+- `unix-timestamp-converter/index.html`
+
+Features:
+- Converts Unix epoch seconds or milliseconds to ISO 8601, UTC, and local time.
+- Converts a date back into a Unix timestamp.
+- Includes a live-ticking current timestamp panel.
+
+### 17) URL Encoder / Decoder
+
+Path:
+- `url-encoder-decoder/index.html`
+
+Features:
+- Percent-encodes and decodes URLs, query strings, and form data.
+- Supports component, full URL, form, and strict RFC 3986 modes.
+- Includes a URL inspector for breaking down a URL's parts.
+
+### 18) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -148,7 +214,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 13) YAML JSON TOML Converter
+### 19) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -170,17 +236,23 @@ python -m http.server 8080
 ```
 
 Then open:
+- `http://localhost:8080/base64-encode-decode/`
 - `http://localhost:8080/byte-storage-converter/`
 - `http://localhost:8080/chmod-file-permission-calculator/`
 - `http://localhost:8080/cron-expression-generator/`
 - `http://localhost:8080/docker-compose-validator-formatter/`
+- `http://localhost:8080/docker-run-compose-converter/`
 - `http://localhost:8080/favicon-generator/`
 - `http://localhost:8080/hash-generator-for-files-and-text/`
 - `http://localhost:8080/image-compressor-resizer/`
 - `http://localhost:8080/json-formatter/`
 - `http://localhost:8080/password-passphrase-generator/`
+- `http://localhost:8080/regex-tester/`
 - `http://localhost:8080/sla-calculator/`
 - `http://localhost:8080/subnet-calculator/`
+- `http://localhost:8080/text-diff-tool/`
+- `http://localhost:8080/unix-timestamp-converter/`
+- `http://localhost:8080/url-encoder-decoder/`
 - `http://localhost:8080/vcard-qr-code-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
 
