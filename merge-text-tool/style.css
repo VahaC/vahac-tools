@@ -1,0 +1,472 @@
+/* ============================================================
+   Merge Text Tool — style.css
+   Namespace prefix: mtx-
+   All selectors scoped to .mtx-wrapper
+   ============================================================ */
+
+/* ── CSS Variables & Wrapper ── */
+.mtx-wrapper {
+  --mtx-bg-primary:    #0a0f1e;
+  --mtx-bg-secondary:  #111827;
+  --mtx-bg-card:       #1a2236;
+  --mtx-bg-input:      #0d1424;
+  --mtx-border:        #2a3a5c;
+  --mtx-border-focus:  #3b82f6;
+  --mtx-text-primary:  #e2e8f0;
+  --mtx-text-secondary:#94a3b8;
+  --mtx-text-muted:    #64748b;
+  --mtx-accent-blue:   #3b82f6;
+  --mtx-accent-cyan:   #22d3ee;
+  --mtx-accent-green:  #10b981;
+  --mtx-accent-amber:  #f59e0b;
+  --mtx-accent-red:    #ef4444;
+  --mtx-diff-bg:       rgba(245, 158, 11, 0.14);
+  --mtx-diff-border:   rgba(245, 158, 11, 0.5);
+  --mtx-line-height:   21px;
+  --mtx-font-mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --mtx-font-sans:     'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mtx-radius:        8px;
+  --mtx-radius-lg:     12px;
+
+  font-family: var(--mtx-font-sans);
+  color: var(--mtx-text-primary);
+  background: var(--mtx-bg-primary);
+  line-height: 1.6;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.mtx-wrapper *,
+.mtx-wrapper *::before,
+.mtx-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* Defensive reset: some host themes inject decorative ::before/::after
+   content (e.g. a "›" prompt marker) on bare label/input/li elements.
+   Nothing in this tool relies on pseudo-element content, so neutralize
+   any such leakage inside the wrapper. */
+.mtx-wrapper label::before,
+.mtx-wrapper label::after,
+.mtx-wrapper input::before,
+.mtx-wrapper input::after,
+.mtx-wrapper textarea::before,
+.mtx-wrapper textarea::after,
+.mtx-wrapper li::before,
+.mtx-wrapper li::after {
+  content: none;
+}
+
+/* ── Header ── */
+.mtx-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.mtx-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mtx-text-primary);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.mtx-subtitle {
+  color: var(--mtx-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Toolbar ── */
+.mtx-toolbar {
+  background: var(--mtx-bg-card);
+  border: 1px solid var(--mtx-border);
+  border-radius: var(--mtx-radius-lg);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.mtx-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mtx-toolbar-row + .mtx-toolbar-row {
+  margin-top: 0.65rem;
+}
+
+.mtx-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--mtx-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mtx-wrapper .mtx-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--mtx-accent-blue);
+  cursor: pointer;
+}
+
+.mtx-btn {
+  padding: 0.6rem 1.3rem;
+  background: var(--mtx-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  min-height: 44px;
+}
+
+.mtx-btn:hover { background: #2563eb; }
+.mtx-btn:active { transform: scale(0.97); }
+
+.mtx-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--mtx-border);
+  color: var(--mtx-text-secondary);
+}
+
+.mtx-btn--secondary:hover {
+  background: var(--mtx-bg-secondary);
+  color: var(--mtx-text-primary);
+}
+
+/* ── Error ── */
+.mtx-error-msg {
+  color: var(--mtx-accent-red);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+  display: none;
+}
+
+.mtx-error-msg.mtx-visible {
+  display: block;
+}
+
+/* ── Stats ── */
+.mtx-stats {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.mtx-stats.mtx-visible {
+  display: flex;
+}
+
+.mtx-stat {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--mtx-font-mono);
+  border: 1px solid var(--mtx-border);
+  background: var(--mtx-bg-secondary);
+  color: var(--mtx-text-secondary);
+}
+
+.mtx-stat--diff {
+  color: var(--mtx-accent-amber);
+  border-color: var(--mtx-diff-border);
+  background: var(--mtx-diff-bg);
+}
+
+.mtx-stat--sim {
+  color: var(--mtx-accent-cyan);
+}
+
+.mtx-stat--nodiff {
+  display: none;
+  color: var(--mtx-accent-green);
+}
+
+.mtx-stats.mtx-nodiff .mtx-stat--nodiff { display: inline-block; }
+.mtx-stats.mtx-nodiff .mtx-stat--diff { display: none; }
+
+/* ── Icon button (copy) ── */
+.mtx-icon-btn {
+  background: transparent;
+  border: 1px solid var(--mtx-border);
+  color: var(--mtx-text-secondary);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s;
+  padding: 0;
+}
+
+.mtx-icon-btn:hover {
+  background: var(--mtx-bg-primary);
+  color: var(--mtx-text-primary);
+}
+
+/* ── Editor ── */
+.mtx-editor-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--mtx-border);
+  border-radius: var(--mtx-radius-lg);
+  background: var(--mtx-bg-card);
+}
+
+/* Grid, not flex: heads and bodies are separate rows so the arrow
+   gutter's own grid cell starts exactly at the top of the text content
+   (row 2), never at the top of the pane headers (row 1). Column order
+   (left, arrows, right) matches the HTML source order via grid auto-flow. */
+.mtx-editor {
+  display: grid;
+  grid-template-columns: 1fr 4.2em 1fr;
+  grid-template-rows: auto 1fr;
+  min-width: 640px;
+}
+
+.mtx-pane-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--mtx-bg-secondary);
+  border-bottom: 1px solid var(--mtx-border);
+  font-family: var(--mtx-font-sans);
+  min-width: 0;
+}
+
+.mtx-arrow-head {
+  background: var(--mtx-bg-secondary);
+  border-bottom: 1px solid var(--mtx-border);
+  border-left: 1px solid var(--mtx-border);
+  border-right: 1px solid var(--mtx-border);
+}
+
+.mtx-pane-head-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--mtx-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mtx-pane-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mtx-meta {
+  font-size: 0.72rem;
+  color: var(--mtx-text-muted);
+  font-family: var(--mtx-font-mono);
+  white-space: nowrap;
+}
+
+.mtx-editor-body {
+  position: relative;
+  display: flex;
+  height: 420px;
+  min-width: 0;
+}
+
+.mtx-gutter {
+  flex: 0 0 auto;
+  width: 3em;
+  position: relative;
+  overflow: hidden;
+  background: var(--mtx-bg-secondary);
+  border-right: 1px solid var(--mtx-border);
+}
+
+.mtx-gutter-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.mtx-gutter-line {
+  height: var(--mtx-line-height);
+  line-height: var(--mtx-line-height);
+  text-align: right;
+  padding-right: 0.5em;
+  font-size: 0.76rem;
+  font-family: var(--mtx-font-mono);
+  color: var(--mtx-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mtx-gutter-line--diff {
+  color: var(--mtx-accent-amber);
+  background: var(--mtx-diff-bg);
+}
+
+.mtx-wrapper .mtx-textarea {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  resize: none;
+  white-space: pre;
+  overflow: auto;
+  padding: 0 0.6rem;
+  background: var(--mtx-bg-input);
+  border: none;
+  color: var(--mtx-text-primary);
+  font-family: var(--mtx-font-mono);
+  font-size: 0.85rem;
+  line-height: var(--mtx-line-height);
+  outline: none;
+}
+
+.mtx-wrapper .mtx-textarea::placeholder {
+  color: var(--mtx-text-muted);
+  white-space: pre-wrap;
+}
+
+/* ── Merge-arrow gutter ── */
+.mtx-editor-arrows {
+  flex: 0 0 4.2em;
+  position: relative;
+  overflow: hidden;
+  background: var(--mtx-bg-secondary);
+  border-left: 1px solid var(--mtx-border);
+  border-right: 1px solid var(--mtx-border);
+}
+
+.mtx-arrow-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Positioned (via inline top/height from JS) to align with the block's
+   row range; buttons lay out horizontally so a single-line block's arrows
+   still fit within one line's height instead of being squeezed/overlapping
+   in a vertical stack. */
+.mtx-arrow-group {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.mtx-gutter-btn {
+  background: var(--mtx-bg-card);
+  border: 1px solid var(--mtx-border);
+  color: var(--mtx-accent-cyan);
+  border-radius: 4px;
+  width: 1.7em;
+  height: 18px;
+  min-height: 0;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+  line-height: 1;
+  font-family: inherit;
+  padding: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mtx-gutter-btn:hover {
+  background: var(--mtx-accent-blue);
+  color: #fff;
+}
+
+/* ── Toast ── */
+.mtx-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--mtx-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.mtx-toast.mtx-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── Footer ── */
+.mtx-footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--mtx-text-muted);
+}
+
+.mtx-footer a {
+  color: var(--mtx-accent-cyan);
+  text-decoration: none;
+}
+
+.mtx-footer a:hover { text-decoration: underline; }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 768px) {
+  .mtx-wrapper {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .mtx-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .mtx-title {
+    font-size: 1.35rem;
+  }
+
+  .mtx-toolbar-row .mtx-btn {
+    flex: 1 1 calc(50% - 0.3rem);
+    text-align: center;
+  }
+
+  .mtx-stats {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .mtx-editor-body {
+    height: 320px;
+  }
+}

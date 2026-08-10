@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-08-10
+- Last updated: 2026-08-10 (Merge Text Tool added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -21,6 +21,7 @@ Documentation status:
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
 - `image-compressor-resizer/` - client-side image compression and resizing.
 - `json-formatter/` - JSON formatting and validation.
+- `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
 - `password-passphrase-generator/` - secure password and passphrase generation.
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
@@ -134,7 +135,17 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 11) Password and Passphrase Generator
+### 11) Merge Text Tool
+
+Path:
+- `merge-text-tool/index.html`
+
+Features:
+- Two-pane, line-by-line comparison of two texts, like a lightweight Araxis Merge / Beyond Compare.
+- Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
+- Options to ignore whitespace or case differences; copy either side's result when done.
+
+### 12) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -144,7 +155,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 12) Regex Tester
+### 13) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -154,7 +165,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 13) Uptime / SLA Calculator
+### 14) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -164,7 +175,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 14) IP Subnet Calculator
+### 15) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -174,7 +185,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 15) Text Diff Tool
+### 16) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -184,7 +195,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 16) Unix Timestamp Converter
+### 17) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -194,7 +205,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 17) URL Encoder / Decoder
+### 18) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -204,7 +215,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 18) vCard QR Code Generator
+### 19) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -214,7 +225,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 19) YAML JSON TOML Converter
+### 20) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -246,6 +257,7 @@ Then open:
 - `http://localhost:8080/hash-generator-for-files-and-text/`
 - `http://localhost:8080/image-compressor-resizer/`
 - `http://localhost:8080/json-formatter/`
+- `http://localhost:8080/merge-text-tool/`
 - `http://localhost:8080/password-passphrase-generator/`
 - `http://localhost:8080/regex-tester/`
 - `http://localhost:8080/sla-calculator/`
@@ -259,7 +271,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (163 tests across 10 modules), powered by the built-in Node.js test runner
+tool (333 tests across 18 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.

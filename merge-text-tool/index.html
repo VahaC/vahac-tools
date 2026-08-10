@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merge Text Tool — Logs from VahaC</title>
+  <meta name="description" content="Compare two texts side by side and merge them — freely edit both sides like a real editor, push differing blocks left or right, like Araxis Merge or Beyond Compare.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mtx-wrapper">
+
+    <div class="mtx-header">
+      <h1 class="mtx-title">Merge Text Tool</h1>
+      <p class="mtx-subtitle">A two-pane merge tool — freely edit both sides and push differing blocks left or right with inline arrows, entirely in your browser</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="mtx-toolbar">
+      <div class="mtx-toolbar-row">
+        <button class="mtx-btn" onclick="mtxCompare()">Compare</button>
+        <button class="mtx-btn mtx-btn--secondary" onclick="mtxSwap()">⇄ Swap</button>
+        <button class="mtx-btn mtx-btn--secondary" onclick="mtxLoadSample()">Load sample</button>
+        <button class="mtx-btn mtx-btn--secondary" onclick="mtxClear()">Clear</button>
+      </div>
+      <div class="mtx-toolbar-row">
+        <label class="mtx-checkbox">
+          <input type="checkbox" id="mtx-opt-ignorews" onchange="mtxOnOptionsChange()">
+          <span>Ignore whitespace</span>
+        </label>
+        <label class="mtx-checkbox">
+          <input type="checkbox" id="mtx-opt-ignorecase" onchange="mtxOnOptionsChange()">
+          <span>Ignore case</span>
+        </label>
+        <label class="mtx-checkbox">
+          <input type="checkbox" id="mtx-opt-live" checked>
+          <span>Live compare</span>
+        </label>
+        <span class="mtx-stats" id="mtx-stats">
+          <span class="mtx-stat mtx-stat--diff" id="mtx-stat-diff">0 differing blocks</span>
+          <span class="mtx-stat mtx-stat--sim" id="mtx-stat-sim">100% similar</span>
+          <span class="mtx-stat mtx-stat--nodiff" id="mtx-stat-nodiff">No differences found</span>
+        </span>
+      </div>
+      <p class="mtx-error-msg" id="mtx-error-msg"></p>
+    </div>
+
+    <!-- Editor: two freely-editable textareas with synced line-number gutters and a merge-arrow
+         gutter. Uses a CSS grid (heads row, bodies row) so the arrow gutter's own row starts
+         exactly where the text content starts, not where the pane headers start. -->
+    <div class="mtx-editor-scroll">
+      <div class="mtx-editor">
+
+        <div class="mtx-pane-head">
+          <span class="mtx-pane-head-label">Left</span>
+          <span class="mtx-pane-head-actions">
+            <span class="mtx-meta" id="mtx-meta-left">1 line</span>
+            <button type="button" class="mtx-icon-btn" title="Copy left text" onclick="mtxCopySide('left')">📋</button>
+          </span>
+        </div>
+        <div class="mtx-arrow-head"></div>
+        <div class="mtx-pane-head">
+          <span class="mtx-pane-head-label">Right</span>
+          <span class="mtx-pane-head-actions">
+            <span class="mtx-meta" id="mtx-meta-right">1 line</span>
+            <button type="button" class="mtx-icon-btn" title="Copy right text" onclick="mtxCopySide('right')">📋</button>
+          </span>
+        </div>
+
+        <div class="mtx-editor-body">
+          <div class="mtx-gutter" id="mtx-gutter-left"><div class="mtx-gutter-inner" id="mtx-gutter-left-inner"></div></div>
+          <textarea id="mtx-input-left" class="mtx-textarea" placeholder="Paste or type the left-side text here…" spellcheck="false"></textarea>
+        </div>
+        <div class="mtx-editor-arrows" id="mtx-arrow-gutter">
+          <div class="mtx-arrow-inner" id="mtx-arrow-inner"></div>
+        </div>
+        <div class="mtx-editor-body">
+          <div class="mtx-gutter" id="mtx-gutter-right"><div class="mtx-gutter-inner" id="mtx-gutter-right-inner"></div></div>
+          <textarea id="mtx-input-right" class="mtx-textarea" placeholder="Paste or type the right-side text here…" spellcheck="false"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="mtx-toast" id="mtx-toast">Copied to clipboard!</div>
+
+    <p class="mtx-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
