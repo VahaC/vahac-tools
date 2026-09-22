@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWT Decoder — Logs from VahaC</title>
+  <meta name="description" content="Decode any JSON Web Token in your browser — header, payload, claims with human-readable dates, expiry status and HS/RS/ES/PS signature verification. 100% client-side.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="jwt-wrapper">
+
+    <div class="jwt-header">
+      <h1 class="jwt-title">JWT Decoder</h1>
+      <p class="jwt-subtitle">Paste a JSON Web Token to inspect its header, payload and claims — with expiry checks and optional signature verification, all inside your browser</p>
+    </div>
+
+    <!-- ══ TOKEN INPUT ══ -->
+    <div class="jwt-input-group">
+      <label for="jwt-token-input">Encoded token</label>
+      <textarea id="jwt-token-input" class="jwt-textarea jwt-mono"
+                rows="5"
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature"
+                spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                oninput="jwtDecodeInput()"></textarea>
+    </div>
+
+    <div class="jwt-meta-row">
+      <span class="jwt-stat" id="jwt-token-stats">0 characters · 0 parts</span>
+      <div class="jwt-actions">
+        <button class="jwt-btn jwt-btn--secondary jwt-btn--small" onclick="jwtLoadSample()">⚡ Sample</button>
+        <button class="jwt-btn jwt-btn--secondary jwt-btn--small" onclick="jwtClear()">✕ Clear</button>
+      </div>
+    </div>
+
+    <p class="jwt-error-msg" id="jwt-error-msg"></p>
+
+    <!-- ══ COLOURED TOKEN MAP ══ -->
+    <div class="jwt-block jwt-hidden" id="jwt-map-block">
+      <h2 class="jwt-block-title">Token structure</h2>
+      <p class="jwt-token-map jwt-mono" id="jwt-token-map"></p>
+      <div class="jwt-legend">
+        <span class="jwt-legend-item"><i class="jwt-swatch jwt-swatch--header"></i>Header</span>
+        <span class="jwt-legend-item"><i class="jwt-swatch jwt-swatch--payload"></i>Payload</span>
+        <span class="jwt-legend-item"><i class="jwt-swatch jwt-swatch--sig"></i>Signature</span>
+      </div>
+    </div>
+
+    <!-- ══ SUMMARY BADGES ══ -->
+    <div class="jwt-summary jwt-hidden" id="jwt-summary">
+      <div class="jwt-badge" id="jwt-badge-alg">
+        <span class="jwt-badge-label">Algorithm</span>
+        <span class="jwt-badge-value" id="jwt-badge-alg-value">—</span>
+      </div>
+      <div class="jwt-badge" id="jwt-badge-type">
+        <span class="jwt-badge-label">Type</span>
+        <span class="jwt-badge-value" id="jwt-badge-type-value">—</span>
+      </div>
+      <div class="jwt-badge" id="jwt-badge-status">
+        <span class="jwt-badge-label">Status</span>
+        <span class="jwt-badge-value" id="jwt-badge-status-value">—</span>
+      </div>
+    </div>
+
+    <p class="jwt-note" id="jwt-alg-note"></p>
+
+    <!-- ══ DECODED HEADER ══ -->
+    <div class="jwt-block jwt-hidden" id="jwt-header-block">
+      <div class="jwt-block-head">
+        <h2 class="jwt-block-title">Header <span class="jwt-block-hint">algorithm &amp; token type</span></h2>
+        <button class="jwt-btn jwt-btn--secondary jwt-btn--small" onclick="jwtCopyHeader()">📋 Copy</button>
+      </div>
+      <pre class="jwt-json jwt-mono" id="jwt-header-json"></pre>
+      <p class="jwt-field-legend" id="jwt-header-legend"></p>
+    </div>
+
+    <!-- ══ DECODED PAYLOAD ══ -->
+    <div class="jwt-block jwt-hidden" id="jwt-payload-block">
+      <div class="jwt-block-head">
+        <h2 class="jwt-block-title">Payload <span class="jwt-block-hint">the claims carried by the token</span></h2>
+        <button class="jwt-btn jwt-btn--secondary jwt-btn--small" onclick="jwtCopyPayload()">📋 Copy</button>
+      </div>
+      <pre class="jwt-json jwt-mono" id="jwt-payload-json"></pre>
+    </div>
+
+    <!-- ══ CLAIMS TABLE ══ -->
+    <div class="jwt-block jwt-hidden" id="jwt-claims-block">
+      <h2 class="jwt-block-title">Claims explained <span class="jwt-block-hint">timestamps converted to readable dates</span></h2>
+      <div class="jwt-claims" id="jwt-claims"></div>
+    </div>
+
+    <!-- ══ SIGNATURE VERIFICATION ══ -->
+    <div class="jwt-block jwt-hidden" id="jwt-verify-block">
+      <h2 class="jwt-block-title">Signature verification <span class="jwt-block-hint">optional — the key never leaves this page</span></h2>
+
+      <div class="jwt-input-group">
+        <label for="jwt-key-input" id="jwt-key-label">Secret</label>
+        <textarea id="jwt-key-input" class="jwt-textarea jwt-textarea--key jwt-mono"
+                  rows="3"
+                  placeholder="your-256-bit-secret"
+                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                  oninput="jwtKeyChanged()"></textarea>
+      </div>
+
+      <div class="jwt-verify-row">
+        <label class="jwt-toggle-label jwt-hidden" id="jwt-b64-toggle" for="jwt-opt-b64" title="Tick if your HMAC secret is stored Base64-encoded">
+          <input type="checkbox" id="jwt-opt-b64" class="jwt-toggle-input" onchange="jwtKeyChanged()">
+          <span class="jwt-toggle-track"><span class="jwt-toggle-thumb"></span></span>
+          <span class="jwt-toggle-text">SECRET IS BASE64</span>
+        </label>
+        <button class="jwt-btn jwt-btn--small" id="jwt-verify-btn" onclick="jwtVerify()">🔐 Verify signature</button>
+      </div>
+
+      <p class="jwt-key-hint" id="jwt-key-hint"></p>
+      <p class="jwt-verify-result" id="jwt-verify-result"></p>
+
+      <div class="jwt-input-group jwt-sig-group">
+        <label for="jwt-sig-raw">Signature (base64url)</label>
+        <textarea id="jwt-sig-raw" class="jwt-textarea jwt-textarea--output jwt-mono"
+                  rows="2" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <p class="jwt-footer">
+      Built by <a href="https://vahac.com" class="jwt-link">VahaC</a> —
+      100% client-side, no data sent anywhere.
+    </p>
+
+    <div class="jwt-toast" id="jwt-toast">✅ Copied!</div>
+  </div><!-- /.jwt-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

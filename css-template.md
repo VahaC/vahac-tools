@@ -256,10 +256,13 @@ Keep this list updated to avoid prefix collisions:
 | `hsg`  | Hash Generator           | Built    |
 | `icr`  | Image Compressor/Resizer | Built    |
 | `jsf`  | JSON Formatter           | Built    |
+| `jwt`  | JWT Decoder              | Built    |
+| `mtx`  | Merge Text Tool          | Built    |
 | `pwg`  | Password Generator       | Built    |
 | `rgx`  | Regex Tester             | Built    |
 | `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
+| `tdf`  | Text Diff Tool           | Built    |
 | `urc`  | URL Encoder / Decoder    | Built    |
 | `uts`  | Unix Timestamp Converter | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |

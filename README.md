@@ -1,4 +1,4 @@
-# vahac-tools
+﻿# vahac-tools
 
 A collection of standalone browser tools by Vahac. Each utility is implemented with plain HTML, CSS, and JavaScript, so it can run locally without a backend.
 
@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-08-10 (Merge Text Tool added)
+- Last updated: 2026-08-10 (JWT Decoder added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -21,6 +21,7 @@ Documentation status:
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
 - `image-compressor-resizer/` - client-side image compression and resizing.
 - `json-formatter/` - JSON formatting and validation.
+- `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
 - `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
 - `password-passphrase-generator/` - secure password and passphrase generation.
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
@@ -135,7 +136,17 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 11) Merge Text Tool
+### 11) JWT Decoder
+
+Path:
+- `jwt-decoder/index.html`
+
+Features:
+- Decodes the header and payload of any JSON Web Token, with syntax-highlighted JSON.
+- Explains registered claims and converts `exp`, `nbf`, and `iat` into readable dates with a validity badge.
+- Optionally verifies HS/RS/ES/PS signatures with a shared secret, PEM public key, or JWK — all via the Web Crypto API in the browser.
+
+### 12) Merge Text Tool
 
 Path:
 - `merge-text-tool/index.html`
@@ -145,7 +156,7 @@ Features:
 - Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
 - Options to ignore whitespace or case differences; copy either side's result when done.
 
-### 12) Password and Passphrase Generator
+### 13) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -155,7 +166,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 13) Regex Tester
+### 14) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -165,7 +176,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 14) Uptime / SLA Calculator
+### 15) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -175,7 +186,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 15) IP Subnet Calculator
+### 16) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -185,7 +196,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 16) Text Diff Tool
+### 17) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -195,7 +206,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 17) Unix Timestamp Converter
+### 18) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -205,7 +216,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 18) URL Encoder / Decoder
+### 19) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -215,7 +226,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 19) vCard QR Code Generator
+### 20) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -225,7 +236,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 20) YAML JSON TOML Converter
+### 21) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -257,6 +268,7 @@ Then open:
 - `http://localhost:8080/hash-generator-for-files-and-text/`
 - `http://localhost:8080/image-compressor-resizer/`
 - `http://localhost:8080/json-formatter/`
+- `http://localhost:8080/jwt-decoder/`
 - `http://localhost:8080/merge-text-tool/`
 - `http://localhost:8080/password-passphrase-generator/`
 - `http://localhost:8080/regex-tester/`
@@ -271,7 +283,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (333 tests across 18 modules), powered by the built-in Node.js test runner
+tool (370 tests across 19 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -282,8 +294,8 @@ npm test
 
 The suite covers byte/storage conversion, chmod permissions, cron parsing and
 scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
-password/passphrase entropy, vCard generation, TOML round-tripping, and MD5
-hashing (verified against `node:crypto`).
+password/passphrase entropy, vCard generation, TOML round-tripping, JWT parsing
+and claim handling, and MD5 hashing (verified against `node:crypto`).
 
 Tests run on demand via GitHub Actions
 (`.github/workflows/test.yml`) — the workflow uses `workflow_dispatch` only, so

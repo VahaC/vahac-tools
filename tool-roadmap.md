@@ -1,0 +1,14 @@
+# Tool Growth Roadmap
+
+| Priority | Tool | Minimum useful scope | Why it is prioritised |
+| --- | --- | --- | --- |
+| 1 | **Wi-Fi QR Code Generator** | SSID, WPA/WPA2/WPA3/open security, hidden-network option, PNG/SVG export, printable card. | The existing vCard QR generator is the clearest current traffic signal. This covers a distinct, broader QR use case and can form a linked QR cluster. |
+| 2 | **CSV ↔ JSON ↔ SQL Converter** | Detect delimiter and headers; convert CSV to JSON, JSON to CSV, and rows to parameter-free SQL `INSERT` statements; show validation errors. | Bridges spreadsheets, APIs, and databases. It extends the existing JSON/YAML/TOML topic without duplicating it. |
+| 3 | **robots.txt Generator and Validator** | Guided allow/disallow rules, sitemap declaration, paste-in validator, and explanatory warnings. | A specific site-owner problem with a tool-friendly result and room for a useful guide. |
+| 4 | **cURL to Fetch / Python / Node.js Converter** | Parse common method, header, body, query, and authentication flags; generate Fetch, Python Requests, and Node.js code; flag unsupported flags. | A frequent developer task with an output users can immediately copy. Honest unsupported-flag warnings are required. |
+| 5 | **UTM Campaign URL Builder** | Source, medium, campaign, content, and term fields; encoded preview; presets; copy and QR export. | Reaches a marketing and small-business audience beyond the current developer-heavy catalogue. |
+| 6 | **CSP and HTTP Security Headers Builder** | Guided Content-Security-Policy construction plus analysis of headers pasted by the user. | Fits the existing JWT, hash, password, and server-admin tools. Do not promise URL fetching because browser CORS policy can prevent reliable checks. |
+| 7 | **Open Graph and Social Card Meta Generator** | Page title, description, canonical URL, image settings, generated tags, and platform-oriented preview guidance. | Helps web publishers and supports linkable explanatory content. |
+| 8 | **SPF and DMARC Record Generator / Parser** | Guided record generation, syntax validation, policy explanation, and parsing of pasted records. | Narrower audience, but strong relevance to self-hosting and systems administration. Keep private email credentials and DKIM private keys out of the tool. |
+| 9 | **Home Assistant Automation Schedule Visualizer** | Cron/time-trigger input, timezone selection, and next-run timeline. | A niche authority tool for the Home Assistant audience; prioritise for qualified returning visitors and references, not broad search volume. |
+| 10 | **IPv6 Subnet Calculator** | Prefix, network range, address count, subnet split, and copyable notation. | Natural complement to the existing IPv4 calculator, but the current IPv4 tool has not shown enough traffic signal to put this earlier. |
