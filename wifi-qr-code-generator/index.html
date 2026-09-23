@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Fi QR Code Generator — Logs from VahaC</title>
+  <meta name="description" content="Free Wi-Fi QR code generator — turn your network name and password into a scannable QR code. WPA2, WPA3, open and hidden networks, PNG/SVG export and a printable card.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wqr-wrapper">
+
+    <!-- Header -->
+    <div class="wqr-header">
+      <h1 class="wqr-title">Free Wi-Fi QR Code Generator</h1>
+      <p class="wqr-subtitle">Turn your network name and password into a QR code that guests scan with their phone camera to join. Export PNG or SVG, or print a ready-made Wi-Fi card. Everything runs in your browser.</p>
+    </div>
+
+    <div class="wqr-layout">
+
+      <!-- ══ LEFT: settings ══ -->
+      <div class="wqr-col">
+
+        <!-- Network -->
+        <section class="wqr-card">
+          <h2 class="wqr-card-title">Network</h2>
+
+          <div class="wqr-field">
+            <div class="wqr-field-head">
+              <label class="wqr-label" for="wqr-ssid">Network name (SSID)</label>
+              <span class="wqr-counter" id="wqr-ssid-count">0 / 32 bytes</span>
+            </div>
+            <input class="wqr-input" id="wqr-ssid" type="text" placeholder="MyHomeNetwork"
+                   maxlength="64" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          </div>
+
+          <div class="wqr-field">
+            <label class="wqr-label" for="wqr-security">Security</label>
+            <select class="wqr-select" id="wqr-security">
+              <option value="wpa" selected>WPA / WPA2 / WPA3 Personal</option>
+              <option value="wpa3">WPA3 Personal only (SAE)</option>
+              <option value="wep">WEP (legacy)</option>
+              <option value="nopass">None — open network</option>
+            </select>
+            <p class="wqr-hint" id="wqr-security-hint"></p>
+          </div>
+
+          <div class="wqr-field" id="wqr-pass-field">
+            <div class="wqr-field-head">
+              <label class="wqr-label" for="wqr-password">Password</label>
+              <span class="wqr-counter" id="wqr-pass-count">0 characters</span>
+            </div>
+            <div class="wqr-pass-row">
+              <input class="wqr-input wqr-input--mono" id="wqr-password" type="password" placeholder="Wi-Fi password"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              <button class="wqr-btn wqr-btn--secondary wqr-btn--icon" id="wqr-pass-toggle" type="button"
+                      aria-label="Show password" aria-pressed="false" onclick="wqrTogglePassword()">Show</button>
+            </div>
+          </div>
+
+          <label class="wqr-check" for="wqr-hidden">
+            <input class="wqr-checkbox" id="wqr-hidden" type="checkbox">
+            <span class="wqr-check-text">Hidden network <span class="wqr-check-sub">SSID is not broadcast (adds <code class="wqr-code">H:true</code>)</span></span>
+          </label>
+
+          <label class="wqr-check wqr-hidden" id="wqr-sae-field" for="wqr-sae">
+            <input class="wqr-checkbox" id="wqr-sae" type="checkbox">
+            <span class="wqr-check-text">Android-style encoding <span class="wqr-check-sub">Write <code class="wqr-code">T:SAE</code> instead of the spec's <code class="wqr-code">T:WPA;R:1</code>. Use only if a scanner rejects the default.</span></span>
+          </label>
+        </section>
+
+        <!-- QR options -->
+        <section class="wqr-card">
+          <h2 class="wqr-card-title">QR code options</h2>
+          <div class="wqr-grid-3">
+            <div class="wqr-field">
+              <label class="wqr-label" for="wqr-ecl">Error correction</label>
+              <select class="wqr-select" id="wqr-ecl">
+                <option value="L">L — 7%</option>
+                <option value="M" selected>M — 15%</option>
+                <option value="Q">Q — 25%</option>
+                <option value="H">H — 30%</option>
+              </select>
+            </div>
+            <div class="wqr-field">
+              <label class="wqr-label" for="wqr-quiet">Quiet zone</label>
+              <select class="wqr-select" id="wqr-quiet">
+                <option value="0">0 modules</option>
+                <option value="2">2 modules</option>
+                <option value="4" selected>4 modules</option>
+                <option value="6">6 modules</option>
+              </select>
+            </div>
+            <div class="wqr-field">
+              <label class="wqr-label" for="wqr-png-size">PNG size</label>
+              <select class="wqr-select" id="wqr-png-size">
+                <option value="512">512 px</option>
+                <option value="1024" selected>1024 px</option>
+                <option value="2048">2048 px</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Printable card options -->
+        <section class="wqr-card">
+          <h2 class="wqr-card-title">Printable card</h2>
+          <div class="wqr-grid-2">
+            <div class="wqr-field">
+              <label class="wqr-label" for="wqr-card-heading">Card title</label>
+              <input class="wqr-input" id="wqr-card-heading" type="text" placeholder="Wi-Fi" maxlength="40" autocomplete="off">
+            </div>
+            <div class="wqr-field">
+              <label class="wqr-label" for="wqr-card-copies">Cards per page</label>
+              <select class="wqr-select" id="wqr-card-copies">
+                <option value="1" selected>1 (large)</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6 (table cards)</option>
+              </select>
+            </div>
+          </div>
+          <div class="wqr-field">
+            <label class="wqr-label" for="wqr-card-note">Note (optional)</label>
+            <input class="wqr-input" id="wqr-card-note" type="text" placeholder="e.g. Ask us if you need help connecting" maxlength="120" autocomplete="off">
+          </div>
+          <label class="wqr-check" for="wqr-card-showpass">
+            <input class="wqr-checkbox" id="wqr-card-showpass" type="checkbox" checked>
+            <span class="wqr-check-text">Print the password on the card <span class="wqr-check-sub">So people whose devices can't scan QR codes can type it in</span></span>
+          </label>
+        </section>
+
+      </div>
+
+      <!-- ══ RIGHT: preview & export ══ -->
+      <div class="wqr-col">
+
+        <section class="wqr-card">
+          <h2 class="wqr-card-title">QR code</h2>
+          <div class="wqr-qr-box">
+            <canvas class="wqr-qr-canvas wqr-hidden" id="wqr-qr-canvas" width="296" height="296" aria-label="Wi-Fi QR code preview" role="img"></canvas>
+            <div class="wqr-qr-placeholder" id="wqr-qr-placeholder">Enter a network name to generate the QR code</div>
+          </div>
+          <p class="wqr-status" id="wqr-status"></p>
+          <ul class="wqr-messages" id="wqr-messages"></ul>
+
+          <div class="wqr-actions">
+            <button class="wqr-btn" id="wqr-btn-png" type="button" onclick="wqrDownloadPng()" disabled>Download PNG</button>
+            <button class="wqr-btn wqr-btn--secondary" id="wqr-btn-svg" type="button" onclick="wqrDownloadSvg()" disabled>Download SVG</button>
+          </div>
+
+          <div class="wqr-field wqr-payload-field">
+            <div class="wqr-field-head">
+              <label class="wqr-label" for="wqr-payload">Encoded text</label>
+              <button class="wqr-link-btn" id="wqr-btn-copy" type="button" onclick="wqrCopyPayload()" disabled>&#128203; Copy</button>
+            </div>
+            <textarea class="wqr-textarea" id="wqr-payload" rows="3" readonly spellcheck="false"></textarea>
+          </div>
+        </section>
+
+        <section class="wqr-card">
+          <h2 class="wqr-card-title">Card preview</h2>
+          <div class="wqr-card-box">
+            <canvas class="wqr-card-canvas wqr-hidden" id="wqr-card-canvas" width="600" height="800" aria-label="Printable Wi-Fi card preview" role="img"></canvas>
+            <div class="wqr-qr-placeholder" id="wqr-card-placeholder">The card appears once the QR code is ready</div>
+          </div>
+          <div class="wqr-actions">
+            <button class="wqr-btn" id="wqr-btn-print" type="button" onclick="wqrPrintCard()" disabled>&#128424; Print card</button>
+            <button class="wqr-btn wqr-btn--secondary" id="wqr-btn-card-png" type="button" onclick="wqrDownloadCard()" disabled>Download card (PNG)</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <p class="wqr-related">
+      Sharing contact details instead? Try the <a class="wqr-footer-link" href="https://vahac.com/tools/vcard-qr-code-generator/">vCard QR Code Generator</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="wqr-toast" id="wqr-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="wqr-footer">
+      Built by <a class="wqr-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-08-10 (JWT Decoder added)
+- Last updated: 2026-09-23 (Wi-Fi QR Code Generator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -31,6 +31,7 @@ Documentation status:
 - `unix-timestamp-converter/` - Unix epoch to ISO/UTC/local date conversion and back.
 - `url-encoder-decoder/` - percent-encoding and decoding for URLs, query strings, and form data.
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
+- `wifi-qr-code-generator/` - Wi-Fi network QR codes (WPA/WPA2/WPA3, WEP, open, hidden) with PNG/SVG export and a printable card.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
@@ -236,7 +237,17 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 21) YAML JSON TOML Converter
+### 21) Wi-Fi QR Code Generator
+
+Path:
+- `wifi-qr-code-generator/index.html`
+
+Features:
+- Builds `WIFI:` payloads for WPA/WPA2/WPA3, WPA3-only (`T:WPA;R:1` per the WPA3 spec, or Android-style `T:SAE`), WEP, and open networks, with a hidden-network flag.
+- Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
+- Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
+
+### 22) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -278,12 +289,13 @@ Then open:
 - `http://localhost:8080/unix-timestamp-converter/`
 - `http://localhost:8080/url-encoder-decoder/`
 - `http://localhost:8080/vcard-qr-code-generator/`
+- `http://localhost:8080/wifi-qr-code-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
 
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (370 tests across 19 modules), powered by the built-in Node.js test runner
+tool (403 tests across 20 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -294,8 +306,9 @@ npm test
 
 The suite covers byte/storage conversion, chmod permissions, cron parsing and
 scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
-password/passphrase entropy, vCard generation, TOML round-tripping, JWT parsing
-and claim handling, and MD5 hashing (verified against `node:crypto`).
+password/passphrase entropy, vCard generation, Wi-Fi QR payload escaping and
+validation, TOML round-tripping, JWT parsing and claim handling, and MD5 hashing
+(verified against `node:crypto`).
 
 Tests run on demand via GitHub Actions
 (`.github/workflows/test.yml`) — the workflow uses `workflow_dispatch` only, so

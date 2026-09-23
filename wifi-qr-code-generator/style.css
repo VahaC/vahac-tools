@@ -1,0 +1,589 @@
+/* Wi-Fi QR Code Generator — style.css
+   Prefix: wqr-
+   Dark terminal palette matching vahac.com.
+   Component selectors are scoped under .wqr-wrapper so they outrank
+   theme rules such as input[type="text"] or .entry-content h2. */
+
+/* ── Variables & reset ─────────────────────────────────── */
+
+.wqr-wrapper {
+  --wqr-bg-primary: #0a0f1e;
+  --wqr-bg-secondary: #111827;
+  --wqr-bg-card: #1a2236;
+  --wqr-bg-input: #0d1424;
+  --wqr-border: #2a3a5c;
+  --wqr-border-focus: #3b82f6;
+  --wqr-text-primary: #e2e8f0;
+  --wqr-text-secondary: #94a3b8;
+  --wqr-text-muted: #64748b;
+  --wqr-accent-blue: #3b82f6;
+  --wqr-accent-cyan: #22d3ee;
+  --wqr-accent-green: #10b981;
+  --wqr-accent-amber: #f59e0b;
+  --wqr-accent-red: #ef4444;
+  --wqr-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --wqr-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --wqr-radius: 8px;
+
+  color-scheme: dark;
+  font-family: var(--wqr-font-sans);
+  font-size: 15px;
+  color: var(--wqr-text-primary);
+  background: var(--wqr-bg-primary);
+  line-height: 1.5;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.wqr-wrapper *,
+.wqr-wrapper *::before,
+.wqr-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* Isolate labels from host-page pseudo-content rules */
+.wqr-wrapper .wqr-label::before,
+.wqr-wrapper .wqr-label::after,
+.wqr-wrapper .wqr-check::before,
+.wqr-wrapper .wqr-check::after {
+  content: none;
+  display: none;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+
+.wqr-wrapper .wqr-header {
+  margin-bottom: 1.5rem;
+}
+
+.wqr-wrapper .wqr-title {
+  margin: 0 0 0.4rem;
+  padding: 0;
+  color: var(--wqr-text-primary);
+  font-family: var(--wqr-font-sans);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.wqr-wrapper .wqr-subtitle {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--wqr-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* ── Layout ────────────────────────────────────────────── */
+
+.wqr-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.wqr-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+
+.wqr-wrapper .wqr-card {
+  background: var(--wqr-bg-card);
+  border: 1px solid var(--wqr-border);
+  border-radius: var(--wqr-radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wqr-wrapper .wqr-card-title {
+  margin: 0;
+  padding: 0;
+  color: var(--wqr-accent-cyan);
+  font-family: var(--wqr-font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.wqr-grid-2,
+.wqr-grid-3 {
+  display: grid;
+  gap: 1rem;
+}
+
+.wqr-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.wqr-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* ── Fields ────────────────────────────────────────────── */
+
+.wqr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.wqr-field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.wqr-wrapper .wqr-label {
+  display: block;
+  margin: 0;
+  color: var(--wqr-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wqr-counter {
+  color: var(--wqr-text-muted);
+  font-family: var(--wqr-font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.wqr-counter.wqr-over {
+  color: var(--wqr-accent-amber);
+}
+
+.wqr-wrapper .wqr-input,
+.wqr-wrapper .wqr-select,
+.wqr-wrapper .wqr-textarea {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  min-height: 44px;
+  background: var(--wqr-bg-input);
+  border: 1px solid var(--wqr-border);
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--wqr-text-primary);
+  font-family: var(--wqr-font-sans);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wqr-wrapper .wqr-input--mono,
+.wqr-wrapper .wqr-textarea {
+  font-family: var(--wqr-font-mono);
+}
+
+.wqr-wrapper .wqr-select {
+  cursor: pointer;
+}
+
+.wqr-wrapper .wqr-textarea {
+  min-height: 0;
+  resize: vertical;
+  font-size: 0.85rem;
+  color: var(--wqr-accent-cyan);
+  word-break: break-all;
+}
+
+.wqr-wrapper .wqr-input::placeholder,
+.wqr-wrapper .wqr-textarea::placeholder {
+  color: var(--wqr-text-muted);
+}
+
+.wqr-wrapper .wqr-input:focus,
+.wqr-wrapper .wqr-select:focus,
+.wqr-wrapper .wqr-textarea:focus {
+  border-color: var(--wqr-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.wqr-pass-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wqr-pass-row .wqr-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.wqr-wrapper .wqr-hint {
+  margin: 0;
+  color: var(--wqr-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.wqr-wrapper .wqr-code {
+  padding: 0.05rem 0.3rem;
+  background: var(--wqr-bg-input);
+  border: 1px solid var(--wqr-border);
+  border-radius: 4px;
+  color: var(--wqr-accent-cyan);
+  font-family: var(--wqr-font-mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* ── Checkboxes ────────────────────────────────────────── */
+
+.wqr-wrapper .wqr-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0;
+  cursor: pointer;
+  color: var(--wqr-text-primary);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.wqr-wrapper .wqr-checkbox {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0.1rem 0 0;
+  accent-color: var(--wqr-accent-blue);
+  cursor: pointer;
+}
+
+.wqr-check-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.wqr-check-sub {
+  color: var(--wqr-text-muted);
+  font-size: 0.8rem;
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+
+.wqr-wrapper .wqr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  margin: 0;
+  padding: 0.6rem 1.2rem;
+  background: var(--wqr-accent-blue);
+  border: 1px solid var(--wqr-accent-blue);
+  border-radius: 6px;
+  box-shadow: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.wqr-wrapper .wqr-btn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.wqr-wrapper .wqr-btn:active {
+  transform: scale(0.97);
+}
+
+.wqr-wrapper .wqr-btn:focus-visible,
+.wqr-wrapper .wqr-link-btn:focus-visible {
+  outline: 2px solid var(--wqr-accent-cyan);
+  outline-offset: 2px;
+}
+
+.wqr-wrapper .wqr-btn--secondary {
+  background: transparent;
+  border-color: var(--wqr-border);
+  color: var(--wqr-text-secondary);
+}
+
+.wqr-wrapper .wqr-btn--secondary:hover {
+  background: var(--wqr-bg-secondary);
+  border-color: var(--wqr-border);
+  color: var(--wqr-text-primary);
+}
+
+.wqr-wrapper .wqr-btn--icon {
+  flex: 0 0 auto;
+  min-width: 72px;
+  padding: 0.6rem 0.9rem;
+}
+
+.wqr-wrapper .wqr-btn:disabled,
+.wqr-wrapper .wqr-btn:disabled:hover {
+  background: var(--wqr-bg-secondary);
+  border-color: var(--wqr-border);
+  color: var(--wqr-text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.wqr-wrapper .wqr-link-btn {
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  min-height: 32px;
+  background: transparent;
+  border: 1px solid var(--wqr-border);
+  border-radius: 6px;
+  color: var(--wqr-text-secondary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.wqr-wrapper .wqr-link-btn:hover {
+  background: var(--wqr-bg-secondary);
+  color: var(--wqr-text-primary);
+}
+
+.wqr-wrapper .wqr-link-btn:disabled {
+  color: var(--wqr-text-muted);
+  cursor: not-allowed;
+}
+
+.wqr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.wqr-actions .wqr-btn {
+  flex: 1 1 auto;
+}
+
+/* ── QR preview ────────────────────────────────────────── */
+
+.wqr-qr-box,
+.wqr-card-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--wqr-bg-input);
+  border: 1px dashed var(--wqr-border);
+  border-radius: var(--wqr-radius);
+}
+
+.wqr-qr-box {
+  min-height: 250px;
+}
+
+.wqr-card-box {
+  min-height: 200px;
+}
+
+.wqr-wrapper .wqr-qr-canvas {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+.wqr-wrapper .wqr-card-canvas {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.wqr-qr-placeholder {
+  max-width: 220px;
+  color: var(--wqr-text-muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.wqr-wrapper .wqr-status {
+  margin: 0;
+  color: var(--wqr-text-secondary);
+  font-family: var(--wqr-font-mono);
+  font-size: 0.78rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.wqr-status.wqr-status--ok {
+  color: var(--wqr-accent-green);
+}
+
+/* ── Validation messages ───────────────────────────────── */
+
+.wqr-wrapper .wqr-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wqr-wrapper .wqr-messages:empty {
+  display: none;
+}
+
+.wqr-wrapper .wqr-msg {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--wqr-accent-blue);
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--wqr-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.wqr-wrapper .wqr-msg::before {
+  content: none;
+}
+
+.wqr-wrapper .wqr-msg--warn {
+  border-left-color: var(--wqr-accent-amber);
+  background: rgba(245, 158, 11, 0.08);
+  color: #fcd34d;
+}
+
+.wqr-wrapper .wqr-msg--error {
+  border-left-color: var(--wqr-accent-red);
+  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+}
+
+.wqr-payload-field {
+  margin-top: 0.25rem;
+}
+
+/* ── Related tools & footer ────────────────────────────── */
+
+.wqr-wrapper .wqr-related {
+  margin: 1.25rem 0 0;
+  color: var(--wqr-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.wqr-wrapper .wqr-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--wqr-border);
+  color: var(--wqr-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.wqr-wrapper .wqr-footer-link {
+  color: var(--wqr-accent-blue);
+  text-decoration: none;
+}
+
+.wqr-wrapper .wqr-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Toast ─────────────────────────────────────────────── */
+
+.wqr-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--wqr-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.wqr-toast.wqr-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── State: hidden ─────────────────────────────────────── */
+/* Keep after all component rules: .wqr-wrapper .wqr-check / .wqr-qr-canvas etc.
+   have the same specificity and would otherwise win with their display value. */
+
+.wqr-wrapper .wqr-hidden {
+  display: none;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .wqr-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .wqr-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .wqr-wrapper .wqr-title {
+    font-size: 1.35rem;
+  }
+
+  .wqr-wrapper .wqr-card {
+    padding: 1rem;
+  }
+
+  .wqr-grid-2,
+  .wqr-grid-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wqr-wrapper .wqr-input,
+  .wqr-wrapper .wqr-select {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+
+  .wqr-actions {
+    flex-direction: column;
+  }
+
+  .wqr-actions .wqr-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .wqr-wrapper {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .wqr-qr-box,
+  .wqr-card-box {
+    padding: 0.6rem;
+  }
+}
