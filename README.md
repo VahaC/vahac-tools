@@ -316,6 +316,17 @@ Requirements: Node.js 20 or newer.
 npm test
 ```
 
+`npm test` runs `tests/run.js`, which collects `tests/*.test.js` and runs them
+through `node:test`'s `run()` API with the spec reporter. This works the same
+on Node 20, 22 and 24 under both cmd.exe and POSIX shells — unlike
+`node --test tests/` (a directory argument breaks on Node 21+) or a glob
+(unsupported by `--test` on Node 20, and never expanded by cmd.exe). To run a
+single module, pass its path directly:
+
+```powershell
+node --test tests/jwt-decoder.test.js
+```
+
 The suite covers byte/storage conversion, chmod permissions, cron parsing and
 scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
 password/passphrase entropy, vCard generation, CSV parsing with delimiter/header

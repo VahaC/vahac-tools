@@ -4,7 +4,7 @@
   "private": true,
   "description": "Standalone browser tools by Vahac (tested with Node's built-in test runner).",
   "scripts": {
-    "test": "node --test --test-reporter=spec tests/"
+    "test": "node tests/run.js"
   },
   "engines": {
     "node": ">=20"
