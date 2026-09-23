@@ -260,6 +260,7 @@ Keep this list updated to avoid prefix collisions:
 | `jwt`  | JWT Decoder              | Built    |
 | `mtx`  | Merge Text Tool          | Built    |
 | `pwg`  | Password Generator       | Built    |
+| `rbt`  | robots.txt Gen/Validator | Built    |
 | `rgx`  | Regex Tester             | Built    |
 | `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |

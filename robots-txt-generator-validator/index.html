@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>robots.txt Generator and Validator — Logs from VahaC</title>
+  <meta name="description" content="Free robots.txt generator and validator: build allow/disallow rules, block AI crawlers, declare sitemaps, lint any robots.txt and test URLs per crawler. 100% in your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="rbt-wrapper">
+
+    <!-- Header -->
+    <div class="rbt-header">
+      <div class="rbt-badges" aria-hidden="true">
+        <span class="rbt-badge rbt-badge--gen">GENERATE</span>
+        <span class="rbt-badge rbt-badge--lint">VALIDATE</span>
+        <span class="rbt-badge rbt-badge--test">TEST URLS</span>
+      </div>
+      <h1 class="rbt-title">robots.txt Generator and Validator</h1>
+      <p class="rbt-subtitle">Build a <code class="rbt-code">robots.txt</code> with guided allow/disallow rules and sitemap lines, or paste an existing file to find mistakes and check which URLs a crawler may fetch. Rules are read the way RFC 9309 and Google's parser read them. Nothing leaves your browser.</p>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="rbt-modes" id="rbt-modes" role="tablist" aria-label="Tool mode">
+      <button class="rbt-mode rbt-active" id="rbt-mode-generate" type="button" role="tab" aria-selected="true" aria-controls="rbt-panel-generate" onclick="rbtSetMode('generate')">&#9998; Generator</button>
+      <button class="rbt-mode" id="rbt-mode-validate" type="button" role="tab" aria-selected="false" aria-controls="rbt-panel-validate" tabindex="-1" onclick="rbtSetMode('validate')">&#10003; Validator &amp; URL tester</button>
+    </div>
+
+    <!-- ══ GENERATOR ══ -->
+    <div class="rbt-panel" id="rbt-panel-generate" role="tabpanel" aria-labelledby="rbt-mode-generate">
+      <div class="rbt-layout">
+
+        <div class="rbt-col">
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Start from a preset</h2>
+            </div>
+            <div class="rbt-presets">
+              <button class="rbt-link-btn" type="button" onclick="rbtPreset('allow')">Allow everything</button>
+              <button class="rbt-link-btn" type="button" onclick="rbtPreset('block')">Block everything</button>
+              <button class="rbt-link-btn" type="button" onclick="rbtPreset('wordpress')">WordPress default</button>
+              <button class="rbt-link-btn" type="button" onclick="rbtPreset('blank')">Start blank</button>
+            </div>
+            <p class="rbt-hint">A preset replaces the groups below. Sitemaps and AI crawler choices stay as they are.</p>
+          </section>
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">User-agent groups</h2>
+              <button class="rbt-link-btn" type="button" onclick="rbtAddGroup()">+ Add group</button>
+            </div>
+            <p class="rbt-hint">Each group names one or more crawlers (<code class="rbt-code">*</code> means every crawler without its own group) and lists the paths they may or may not crawl. The longest matching rule wins; on a tie, <code class="rbt-code">Allow</code> wins.</p>
+            <div class="rbt-groups" id="rbt-groups"></div>
+            <datalist id="rbt-agent-list"></datalist>
+          </section>
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Block AI crawlers</h2>
+              <div class="rbt-toolbar">
+                <button class="rbt-link-btn" type="button" onclick="rbtAiAll(true)">Select all</button>
+                <button class="rbt-link-btn" type="button" onclick="rbtAiAll(false)">None</button>
+              </div>
+            </div>
+            <p class="rbt-hint">Checked crawlers get one shared group with <code class="rbt-code">Disallow: /</code>. Search crawlers such as Googlebot and Bingbot are not affected.</p>
+            <div class="rbt-ai-grid" id="rbt-ai-grid"></div>
+            <p class="rbt-hint rbt-hint--note">robots.txt is a request, not access control: reputable crawlers honour it, others may not.</p>
+          </section>
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Sitemaps</h2>
+            </div>
+            <div class="rbt-field">
+              <label class="rbt-label" for="rbt-sitemaps">Sitemap URLs — one per line</label>
+              <textarea class="rbt-textarea rbt-textarea--short" id="rbt-sitemaps" rows="3"
+                        spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                        placeholder="https://example.com/sitemap.xml"></textarea>
+            </div>
+            <p class="rbt-hint">Use full URLs, including <code class="rbt-code">https://</code>. WordPress 5.5+ serves <code class="rbt-code">/wp-sitemap.xml</code>; SEO plugins often use <code class="rbt-code">/sitemap_index.xml</code>.</p>
+          </section>
+
+        </div>
+
+        <div class="rbt-col rbt-col--sticky">
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Your robots.txt</h2>
+              <span class="rbt-counter" id="rbt-gen-size"></span>
+            </div>
+            <label class="rbt-sr-only" for="rbt-gen-output">Generated robots.txt</label>
+            <textarea class="rbt-textarea rbt-textarea--output" id="rbt-gen-output" rows="16" readonly spellcheck="false"></textarea>
+            <div class="rbt-actions">
+              <button class="rbt-btn" id="rbt-gen-copy" type="button" onclick="rbtCopyGenerated()">&#128203; Copy</button>
+              <button class="rbt-btn rbt-btn--secondary" id="rbt-gen-download" type="button" onclick="rbtDownloadGenerated()">Download robots.txt</button>
+              <button class="rbt-btn rbt-btn--secondary" type="button" onclick="rbtSendToValidator()">Test URLs &#8594;</button>
+            </div>
+            <p class="rbt-hint">Upload it to the root of your site so it answers at <code class="rbt-code">https://your-domain/robots.txt</code>. Each subdomain, protocol and port needs its own file.</p>
+          </section>
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Checks</h2>
+              <span class="rbt-counter" id="rbt-gen-check-count"></span>
+            </div>
+            <ul class="rbt-messages" id="rbt-gen-messages"></ul>
+          </section>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ VALIDATOR ══ -->
+    <div class="rbt-panel rbt-hidden" id="rbt-panel-validate" role="tabpanel" aria-labelledby="rbt-mode-validate">
+      <div class="rbt-layout">
+
+        <div class="rbt-col">
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">robots.txt to check</h2>
+              <div class="rbt-toolbar">
+                <button class="rbt-link-btn" type="button" onclick="rbtLoadSample()">Sample with mistakes</button>
+                <button class="rbt-link-btn" type="button" onclick="rbtOpenFile()">&#128194; Open file</button>
+                <button class="rbt-link-btn" type="button" onclick="rbtClearInput()">Clear</button>
+              </div>
+            </div>
+
+            <input class="rbt-file-input" id="rbt-file" type="file" tabindex="-1" aria-hidden="true" accept=".txt,text/plain">
+
+            <label class="rbt-sr-only" for="rbt-input">robots.txt content</label>
+            <textarea class="rbt-textarea" id="rbt-input" rows="16"
+                      spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                      placeholder="User-agent: *&#10;Disallow: /admin/&#10;&#10;Sitemap: https://example.com/sitemap.xml&#10;&#10;Paste the contents of https://your-domain/robots.txt here, or drop the file."></textarea>
+            <div class="rbt-status-row">
+              <p class="rbt-status" id="rbt-input-status" aria-live="polite"></p>
+              <span class="rbt-counter" id="rbt-file-name"></span>
+            </div>
+          </section>
+        </div>
+
+        <div class="rbt-col">
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Report</h2>
+            </div>
+            <div class="rbt-chips" id="rbt-summary"></div>
+            <ul class="rbt-messages" id="rbt-val-messages"></ul>
+            <p class="rbt-hint" id="rbt-val-empty">Paste a robots.txt to see errors, warnings and notes for each line.</p>
+          </section>
+
+          <section class="rbt-card">
+            <div class="rbt-card-head">
+              <h2 class="rbt-card-title">Groups as crawlers read them</h2>
+            </div>
+            <ul class="rbt-group-list" id="rbt-group-list"></ul>
+            <p class="rbt-hint" id="rbt-group-empty">No user-agent groups yet.</p>
+          </section>
+        </div>
+
+      </div>
+
+      <section class="rbt-card rbt-tester">
+        <div class="rbt-card-head">
+          <h2 class="rbt-card-title">URL tester</h2>
+          <span class="rbt-counter" id="rbt-test-count"></span>
+        </div>
+        <div class="rbt-grid-2">
+          <div class="rbt-field">
+            <label class="rbt-label" for="rbt-crawler">Crawler</label>
+            <select class="rbt-select" id="rbt-crawler"></select>
+          </div>
+          <div class="rbt-field rbt-hidden" id="rbt-custom-field">
+            <label class="rbt-label" for="rbt-custom-agent">Custom user-agent token</label>
+            <input class="rbt-input rbt-input--mono" id="rbt-custom-agent" type="text" placeholder="MyCrawler"
+                   maxlength="100" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
+        <div class="rbt-field">
+          <label class="rbt-label" for="rbt-urls">URLs or paths — one per line</label>
+          <textarea class="rbt-textarea rbt-textarea--short" id="rbt-urls" rows="5"
+                    spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                    placeholder="/&#10;/wp-admin/&#10;https://example.com/blog/post?id=7"></textarea>
+        </div>
+        <ul class="rbt-results" id="rbt-results" aria-live="polite"></ul>
+        <p class="rbt-hint" id="rbt-crawler-note"></p>
+      </section>
+    </div>
+
+    <p class="rbt-related">
+      Checking what a crawler will see? Decode percent-encoded paths with the <a class="rbt-footer-link" href="https://vahac.com/tools/url-encoder-and-decoder/">URL Encoder / Decoder</a>, or try wildcard patterns in the <a class="rbt-footer-link" href="https://vahac.com/tools/regex-tester-tool/">Regex Tester</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="rbt-toast" id="rbt-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="rbt-footer">
+      Built by <a class="rbt-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

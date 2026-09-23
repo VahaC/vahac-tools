@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-09-23 (CSV ↔ JSON ↔ SQL Converter added)
+- Last updated: 2026-09-23 (robots.txt Generator and Validator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -26,6 +26,7 @@ Documentation status:
 - `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
 - `password-passphrase-generator/` - secure password and passphrase generation.
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
+- `robots-txt-generator-validator/` - guided robots.txt builder (groups, AI crawler block, sitemaps), line-by-line validator with explanations, and a per-crawler URL tester.
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
 - `subnet-calculator/` - IPv4 subnet calculation and network planning.
 - `text-diff-tool/` - line/word/character text comparison with diff highlighting.
@@ -188,7 +189,17 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 16) Uptime / SLA Calculator
+### 16) robots.txt Generator and Validator
+
+Path:
+- `robots-txt-generator-validator/index.html`
+
+Features:
+- Builds a robots.txt from presets (allow all, block all, WordPress default) and editable user-agent groups with Allow/Disallow rules, optional Crawl-delay, a shared block for AI crawlers, and Sitemap lines.
+- Validates pasted or uploaded files line by line following RFC 9309 and Google's parser: typos, missing colons, rules outside groups, paths that never match, relative sitemaps, unsupported directives (Noindex, Host), groups merged by blank lines, and the 500 KiB limit.
+- Tests URLs per crawler (Googlebot, Bingbot, GPTBot, custom tokens, with documented Googlebot fallbacks) and explains which group and rule decide: the longest match wins and Allow wins ties.
+
+### 17) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -198,7 +209,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 17) IP Subnet Calculator
+### 18) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -208,7 +219,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 18) Text Diff Tool
+### 19) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -218,7 +229,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 19) Unix Timestamp Converter
+### 20) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -228,7 +239,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 20) URL Encoder / Decoder
+### 21) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -238,7 +249,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 21) vCard QR Code Generator
+### 22) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -248,7 +259,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 22) Wi-Fi QR Code Generator
+### 23) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -258,7 +269,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 23) YAML JSON TOML Converter
+### 24) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -295,6 +306,7 @@ Then open:
 - `http://localhost:8080/merge-text-tool/`
 - `http://localhost:8080/password-passphrase-generator/`
 - `http://localhost:8080/regex-tester/`
+- `http://localhost:8080/robots-txt-generator-validator/`
 - `http://localhost:8080/sla-calculator/`
 - `http://localhost:8080/subnet-calculator/`
 - `http://localhost:8080/text-diff-tool/`
@@ -307,7 +319,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (476 tests across 22 modules), powered by the built-in Node.js test runner
+tool (518 tests across 22 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
