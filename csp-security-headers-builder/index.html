@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSP and HTTP Security Headers Builder — Logs from VahaC</title>
+  <meta name="description" content="Free Content Security Policy generator and security headers analyzer: build CSP, HSTS and Permissions-Policy, copy Nginx, Apache, Caddy or Traefik config, and audit pasted headers.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="csh-wrapper">
+
+    <!-- Header -->
+    <div class="csh-header">
+      <div class="csh-badges" aria-hidden="true">
+        <span class="csh-badge csh-badge--build">BUILD</span>
+        <span class="csh-badge csh-badge--audit">ANALYZE</span>
+        <span class="csh-badge csh-badge--conf">10 CONFIG FORMATS</span>
+      </div>
+      <h1 class="csh-title">CSP and HTTP Security Headers Builder</h1>
+      <p class="csh-subtitle">Build a Content-Security-Policy step by step, add HSTS, Permissions-Policy and the other security headers, and copy them as Nginx, Apache, Caddy, Traefik, IIS or WordPress config. Or paste the headers a site already sends to see what is missing, broken or unsafe. Nothing leaves your browser.</p>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="csh-modes" id="csh-modes" role="tablist" aria-label="Tool mode">
+      <button class="csh-mode csh-active" id="csh-mode-build" type="button" role="tab" aria-selected="true" aria-controls="csh-panel-build" onclick="cshSetMode('build')">&#128736; Builder</button>
+      <button class="csh-mode" id="csh-mode-analyze" type="button" role="tab" aria-selected="false" aria-controls="csh-panel-analyze" tabindex="-1" onclick="cshSetMode('analyze')">&#128269; Analyzer</button>
+    </div>
+
+    <!-- ══ BUILDER ══ -->
+    <div class="csh-panel" id="csh-panel-build" role="tabpanel" aria-labelledby="csh-mode-build">
+      <div class="csh-layout">
+
+        <div class="csh-col">
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">1. Start from a preset</h2>
+            </div>
+            <div class="csh-presets">
+              <button class="csh-preset" type="button" onclick="cshPreset('starter')"><span class="csh-preset-name">Starter</span><span class="csh-preset-sub">Your own origin only — static and self-hosted sites</span></button>
+              <button class="csh-preset" type="button" onclick="cshPreset('strict')"><span class="csh-preset-name">Strict CSP (nonce)</span><span class="csh-preset-sub">Google's recommended policy for apps that can add nonces</span></button>
+              <button class="csh-preset" type="button" onclick="cshPreset('compat')"><span class="csh-preset-name">Compatible</span><span class="csh-preset-sub">Allows inline scripts, which many CMS themes and plugins need</span></button>
+              <button class="csh-preset" type="button" onclick="cshPreset('api')"><span class="csh-preset-name">API / JSON</span><span class="csh-preset-sub">Blocks everything — for endpoints that serve no HTML</span></button>
+              <button class="csh-preset" type="button" onclick="cshPreset('blank')"><span class="csh-preset-name">Blank</span><span class="csh-preset-sub">Start from nothing</span></button>
+            </div>
+            <p class="csh-hint">A preset replaces the CSP directives below. Services and the other headers stay as they are.</p>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">2. Content-Security-Policy</h2>
+              <label class="csh-inline-check" for="csh-csp-on"><input class="csh-checkbox" id="csh-csp-on" type="checkbox" checked> Send CSP</label>
+            </div>
+
+            <div class="csh-segment" role="radiogroup" aria-label="CSP mode">
+              <label class="csh-seg"><input class="csh-seg-input" type="radio" name="csh-csp-mode" value="enforce" checked><span class="csh-seg-label">Enforce</span></label>
+              <label class="csh-seg"><input class="csh-seg-input" type="radio" name="csh-csp-mode" value="report"><span class="csh-seg-label">Report-Only</span></label>
+            </div>
+            <p class="csh-hint">Report-Only sends <code class="csh-code">Content-Security-Policy-Report-Only</code>: browsers report what would be blocked but block nothing — the safe way to try a new policy on a live site.</p>
+
+            <h3 class="csh-subhead">Third-party services</h3>
+            <div class="csh-services" id="csh-services"></div>
+            <ul class="csh-service-notes" id="csh-service-notes"></ul>
+            <p class="csh-hint">Hosts come from each vendor's own documentation. With a strict (nonce) policy, give the vendor's &lt;script&gt; tag your nonce instead — hosts are then only a fallback for old browsers.</p>
+
+            <h3 class="csh-subhead">Directives</h3>
+            <p class="csh-hint">Separate sources with spaces. Keywords need single quotes, such as <code class="csh-code">'self'</code> and <code class="csh-code">'none'</code>. An empty field falls back as shown; the buttons add or remove common values.</p>
+            <div class="csh-dirs" id="csh-dirs"></div>
+            <button class="csh-link-btn csh-more-btn" id="csh-more-btn" type="button" aria-expanded="false" aria-controls="csh-dirs-more" onclick="cshToggleMore()">+ More directives</button>
+            <div class="csh-dirs csh-hidden" id="csh-dirs-more"></div>
+
+            <label class="csh-check" for="csh-upgrade">
+              <input class="csh-checkbox" id="csh-upgrade" type="checkbox">
+              <span class="csh-check-text">
+                <span class="csh-check-name">upgrade-insecure-requests</span>
+                <span class="csh-check-sub">Load http:// images, scripts and styles over https:// instead — handy for old content.</span>
+              </span>
+            </label>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Hash an inline script or style</h2>
+            </div>
+            <p class="csh-hint">Paste the exact text between <code class="csh-code">&lt;script&gt;</code> and <code class="csh-code">&lt;/script&gt;</code>, or the whole element. Every space counts; line endings are turned into LF, as the HTML parser does.</p>
+            <label class="csh-sr-only" for="csh-hash-input">Inline script or style to hash</label>
+            <textarea class="csh-textarea csh-textarea--short" id="csh-hash-input" rows="4"
+                      spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                      placeholder="window.dataLayer = window.dataLayer || [];"></textarea>
+            <div class="csh-grid-2">
+              <div class="csh-field">
+                <label class="csh-label" for="csh-hash-target">Add to</label>
+                <select class="csh-select" id="csh-hash-target">
+                  <option value="script">&lt;script&gt; block → script-src</option>
+                  <option value="style">&lt;style&gt; block → style-src</option>
+                  <option value="attr">Event handler (onclick…) → script-src + 'unsafe-hashes'</option>
+                </select>
+              </div>
+              <div class="csh-field">
+                <label class="csh-label" for="csh-hash-alg">Algorithm</label>
+                <select class="csh-select" id="csh-hash-alg">
+                  <option value="sha256">SHA-256</option>
+                  <option value="sha384">SHA-384</option>
+                  <option value="sha512">SHA-512</option>
+                </select>
+              </div>
+            </div>
+            <div class="csh-hash-box">
+              <code class="csh-hash-value" id="csh-hash-value">—</code>
+              <p class="csh-hint" id="csh-hash-note"></p>
+            </div>
+            <div class="csh-actions">
+              <button class="csh-btn csh-btn--secondary" type="button" onclick="cshAddHash()">+ Add to policy</button>
+              <button class="csh-btn csh-btn--secondary" type="button" onclick="cshCopyHash()">&#128203; Copy hash</button>
+            </div>
+            <p class="csh-hint csh-hint--note">Nonces must be new on every response, so they come from your server, not from this page: PHP <code class="csh-code">base64_encode(random_bytes(16))</code>, Node.js <code class="csh-code">crypto.randomBytes(16).toString('base64')</code>, Python <code class="csh-code">secrets.token_urlsafe(16)</code>. Example of the format: <code class="csh-code" id="csh-nonce-sample"></code></p>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Violation reports</h2>
+            </div>
+            <div class="csh-grid-2">
+              <div class="csh-field">
+                <label class="csh-label" for="csh-report-url">Report URL</label>
+                <input class="csh-input csh-input--mono" id="csh-report-url" type="url" placeholder="https://example.com/csp-reports"
+                       autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              </div>
+              <div class="csh-field">
+                <label class="csh-label" for="csh-report-name">Endpoint name</label>
+                <input class="csh-input csh-input--mono" id="csh-report-name" type="text" placeholder="csp-endpoint"
+                       autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+              </div>
+            </div>
+            <p class="csh-hint">Adds <code class="csh-code">report-uri</code> and <code class="csh-code">report-to</code> to the CSP plus a <code class="csh-code">Reporting-Endpoints</code> header. You need something that accepts the JSON reports — a small endpoint of your own or a hosted collector.</p>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">3. HTTPS, framing and sniffing</h2>
+            </div>
+            <label class="csh-check" for="csh-hsts-on">
+              <input class="csh-checkbox" id="csh-hsts-on" type="checkbox" checked>
+              <span class="csh-check-text">
+                <span class="csh-check-name">Strict-Transport-Security</span>
+                <span class="csh-check-sub">Browsers remember to use HTTPS only. Turn it on once every page works over HTTPS.</span>
+              </span>
+            </label>
+            <div class="csh-grid-2" id="csh-hsts-opts">
+              <div class="csh-field">
+                <label class="csh-label" for="csh-hsts-age">max-age</label>
+                <select class="csh-select" id="csh-hsts-age">
+                  <option value="300">5 minutes — first test</option>
+                  <option value="604800">1 week</option>
+                  <option value="2592000">30 days</option>
+                  <option value="15552000">180 days</option>
+                  <option value="31536000">1 year — recommended</option>
+                  <option value="63072000">2 years</option>
+                </select>
+              </div>
+              <div class="csh-field csh-field--checks">
+                <label class="csh-check" for="csh-hsts-sub">
+                  <input class="csh-checkbox" id="csh-hsts-sub" type="checkbox">
+                  <span class="csh-check-text">
+                    <span class="csh-check-name">includeSubDomains</span>
+                    <span class="csh-check-sub">Every subdomain needs HTTPS</span>
+                  </span>
+                </label>
+                <label class="csh-check" for="csh-hsts-preload">
+                  <input class="csh-checkbox" id="csh-hsts-preload" type="checkbox">
+                  <span class="csh-check-text">
+                    <span class="csh-check-name">preload</span>
+                    <span class="csh-check-sub">For hstspreload.org — slow to undo</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+            <p class="csh-hint">Raise max-age in steps (5 minutes → 1 week → 30 days → 1 year) and check that nothing breaks in between.</p>
+
+            <div class="csh-grid-2">
+              <div class="csh-field">
+                <label class="csh-label" for="csh-xfo">X-Frame-Options</label>
+                <select class="csh-select" id="csh-xfo">
+                  <option value="auto">Auto — match frame-ancestors</option>
+                  <option value="SAMEORIGIN">SAMEORIGIN</option>
+                  <option value="DENY">DENY</option>
+                  <option value="">Don't send</option>
+                </select>
+              </div>
+              <div class="csh-field">
+                <label class="csh-label" for="csh-referrer">Referrer-Policy</label>
+                <select class="csh-select" id="csh-referrer"></select>
+              </div>
+            </div>
+            <label class="csh-check" for="csh-xcto">
+              <input class="csh-checkbox" id="csh-xcto" type="checkbox" checked>
+              <span class="csh-check-text">
+                <span class="csh-check-name">X-Content-Type-Options: nosniff</span>
+                <span class="csh-check-sub">Stops browsers from guessing file types, such as running an uploaded .txt file as a script.</span>
+              </span>
+            </label>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">4. Permissions-Policy</h2>
+              <div class="csh-toolbar">
+                <button class="csh-link-btn" type="button" onclick="cshPermBlock()">Block sensors &amp; devices</button>
+                <button class="csh-link-btn" type="button" onclick="cshPermClear()">Clear</button>
+              </div>
+            </div>
+            <p class="csh-hint">Switch off browser features your site never uses, so injected or embedded code cannot ask for them. Chromium-based browsers apply this header; Firefox and Safari ignore it for now.</p>
+            <div class="csh-perms" id="csh-perms"></div>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">5. Cross-origin and clean-up</h2>
+            </div>
+            <div class="csh-grid-3">
+              <div class="csh-field">
+                <label class="csh-label" for="csh-coop">Opener policy (COOP)</label>
+                <select class="csh-select" id="csh-coop">
+                  <option value="">Not set</option>
+                  <option value="same-origin-allow-popups">same-origin-allow-popups</option>
+                  <option value="same-origin">same-origin</option>
+                  <option value="noopener-allow-popups">noopener-allow-popups</option>
+                  <option value="unsafe-none">unsafe-none</option>
+                </select>
+              </div>
+              <div class="csh-field">
+                <label class="csh-label" for="csh-coep">Embedder policy (COEP)</label>
+                <select class="csh-select" id="csh-coep">
+                  <option value="">Not set</option>
+                  <option value="credentialless">credentialless</option>
+                  <option value="require-corp">require-corp</option>
+                  <option value="unsafe-none">unsafe-none</option>
+                </select>
+              </div>
+              <div class="csh-field">
+                <label class="csh-label" for="csh-corp">Resource policy (CORP)</label>
+                <select class="csh-select" id="csh-corp">
+                  <option value="">Not set</option>
+                  <option value="same-origin">same-origin</option>
+                  <option value="same-site">same-site</option>
+                  <option value="cross-origin">cross-origin</option>
+                </select>
+              </div>
+            </div>
+            <p class="csh-hint">COOP <code class="csh-code">same-origin-allow-popups</code> is a safe start. Set COEP only if you need cross-origin isolation (SharedArrayBuffer, precise timers): it can block third-party images and embeds.</p>
+            <label class="csh-check" for="csh-xxss">
+              <input class="csh-checkbox" id="csh-xxss" type="checkbox">
+              <span class="csh-check-text">
+                <span class="csh-check-name">X-XSS-Protection: 0</span>
+                <span class="csh-check-sub">Explicitly turns off the old browser XSS filter, as OWASP recommends. Only useful if something else adds this header.</span>
+              </span>
+            </label>
+            <label class="csh-check" for="csh-hide">
+              <input class="csh-checkbox" id="csh-hide" type="checkbox">
+              <span class="csh-check-text">
+                <span class="csh-check-name">Hide server details</span>
+                <span class="csh-check-sub">Adds config that removes version numbers from Server and drops X-Powered-By, where the server allows it.</span>
+              </span>
+            </label>
+          </section>
+
+        </div>
+
+        <div class="csh-col csh-col--sticky">
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Your headers</h2>
+              <span class="csh-counter" id="csh-out-count"></span>
+            </div>
+            <div class="csh-field">
+              <label class="csh-label" for="csh-format">Format</label>
+              <select class="csh-select" id="csh-format"></select>
+            </div>
+            <label class="csh-sr-only" for="csh-output">Generated configuration</label>
+            <textarea class="csh-textarea csh-textarea--output" id="csh-output" rows="14" readonly spellcheck="false"></textarea>
+            <div class="csh-actions">
+              <button class="csh-btn" type="button" onclick="cshCopyOutput()">&#128203; Copy</button>
+              <button class="csh-btn csh-btn--secondary" type="button" onclick="cshDownloadOutput()">Download</button>
+              <button class="csh-btn csh-btn--secondary" type="button" onclick="cshSendToAnalyzer()">Full report &#8594;</button>
+            </div>
+            <ul class="csh-messages" id="csh-format-notes"></ul>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Checks</h2>
+              <span class="csh-score" id="csh-build-score"></span>
+            </div>
+            <ul class="csh-messages" id="csh-build-checks"></ul>
+          </section>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ ANALYZER ══ -->
+    <div class="csh-panel csh-hidden" id="csh-panel-analyze" role="tabpanel" aria-labelledby="csh-mode-analyze">
+      <div class="csh-layout">
+
+        <div class="csh-col">
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Headers to analyze</h2>
+              <div class="csh-toolbar">
+                <button class="csh-link-btn" type="button" onclick="cshLoadSample()">Sample with mistakes</button>
+                <button class="csh-link-btn" type="button" onclick="cshClearInput()">Clear</button>
+              </div>
+            </div>
+            <label class="csh-sr-only" for="csh-input">Response headers, a CSP value or a meta tag</label>
+            <textarea class="csh-textarea" id="csh-input" rows="16"
+                      spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                      placeholder="HTTP/2 200&#10;content-security-policy: default-src 'self'&#10;strict-transport-security: max-age=31536000&#10;x-content-type-options: nosniff&#10;&#10;Paste curl -I output, DevTools response headers, a bare CSP value or a &lt;meta http-equiv&gt; tag."></textarea>
+            <p class="csh-status" id="csh-input-status" aria-live="polite"></p>
+            <div class="csh-field csh-hidden" id="csh-response-field">
+              <label class="csh-label" for="csh-response">Response to analyze</label>
+              <select class="csh-select" id="csh-response"></select>
+            </div>
+          </section>
+
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">How to get the headers</h2>
+            </div>
+            <p class="csh-hint">This page does not fetch sites for you: browsers hide most response headers from cross-origin requests (CORS), so a "check URL" button in a web page gives incomplete answers. Copy them yourself — it takes seconds:</p>
+            <ul class="csh-howto">
+              <li class="csh-howto-item"><span class="csh-howto-os">Linux / macOS</span><code class="csh-code">curl -sI https://example.com</code></li>
+              <li class="csh-howto-item"><span class="csh-howto-os">Windows</span><code class="csh-code">curl.exe -sI https://example.com</code></li>
+              <li class="csh-howto-item"><span class="csh-howto-os">Browser</span>DevTools → Network → reload → click the page → Headers → Response Headers → Raw</li>
+            </ul>
+            <p class="csh-hint">Some servers answer HEAD requests (<code class="csh-code">-I</code>) with fewer headers than GET. For a GET, use <code class="csh-code">curl -s -D - -o /dev/null URL</code> (<code class="csh-code">-o NUL</code> on Windows); add <code class="csh-code">-L</code> to follow redirects.</p>
+          </section>
+        </div>
+
+        <div class="csh-col">
+          <section class="csh-card">
+            <div class="csh-card-head">
+              <h2 class="csh-card-title">Report</h2>
+              <div class="csh-toolbar">
+                <button class="csh-link-btn" id="csh-to-builder" type="button" onclick="cshEditInBuilder()" disabled>Edit in builder &#8594;</button>
+                <button class="csh-link-btn" id="csh-copy-report" type="button" onclick="cshCopyReport()" disabled>&#128203; Copy report</button>
+              </div>
+            </div>
+            <div class="csh-grade-row csh-hidden" id="csh-grade-row">
+              <div class="csh-grade" id="csh-grade">–</div>
+              <div class="csh-grade-text">
+                <div class="csh-grade-score" id="csh-grade-score"></div>
+                <div class="csh-chips" id="csh-summary"></div>
+              </div>
+            </div>
+            <p class="csh-hint" id="csh-report-empty">Paste headers to get a checklist of what is good, weak, missing or broken — with the reason for each finding.</p>
+            <ul class="csh-sections" id="csh-sections"></ul>
+            <p class="csh-hint csh-hidden" id="csh-score-note">The score covers only the headers you pasted. It is a checklist, not a penetration test.</p>
+          </section>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="csh-related">
+      Working on the rest of your security setup? Decode session tokens with the <a class="csh-footer-link" href="https://vahac.com/tools/jwt-token-decoder/">JWT Token Decoder</a>, compute checksums with the <a class="csh-footer-link" href="https://vahac.com/tools/hash-generator-for-files-and-text/">Hash Generator</a>, or create strong secrets with the <a class="csh-footer-link" href="https://vahac.com/tools/secure-password-and-passphrase-generator/">Password Generator</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="csh-toast" id="csh-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="csh-footer">
+      Built by <a class="csh-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
