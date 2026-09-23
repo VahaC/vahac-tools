@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cURL to Code Converter — Logs from VahaC</title>
+  <meta name="description" content="Free cURL to code converter: turn curl commands from docs or browser DevTools into fetch, Python requests or Node.js code, with honest notes for unsupported flags.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="crl-wrapper">
+
+    <!-- Header -->
+    <div class="crl-header">
+      <div class="crl-badges" aria-hidden="true">
+        <span class="crl-badge crl-badge--curl">CURL</span>
+        <span class="crl-badge-arrow">&#8594;</span>
+        <span class="crl-badge crl-badge--fetch">FETCH</span>
+        <span class="crl-badge crl-badge--python">PYTHON</span>
+        <span class="crl-badge crl-badge--node">NODE.JS</span>
+      </div>
+      <h1 class="crl-title">cURL to Code Converter</h1>
+      <p class="crl-subtitle">Paste a curl command from API docs, a README or your browser's <em>Copy as cURL</em>. The tool reads it the way your shell and curl would, then writes the same request as <code class="crl-code">fetch()</code>, Python <code class="crl-code">requests</code> or Node.js code. Options that cannot be carried over are listed, not silently dropped. Nothing leaves your browser.</p>
+    </div>
+
+    <div class="crl-layout">
+
+      <!-- ══ INPUT ══ -->
+      <div class="crl-col">
+        <section class="crl-card">
+          <div class="crl-card-head">
+            <h2 class="crl-card-title">curl command</h2>
+            <div class="crl-shell">
+              <label class="crl-shell-label" for="crl-dialect">Shell</label>
+              <select class="crl-select" id="crl-dialect">
+                <option value="auto" selected>Auto-detect</option>
+                <option value="posix">bash / zsh</option>
+                <option value="cmd">Windows cmd</option>
+                <option value="powershell">PowerShell</option>
+              </select>
+            </div>
+          </div>
+          <label class="crl-sr-only" for="crl-input">curl command</label>
+          <textarea class="crl-textarea" id="crl-input" rows="12"
+                    spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                    placeholder="curl -X POST https://api.example.com/items -H 'Content-Type: application/json' -d '{&quot;name&quot;:&quot;Widget&quot;}'"></textarea>
+          <div class="crl-status-row">
+            <p class="crl-status" id="crl-status" aria-live="polite"></p>
+            <button class="crl-link-btn" type="button" onclick="crlClear()">Clear</button>
+          </div>
+          <div class="crl-samples">
+            <span class="crl-samples-label">Examples:</span>
+            <button class="crl-link-btn" type="button" onclick="crlSample('get')">GET + token</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('json')">POST JSON</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('form')">File upload</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('chrome')">Chrome DevTools</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('cmd')">Windows cmd</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('powershell')">PowerShell</button>
+            <button class="crl-link-btn" type="button" onclick="crlSample('flags')">Unsupported flags</button>
+          </div>
+        </section>
+
+        <section class="crl-card">
+          <div class="crl-card-head">
+            <h2 class="crl-card-title">Parsed request</h2>
+          </div>
+          <div id="crl-summary"></div>
+          <details class="crl-args crl-hidden" id="crl-args-box">
+            <summary class="crl-args-summary">Arguments curl receives <span class="crl-counter" id="crl-args-count"></span></summary>
+            <ol class="crl-arg-list" id="crl-args"></ol>
+            <p class="crl-hint">This is the argument list after the shell has removed quotes and processed escapes. If a value looks wrong here, the quoting in the command is off.</p>
+          </details>
+        </section>
+      </div>
+
+      <!-- ══ OUTPUT ══ -->
+      <div class="crl-col crl-col--sticky">
+        <section class="crl-card">
+          <div class="crl-tabs" id="crl-tabs" role="tablist" aria-label="Output language">
+            <button class="crl-tab crl-active" id="crl-tab-fetch" type="button" role="tab" aria-selected="true" aria-controls="crl-output-panel" onclick="crlSetTarget('fetch')">Fetch</button>
+            <button class="crl-tab" id="crl-tab-python" type="button" role="tab" aria-selected="false" aria-controls="crl-output-panel" tabindex="-1" onclick="crlSetTarget('python')">Python</button>
+            <button class="crl-tab" id="crl-tab-node" type="button" role="tab" aria-selected="false" aria-controls="crl-output-panel" tabindex="-1" onclick="crlSetTarget('node')">Node.js</button>
+          </div>
+          <div class="crl-output-panel" id="crl-output-panel" role="tabpanel" aria-labelledby="crl-tab-fetch">
+            <div class="crl-output-head">
+              <span class="crl-output-label" id="crl-output-label">Fetch (browser)</span>
+              <div class="crl-flavor crl-hidden" id="crl-node-flavor" role="group" aria-label="Node.js HTTP client">
+                <button class="crl-flavor-btn crl-active" id="crl-flavor-fetch" type="button" aria-pressed="true" onclick="crlSetNode('fetch')">fetch</button>
+                <button class="crl-flavor-btn" id="crl-flavor-axios" type="button" aria-pressed="false" onclick="crlSetNode('axios')">axios</button>
+              </div>
+            </div>
+            <pre class="crl-pre" tabindex="0" aria-label="Generated code"><code class="crl-output" id="crl-output"></code></pre>
+            <div class="crl-actions">
+              <button class="crl-btn" id="crl-copy" type="button" onclick="crlCopy()">&#128203; Copy code</button>
+              <button class="crl-btn crl-btn--secondary" id="crl-download" type="button" onclick="crlDownload()">Download</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="crl-card">
+          <div class="crl-card-head">
+            <h2 class="crl-card-title">Conversion notes</h2>
+            <div class="crl-chips" id="crl-note-counts"></div>
+          </div>
+          <ul class="crl-messages" id="crl-notes" aria-live="polite"></ul>
+          <p class="crl-hint crl-hint--note">"Not translated" means the generated code behaves differently from curl for that option. Read those notes before you run the code.</p>
+        </section>
+      </div>
+
+    </div>
+
+    <p class="crl-related">
+      Working with the response? Tidy it up in the <a class="crl-footer-link" href="https://vahac.com/tools/json-formatter-and-validator/">JSON Formatter and Validator</a>, decode tokens with the <a class="crl-footer-link" href="https://vahac.com/tools/jwt-token-decoder/">JWT Decoder</a>, or fix query strings with the <a class="crl-footer-link" href="https://vahac.com/tools/url-encoder-and-decoder/">URL Encoder / Decoder</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="crl-toast" id="crl-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="crl-footer">
+      Built by <a class="crl-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -251,6 +251,7 @@ Keep this list updated to avoid prefix collisions:
 | `chm`  | Chmod Permission Calc    | Built    |
 | `crn`  | Cron Expression Generator| Built    |
 | `cjs`  | CSV ↔ JSON ↔ SQL Conv.   | Built    |
+| `crl`  | cURL to Code Converter   | Built    |
 | `dcv`  | Docker Compose Validator | Built    |
 | `drc`  | Docker Run ↔ Compose     | Built    |
 | `fvg`  | Favicon Generator        | Built    |
