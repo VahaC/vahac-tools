@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTM Campaign URL Builder — Logs from VahaC</title>
+  <meta name="description" content="Free UTM campaign URL builder: tag any link with utm_source, utm_medium and utm_campaign, check its GA4 channel, then copy it or download a QR code.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ucb-wrapper">
+
+    <!-- Header -->
+    <div class="ucb-header">
+      <h1 class="ucb-title">UTM Campaign URL Builder</h1>
+      <p class="ucb-subtitle">Tag any link so Google Analytics shows which newsletter, post, ad or flyer brought each visitor. Pick a preset, check which GA4 channel the visits will land in, then copy the link or download a QR code for print. Everything runs in your browser.</p>
+    </div>
+
+    <div class="ucb-layout">
+
+      <!-- ══ LEFT: link details ══ -->
+      <div class="ucb-col">
+
+        <section class="ucb-card">
+          <div class="ucb-card-head">
+            <h2 class="ucb-card-title">Link details</h2>
+            <div class="ucb-card-tools">
+              <button class="ucb-link-btn" type="button" onclick="ucbExample()">Try an example</button>
+              <button class="ucb-link-btn" type="button" onclick="ucbReset()">Clear</button>
+            </div>
+          </div>
+
+          <div class="ucb-field">
+            <label class="ucb-label" for="ucb-url">Website URL <span class="ucb-req" aria-hidden="true">*</span></label>
+            <input class="ucb-input ucb-input--mono" id="ucb-url" type="text" inputmode="url" placeholder="https://example.com/spring-sale"
+                   autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-url-hint">
+            <p class="ucb-hint" id="ucb-url-hint">The page visitors should land on. Paste an already tagged link to edit its tags.</p>
+          </div>
+
+          <div class="ucb-field">
+            <label class="ucb-label" for="ucb-preset">Preset</label>
+            <div class="ucb-preset-row">
+              <select class="ucb-select" id="ucb-preset" aria-describedby="ucb-preset-hint">
+                <option value="">Choose a preset…</option>
+              </select>
+              <button class="ucb-btn ucb-btn--secondary ucb-btn--compact" id="ucb-preset-save" type="button" onclick="ucbPresetSaveStart()">Save as preset</button>
+              <button class="ucb-btn ucb-btn--secondary ucb-btn--compact ucb-hidden" id="ucb-preset-delete" type="button" onclick="ucbPresetDelete()">Delete</button>
+            </div>
+            <div class="ucb-preset-form ucb-hidden" id="ucb-preset-form">
+              <label class="ucb-sr-only" for="ucb-preset-name">Preset name</label>
+              <input class="ucb-input" id="ucb-preset-name" type="text" maxlength="60" placeholder="Preset name, e.g. Monthly newsletter" autocomplete="off">
+              <button class="ucb-btn ucb-btn--compact" type="button" onclick="ucbPresetSaveConfirm()">Save</button>
+              <button class="ucb-btn ucb-btn--secondary ucb-btn--compact" type="button" onclick="ucbPresetSaveCancel()">Cancel</button>
+            </div>
+            <p class="ucb-hint" id="ucb-preset-hint"></p>
+          </div>
+
+          <div class="ucb-grid-2">
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-source">Campaign source <span class="ucb-req" aria-hidden="true">*</span></label>
+              <input class="ucb-input ucb-input--mono" id="ucb-source" type="text" list="ucb-source-list" placeholder="newsletter, facebook, google"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-source-hint">
+              <p class="ucb-hint" id="ucb-source-hint"><code class="ucb-code">utm_source</code> — where the visit comes from</p>
+            </div>
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-medium">Campaign medium <span class="ucb-req" aria-hidden="true">*</span></label>
+              <input class="ucb-input ucb-input--mono" id="ucb-medium" type="text" list="ucb-medium-list" placeholder="email, social, cpc"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-medium-hint">
+              <p class="ucb-hint" id="ucb-medium-hint"><code class="ucb-code">utm_medium</code> — the kind of channel</p>
+            </div>
+          </div>
+
+          <div class="ucb-field">
+            <label class="ucb-label" for="ucb-campaign">Campaign name <span class="ucb-req" aria-hidden="true">*</span></label>
+            <input class="ucb-input ucb-input--mono" id="ucb-campaign" type="text" placeholder="spring_sale_2026"
+                   autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-campaign-hint">
+            <p class="ucb-hint" id="ucb-campaign-hint"><code class="ucb-code">utm_campaign</code> — the promotion, product or slogan</p>
+          </div>
+
+          <div class="ucb-grid-2">
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-content">Campaign content</label>
+              <input class="ucb-input ucb-input--mono" id="ucb-content" type="text" placeholder="header_button"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-content-hint">
+              <p class="ucb-hint" id="ucb-content-hint"><code class="ucb-code">utm_content</code> — tells apart links or ads in one campaign</p>
+            </div>
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-term">Campaign term</label>
+              <input class="ucb-input ucb-input--mono" id="ucb-term" type="text" placeholder="running_shoes"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="ucb-term-hint">
+              <p class="ucb-hint" id="ucb-term-hint"><code class="ucb-code">utm_term</code> — the paid search keyword</p>
+            </div>
+          </div>
+
+          <details class="ucb-more" id="ucb-more">
+            <summary class="ucb-more-summary">More GA4 parameters <span class="ucb-more-sub">campaign ID, source platform, creative format, tactic</span></summary>
+            <div class="ucb-more-body">
+              <div class="ucb-grid-2">
+                <div class="ucb-field">
+                  <label class="ucb-label" for="ucb-id">Campaign ID</label>
+                  <input class="ucb-input ucb-input--mono" id="ucb-id" type="text" placeholder="spring_2026_01"
+                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                  <p class="ucb-hint"><code class="ucb-code">utm_id</code> — recommended if you import cost data into GA4</p>
+                </div>
+                <div class="ucb-field">
+                  <label class="ucb-label" for="ucb-platform">Source platform</label>
+                  <input class="ucb-input ucb-input--mono" id="ucb-platform" type="text" placeholder="manual"
+                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                  <p class="ucb-hint"><code class="ucb-code">utm_source_platform</code> — the platform that buys or manages the traffic</p>
+                </div>
+                <div class="ucb-field">
+                  <label class="ucb-label" for="ucb-format">Creative format</label>
+                  <input class="ucb-input ucb-input--mono" id="ucb-format" type="text" placeholder="video"
+                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                  <p class="ucb-hint"><code class="ucb-code">utm_creative_format</code> — not reported in GA4 yet</p>
+                </div>
+                <div class="ucb-field">
+                  <label class="ucb-label" for="ucb-tactic">Marketing tactic</label>
+                  <input class="ucb-input ucb-input--mono" id="ucb-tactic" type="text" placeholder="remarketing"
+                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                  <p class="ucb-hint"><code class="ucb-code">utm_marketing_tactic</code> — not reported in GA4 yet</p>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="ucb-options">
+            <h3 class="ucb-subhead">Formatting</h3>
+            <label class="ucb-check" for="ucb-lower">
+              <input class="ucb-checkbox" id="ucb-lower" type="checkbox" checked>
+              <span class="ucb-check-text">Lowercase values <span class="ucb-check-sub">GA4 is case-sensitive: Facebook and facebook would show up as two sources.</span></span>
+            </label>
+            <div class="ucb-field ucb-field--row">
+              <label class="ucb-label" for="ucb-spaces">Spaces</label>
+              <select class="ucb-select" id="ucb-spaces">
+                <option value="underscore" selected>Replace with _ (spring_sale)</option>
+                <option value="hyphen">Replace with - (spring-sale)</option>
+                <option value="keep">Keep (sent as %20)</option>
+              </select>
+            </div>
+            <label class="ucb-check" for="ucb-macros">
+              <input class="ucb-checkbox" id="ucb-macros" type="checkbox" checked>
+              <span class="ucb-check-text">Keep ad-platform placeholders <span class="ucb-check-sub">Leaves <code class="ucb-code">{{campaign.name}}</code>, <code class="ucb-code">{campaignid}</code> or <code class="ucb-code">__CAMPAIGN_NAME__</code> unencoded so Meta, Google Ads or TikTok can fill them in.</span></span>
+            </label>
+          </div>
+
+          <datalist id="ucb-source-list">
+            <option value="newsletter"></option>
+            <option value="facebook"></option>
+            <option value="instagram"></option>
+            <option value="linkedin"></option>
+            <option value="twitter"></option>
+            <option value="tiktok"></option>
+            <option value="youtube"></option>
+            <option value="pinterest"></option>
+            <option value="reddit"></option>
+            <option value="whatsapp"></option>
+            <option value="google"></option>
+            <option value="bing"></option>
+            <option value="email_signature"></option>
+            <option value="google_business_profile"></option>
+            <option value="flyer"></option>
+            <option value="sms"></option>
+          </datalist>
+          <datalist id="ucb-medium-list">
+            <option value="email" label="Email"></option>
+            <option value="social" label="Organic Social"></option>
+            <option value="paid_social" label="Paid Social (with a social source)"></option>
+            <option value="cpc" label="Paid Search or Paid Social, by source"></option>
+            <option value="display" label="Display"></option>
+            <option value="banner" label="Display"></option>
+            <option value="affiliate" label="Affiliates"></option>
+            <option value="referral" label="Referral"></option>
+            <option value="organic" label="Organic Search"></option>
+            <option value="video" label="Organic Video"></option>
+            <option value="paid_video" label="Paid Video (with a video source)"></option>
+            <option value="audio" label="Audio"></option>
+            <option value="sms" label="SMS"></option>
+            <option value="push" label="Mobile Push Notifications"></option>
+            <option value="print" label="Unassigned (offline)"></option>
+          </datalist>
+        </section>
+
+      </div>
+
+      <!-- ══ RIGHT: result ══ -->
+      <div class="ucb-col">
+
+        <section class="ucb-card">
+          <h2 class="ucb-card-title">Campaign URL</h2>
+          <div class="ucb-preview ucb-preview--empty" id="ucb-preview" aria-live="polite"></div>
+          <p class="ucb-status" id="ucb-status"></p>
+          <div class="ucb-actions">
+            <button class="ucb-btn" id="ucb-btn-copy" type="button" onclick="ucbCopyUrl()" disabled>&#128203; Copy URL</button>
+            <button class="ucb-btn ucb-btn--secondary" id="ucb-btn-copy-params" type="button" onclick="ucbCopyParams()" disabled
+                    title="Copy only the utm_ parameters, e.g. for an ad platform's URL parameters field">Copy parameters</button>
+            <button class="ucb-btn ucb-btn--secondary" id="ucb-btn-open" type="button" onclick="ucbOpenUrl()" disabled
+                    title="Open the link in a new tab. The visit counts in your analytics with these tags.">Open &#8599;</button>
+            <button class="ucb-btn ucb-btn--secondary" id="ucb-btn-add" type="button" onclick="ucbAddToList()" disabled>+ Add to list</button>
+          </div>
+          <ul class="ucb-messages" id="ucb-messages" aria-live="polite"></ul>
+          <div class="ucb-params ucb-hidden" id="ucb-params-wrap">
+            <h3 class="ucb-subhead">Parameters</h3>
+            <div class="ucb-param-table" id="ucb-params" role="table" aria-label="UTM parameters"></div>
+          </div>
+        </section>
+
+        <section class="ucb-card">
+          <h2 class="ucb-card-title">GA4 channel check</h2>
+          <div class="ucb-channel">
+            <span class="ucb-channel-badge ucb-channel-badge--idle" id="ucb-channel-badge">Waiting for source and medium</span>
+            <p class="ucb-channel-why" id="ucb-channel-why">Add a source and medium to see which GA4 default channel group the visits will count toward.</p>
+          </div>
+          <div class="ucb-report ucb-hidden" id="ucb-report"></div>
+          <p class="ucb-hint">Based on Google’s published default channel group rules and source list. Custom channel groups in your GA4 property can differ.</p>
+        </section>
+
+        <section class="ucb-card">
+          <h2 class="ucb-card-title">QR code</h2>
+          <div class="ucb-qr-box">
+            <canvas class="ucb-qr-canvas ucb-hidden" id="ucb-qr-canvas" width="240" height="240" role="img" aria-label="QR code for the campaign URL"></canvas>
+            <div class="ucb-qr-placeholder" id="ucb-qr-placeholder">The QR code appears once the link is ready.</div>
+          </div>
+          <p class="ucb-status ucb-status--center" id="ucb-qr-status"></p>
+          <p class="ucb-qr-note ucb-hidden" id="ucb-qr-note"></p>
+          <div class="ucb-grid-2">
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-ecl">Error correction</label>
+              <select class="ucb-select" id="ucb-ecl">
+                <option value="L">L — 7%</option>
+                <option value="M" selected>M — 15%</option>
+                <option value="Q">Q — 25%</option>
+                <option value="H">H — 30%</option>
+              </select>
+            </div>
+            <div class="ucb-field">
+              <label class="ucb-label" for="ucb-png-size">PNG size</label>
+              <select class="ucb-select" id="ucb-png-size">
+                <option value="512">512 px</option>
+                <option value="1024" selected>1024 px</option>
+                <option value="2048">2048 px</option>
+              </select>
+            </div>
+          </div>
+          <div class="ucb-actions">
+            <button class="ucb-btn" id="ucb-btn-png" type="button" onclick="ucbDownloadPng()" disabled>Download PNG</button>
+            <button class="ucb-btn ucb-btn--secondary" id="ucb-btn-svg" type="button" onclick="ucbDownloadSvg()" disabled>Download SVG</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Link list -->
+    <section class="ucb-card ucb-list-card">
+      <div class="ucb-card-head">
+        <h2 class="ucb-card-title">Link list <span class="ucb-count" id="ucb-list-count">0</span></h2>
+        <div class="ucb-card-tools">
+          <button class="ucb-link-btn" id="ucb-list-copy" type="button" onclick="ucbListCopyAll()" disabled>Copy all</button>
+          <button class="ucb-link-btn" id="ucb-list-csv" type="button" onclick="ucbListCsv()" disabled>Download CSV</button>
+          <button class="ucb-link-btn ucb-link-btn--danger" id="ucb-list-clear" type="button" onclick="ucbListClear()" disabled>Clear</button>
+        </div>
+      </div>
+      <p class="ucb-list-empty" id="ucb-list-empty">Building one campaign for several channels? Add each link here and export them as a CSV for your tracking sheet. The list is saved in this browser only.</p>
+      <ul class="ucb-list" id="ucb-list"></ul>
+    </section>
+
+    <p class="ucb-related">
+      Need to decode a messy link first? Use the <a class="ucb-footer-link" href="https://vahac.com/tools/url-encoder-and-decoder/">URL Encoder / Decoder</a>. Sharing a network or contact card instead? Try the <a class="ucb-footer-link" href="https://vahac.com/tools/wifi-qr-code-generator/">Wi-Fi QR Code Generator</a> or the <a class="ucb-footer-link" href="https://vahac.com/tools/vcard-qr-code-generator/">vCard QR Code Generator</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="ucb-toast" id="ucb-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="ucb-footer">
+      Built by <a class="ucb-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

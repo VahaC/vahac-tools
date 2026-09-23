@@ -266,6 +266,7 @@ Keep this list updated to avoid prefix collisions:
 | `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
 | `tdf`  | Text Diff Tool           | Built    |
+| `ucb`  | UTM Campaign URL Builder | Built    |
 | `urc`  | URL Encoder / Decoder    | Built    |
 | `uts`  | Unix Timestamp Converter | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |

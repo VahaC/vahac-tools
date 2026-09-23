@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-09-23 (cURL to Code Converter added)
+- Last updated: 2026-09-23 (UTM Campaign URL Builder added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -33,6 +33,7 @@ Documentation status:
 - `text-diff-tool/` - line/word/character text comparison with diff highlighting.
 - `unix-timestamp-converter/` - Unix epoch to ISO/UTC/local date conversion and back.
 - `url-encoder-decoder/` - percent-encoding and decoding for URLs, query strings, and form data.
+- `utm-campaign-url-builder/` - UTM-tagged campaign links with presets, a GA4 default-channel check, saved presets, a CSV link list, and QR export.
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
 - `wifi-qr-code-generator/` - Wi-Fi network QR codes (WPA/WPA2/WPA3, WEP, open, hidden) with PNG/SVG export and a printable card.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
@@ -260,7 +261,17 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 23) vCard QR Code Generator
+### 23) UTM Campaign URL Builder
+
+Path:
+- `utm-campaign-url-builder/index.html`
+
+Features:
+- Builds campaign links with utm_source, utm_medium, utm_campaign, utm_content, utm_term and the GA4 extras (utm_id, utm_source_platform, utm_creative_format, utm_marketing_tactic); lowercases values, replaces spaces, percent-encodes the rest, and keeps ad-platform placeholders such as `{{campaign.name}}` unencoded.
+- Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
+- Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
+
+### 24) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -270,7 +281,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 24) Wi-Fi QR Code Generator
+### 25) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -280,7 +291,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 25) YAML JSON TOML Converter
+### 26) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -324,6 +335,7 @@ Then open:
 - `http://localhost:8080/text-diff-tool/`
 - `http://localhost:8080/unix-timestamp-converter/`
 - `http://localhost:8080/url-encoder-decoder/`
+- `http://localhost:8080/utm-campaign-url-builder/`
 - `http://localhost:8080/vcard-qr-code-generator/`
 - `http://localhost:8080/wifi-qr-code-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
@@ -331,7 +343,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (564 tests across 23 modules), powered by the built-in Node.js test runner
+tool (632 tests across 24 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -356,8 +368,10 @@ scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
 password/passphrase entropy, vCard generation, curl command parsing (POSIX, cmd and
 PowerShell quoting) and code generation, CSV parsing with delimiter/header
 detection, per-dialect SQL literal escaping, Wi-Fi QR payload escaping and
-validation, TOML round-tripping, JWT parsing and claim handling, and MD5 hashing
-(verified against `node:crypto`).
+validation, UTM link building (URL parsing, encoding round-trips through the
+WHATWG URL parser, GA4 default-channel rules for every preset), TOML
+round-tripping, JWT parsing and claim handling, and MD5 hashing (verified against
+`node:crypto`).
 
 Tests run on demand via GitHub Actions
 (`.github/workflows/test.yml`) — the workflow uses `workflow_dispatch` only, so
