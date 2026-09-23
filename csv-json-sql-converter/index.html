@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV ↔ JSON ↔ SQL Converter — Logs from VahaC</title>
+  <meta name="description" content="Free CSV to JSON to SQL converter: auto-detects the delimiter and header row, converts CSV and JSON both ways, and writes SQL INSERT statements. 100% in your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="cjs-wrapper">
+
+    <!-- Header -->
+    <div class="cjs-header">
+      <div class="cjs-badges" aria-hidden="true">
+        <span class="cjs-badge cjs-badge--csv">CSV</span>
+        <span class="cjs-arrow">⇄</span>
+        <span class="cjs-badge cjs-badge--json">JSON</span>
+        <span class="cjs-arrow">→</span>
+        <span class="cjs-badge cjs-badge--sql">SQL</span>
+      </div>
+      <h1 class="cjs-title">CSV ↔ JSON ↔ SQL Converter</h1>
+      <p class="cjs-subtitle">Paste a spreadsheet export or an API response. The converter detects the delimiter and header row, shows the parsed rows, and turns them into JSON, CSV, or SQL <code class="cjs-code">INSERT</code> statements. Nothing leaves your browser.</p>
+    </div>
+
+    <div class="cjs-layout">
+
+      <!-- ══ LEFT: input ══ -->
+      <div class="cjs-col">
+
+        <section class="cjs-card">
+          <div class="cjs-card-head">
+            <h2 class="cjs-card-title">Input</h2>
+            <div class="cjs-toolbar">
+              <button class="cjs-link-btn" type="button" onclick="cjsLoadSample('csv')">Sample CSV</button>
+              <button class="cjs-link-btn" type="button" onclick="cjsLoadSample('json')">Sample JSON</button>
+              <button class="cjs-link-btn" type="button" onclick="cjsOpenFile()">&#128194; Open file</button>
+              <button class="cjs-link-btn" type="button" onclick="cjsClear()">Clear</button>
+            </div>
+          </div>
+
+          <input class="cjs-file-input" id="cjs-file" type="file" tabindex="-1" aria-hidden="true"
+                 accept=".csv,.tsv,.txt,.json,.jsonl,.ndjson,text/csv,text/plain,application/json">
+
+          <label class="cjs-sr-only" for="cjs-input">CSV or JSON input</label>
+          <textarea class="cjs-textarea" id="cjs-input" rows="14"
+                    spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                    placeholder="id,name,city&#10;1,Alice,Berlin&#10;2,Bob,Dublin&#10;&#10;…or a JSON array of objects. You can also drop a .csv or .json file here."></textarea>
+
+          <div class="cjs-status-row">
+            <p class="cjs-status" id="cjs-summary" aria-live="polite"></p>
+            <span class="cjs-counter" id="cjs-file-name"></span>
+          </div>
+          <ul class="cjs-messages" id="cjs-messages"></ul>
+        </section>
+
+        <section class="cjs-card">
+          <h2 class="cjs-card-title">Input options</h2>
+          <div class="cjs-grid-3">
+            <div class="cjs-field">
+              <label class="cjs-label" for="cjs-format">Input format</label>
+              <select class="cjs-select" id="cjs-format">
+                <option value="auto" selected>Auto</option>
+                <option value="csv">CSV / TSV</option>
+                <option value="json">JSON / JSON Lines</option>
+              </select>
+            </div>
+            <div class="cjs-field">
+              <label class="cjs-label" for="cjs-delimiter">Delimiter</label>
+              <select class="cjs-select" id="cjs-delimiter">
+                <option value="auto" selected>Auto</option>
+                <option value=",">Comma ,</option>
+                <option value=";">Semicolon ;</option>
+                <option value="tab">Tab</option>
+                <option value="|">Pipe |</option>
+              </select>
+            </div>
+            <div class="cjs-field">
+              <label class="cjs-label" for="cjs-header-row">Header row</label>
+              <select class="cjs-select" id="cjs-header-row">
+                <option value="auto" selected>Auto</option>
+                <option value="yes">Yes — first row</option>
+                <option value="no">No header</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cjs-checks">
+            <label class="cjs-check" for="cjs-trim">
+              <input class="cjs-checkbox" id="cjs-trim" type="checkbox" checked>
+              <span class="cjs-check-text">Trim spaces around values <span class="cjs-check-sub">CSV input</span></span>
+            </label>
+            <label class="cjs-check" for="cjs-infer">
+              <input class="cjs-checkbox" id="cjs-infer" type="checkbox" checked>
+              <span class="cjs-check-text">Detect numbers and booleans <span class="cjs-check-sub">CSV input, per column — <code class="cjs-code">007</code> and 16+ digit IDs stay text</span></span>
+            </label>
+            <label class="cjs-check" for="cjs-empty-null">
+              <input class="cjs-checkbox" id="cjs-empty-null" type="checkbox" checked>
+              <span class="cjs-check-text">Empty fields become null <span class="cjs-check-sub">CSV input — otherwise an empty string</span></span>
+            </label>
+            <label class="cjs-check" for="cjs-flatten">
+              <input class="cjs-checkbox" id="cjs-flatten" type="checkbox" checked>
+              <span class="cjs-check-text">Flatten nested objects <span class="cjs-check-sub">JSON input — <code class="cjs-code">{"a":{"b":1}}</code> becomes column <code class="cjs-code">a.b</code></span></span>
+            </label>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ══ RIGHT: output ══ -->
+      <div class="cjs-col">
+
+        <section class="cjs-card">
+          <h2 class="cjs-card-title">Output</h2>
+
+          <div class="cjs-tabs" id="cjs-tabs" role="tablist" aria-label="Output format">
+            <button class="cjs-tab cjs-active" id="cjs-tab-json" type="button" role="tab" aria-selected="true" aria-controls="cjs-output-panel" onclick="cjsSetTab('json')">JSON</button>
+            <button class="cjs-tab" id="cjs-tab-csv" type="button" role="tab" aria-selected="false" aria-controls="cjs-output-panel" tabindex="-1" onclick="cjsSetTab('csv')">CSV</button>
+            <button class="cjs-tab" id="cjs-tab-sql" type="button" role="tab" aria-selected="false" aria-controls="cjs-output-panel" tabindex="-1" onclick="cjsSetTab('sql')">SQL INSERT</button>
+          </div>
+
+          <div class="cjs-tabpanel" id="cjs-output-panel" role="tabpanel" aria-labelledby="cjs-tab-json">
+
+            <!-- JSON options -->
+            <div class="cjs-opts" id="cjs-opts-json">
+              <div class="cjs-grid-2">
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-json-shape">Structure</label>
+                  <select class="cjs-select" id="cjs-json-shape">
+                    <option value="objects" selected>Array of objects</option>
+                    <option value="arrays">Array of arrays (header first)</option>
+                    <option value="jsonl">JSON Lines (one object per line)</option>
+                  </select>
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-json-indent">Indentation</label>
+                  <select class="cjs-select" id="cjs-json-indent">
+                    <option value="2" selected>2 spaces</option>
+                    <option value="4">4 spaces</option>
+                    <option value="tab">Tab</option>
+                    <option value="0">Minified</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- CSV options -->
+            <div class="cjs-opts cjs-hidden" id="cjs-opts-csv">
+              <div class="cjs-grid-3">
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-csv-delimiter">Delimiter</label>
+                  <select class="cjs-select" id="cjs-csv-delimiter">
+                    <option value="," selected>Comma ,</option>
+                    <option value=";">Semicolon ;</option>
+                    <option value="tab">Tab</option>
+                    <option value="|">Pipe |</option>
+                  </select>
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-csv-quote">Quoting</label>
+                  <select class="cjs-select" id="cjs-csv-quote">
+                    <option value="needed" selected>When needed</option>
+                    <option value="all">All fields</option>
+                  </select>
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-csv-eol">Line endings</label>
+                  <select class="cjs-select" id="cjs-csv-eol">
+                    <option value="lf" selected>LF (Unix)</option>
+                    <option value="crlf">CRLF (Windows)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cjs-checks cjs-checks--inline">
+                <label class="cjs-check" for="cjs-csv-header">
+                  <input class="cjs-checkbox" id="cjs-csv-header" type="checkbox" checked>
+                  <span class="cjs-check-text">Header row</span>
+                </label>
+                <label class="cjs-check" for="cjs-csv-bom">
+                  <input class="cjs-checkbox" id="cjs-csv-bom" type="checkbox">
+                  <span class="cjs-check-text">UTF-8 BOM in download <span class="cjs-check-sub">Helps Excel open accented text</span></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- SQL options -->
+            <div class="cjs-opts cjs-hidden" id="cjs-opts-sql">
+              <div class="cjs-grid-2">
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-sql-dialect">Dialect</label>
+                  <select class="cjs-select" id="cjs-sql-dialect">
+                    <option value="postgres" selected>PostgreSQL</option>
+                    <option value="mysql">MySQL / MariaDB</option>
+                    <option value="sqlite">SQLite</option>
+                    <option value="mssql">SQL Server</option>
+                  </select>
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-sql-table">Table name</label>
+                  <input class="cjs-input cjs-input--mono" id="cjs-sql-table" type="text" value="my_table"
+                         placeholder="schema.table" maxlength="200" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-sql-batch">Rows per INSERT</label>
+                  <select class="cjs-select" id="cjs-sql-batch">
+                    <option value="1">1 (one statement per row)</option>
+                    <option value="100" selected>100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="0">All rows in one statement</option>
+                  </select>
+                </div>
+                <div class="cjs-field">
+                  <label class="cjs-label" for="cjs-sql-quoting">Quote identifiers</label>
+                  <select class="cjs-select" id="cjs-sql-quoting">
+                    <option value="always" selected>Always</option>
+                    <option value="needed">Only when needed</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cjs-checks cjs-checks--inline">
+                <label class="cjs-check" for="cjs-sql-create">
+                  <input class="cjs-checkbox" id="cjs-sql-create" type="checkbox">
+                  <span class="cjs-check-text">CREATE TABLE <span class="cjs-check-sub">Column types inferred from the data</span></span>
+                </label>
+                <label class="cjs-check" for="cjs-sql-tx">
+                  <input class="cjs-checkbox" id="cjs-sql-tx" type="checkbox">
+                  <span class="cjs-check-text">Wrap in a transaction</span>
+                </label>
+              </div>
+            </div>
+
+            <label class="cjs-sr-only" for="cjs-output">Converted output</label>
+            <textarea class="cjs-textarea cjs-textarea--output" id="cjs-output" rows="14" readonly
+                      spellcheck="false" placeholder="The converted output appears here."></textarea>
+
+            <p class="cjs-status" id="cjs-out-status" aria-live="polite"></p>
+            <ul class="cjs-messages" id="cjs-out-messages"></ul>
+
+            <div class="cjs-actions">
+              <button class="cjs-btn" id="cjs-btn-copy" type="button" onclick="cjsCopy()" disabled>&#128203; Copy</button>
+              <button class="cjs-btn cjs-btn--secondary" id="cjs-btn-download" type="button" onclick="cjsDownload()" disabled>Download .json</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Parsed data preview -->
+    <section class="cjs-card cjs-preview-card">
+      <div class="cjs-card-head">
+        <h2 class="cjs-card-title">Parsed data preview</h2>
+        <span class="cjs-counter" id="cjs-preview-caption"></span>
+      </div>
+      <div class="cjs-table-wrap cjs-hidden" id="cjs-preview" tabindex="0" role="region" aria-label="Parsed data preview"></div>
+      <p class="cjs-hint" id="cjs-preview-empty">Parsed rows appear here as a table, with the detected type of each column under its name.</p>
+    </section>
+
+    <p class="cjs-related">
+      Converting config files instead? Try the <a class="cjs-footer-link" href="https://vahac.com/tools/yaml-json-toml-converter/">YAML ↔ JSON ↔ TOML Converter</a>, or validate a payload with the <a class="cjs-footer-link" href="https://vahac.com/tools/json-formatter-and-validator/">JSON Formatter</a>.
+    </p>
+
+    <!-- Toast notification -->
+    <div class="cjs-toast" id="cjs-toast" role="status" aria-live="polite"></div>
+
+    <!-- Footer -->
+    <div class="cjs-footer">
+      Built by <a class="cjs-footer-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

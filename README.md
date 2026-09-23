@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-09-23 (Wi-Fi QR Code Generator added)
+- Last updated: 2026-09-23 (CSV ↔ JSON ↔ SQL Converter added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -15,6 +15,7 @@ Documentation status:
 - `byte-storage-converter/` - SI/IEC storage unit conversion and bitrate/file size calculations.
 - `chmod-file-permission-calculator/` - symbolic/octal permission conversion for Unix-like file modes.
 - `cron-expression-generator/` - assisted cron expression builder for common scheduling patterns.
+- `csv-json-sql-converter/` - CSV ↔ JSON conversion with delimiter/header detection, plus SQL `INSERT` generation for PostgreSQL, MySQL, SQLite, and SQL Server.
 - `docker-compose-validator-formatter/` - validation, formatting, and docker run to Compose conversion for Compose YAML.
 - `docker-run-compose-converter/` - converts `docker run` commands to `docker-compose.yml` and back.
 - `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
@@ -77,7 +78,17 @@ Features:
 - Supports frequent scheduling patterns for automation tasks.
 - Reduces manual errors when composing cron syntax.
 
-### 5) Docker Compose Validator and Formatter
+### 5) CSV ↔ JSON ↔ SQL Converter
+
+Path:
+- `csv-json-sql-converter/index.html`
+
+Features:
+- Detects the delimiter (comma, semicolon, tab, pipe) and header row, with manual overrides; parses quoted fields, embedded line breaks, and JSON Lines.
+- Converts CSV to JSON (objects, arrays, or JSON Lines) and JSON back to CSV, flattening nested objects into dot-notation columns.
+- Generates literal-value SQL `INSERT` statements for PostgreSQL, MySQL/MariaDB, SQLite, and SQL Server, with batching, an optional `CREATE TABLE` with inferred types, and validation messages for ragged rows, bad quotes, and invalid JSON.
+
+### 6) Docker Compose Validator and Formatter
 
 Path:
 - `docker-compose-validator-formatter/index.html`
@@ -87,7 +98,7 @@ Features:
 - Formats Compose files for readability and consistency.
 - Converts common `docker run` command patterns into Compose blocks.
 
-### 6) Docker Run to Compose Converter
+### 7) Docker Run to Compose Converter
 
 Path:
 - `docker-run-compose-converter/index.html`
@@ -97,7 +108,7 @@ Features:
 - Flags unsupported or ambiguous flags with warnings instead of silently dropping them.
 - Runs entirely client-side, no signup or data upload.
 
-### 7) Favicon Generator
+### 8) Favicon Generator
 
 Path:
 - `favicon-generator/index.html`
@@ -107,7 +118,7 @@ Features:
 - Exports common icon sizes and formats for modern platforms.
 - Helps produce a ready-to-use favicon package and markup.
 
-### 8) Hash Generator for Files and Text
+### 9) Hash Generator for Files and Text
 
 Path:
 - `hash-generator-for-files-and-text/index.html`
@@ -117,7 +128,7 @@ Features:
 - Useful for integrity checks and comparison workflows.
 - Runs directly in the browser without server-side processing.
 
-### 9) Image Compressor and Resizer
+### 10) Image Compressor and Resizer
 
 Path:
 - `image-compressor-resizer/index.html`
@@ -127,7 +138,7 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 10) JSON Formatter and Validator
+### 11) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -137,7 +148,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 11) JWT Decoder
+### 12) JWT Decoder
 
 Path:
 - `jwt-decoder/index.html`
@@ -147,7 +158,7 @@ Features:
 - Explains registered claims and converts `exp`, `nbf`, and `iat` into readable dates with a validity badge.
 - Optionally verifies HS/RS/ES/PS signatures with a shared secret, PEM public key, or JWK — all via the Web Crypto API in the browser.
 
-### 12) Merge Text Tool
+### 13) Merge Text Tool
 
 Path:
 - `merge-text-tool/index.html`
@@ -157,7 +168,7 @@ Features:
 - Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
 - Options to ignore whitespace or case differences; copy either side's result when done.
 
-### 13) Password and Passphrase Generator
+### 14) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -167,7 +178,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 14) Regex Tester
+### 15) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -177,7 +188,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 15) Uptime / SLA Calculator
+### 16) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -187,7 +198,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 16) IP Subnet Calculator
+### 17) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -197,7 +208,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 17) Text Diff Tool
+### 18) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -207,7 +218,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 18) Unix Timestamp Converter
+### 19) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -217,7 +228,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 19) URL Encoder / Decoder
+### 20) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -227,7 +238,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 20) vCard QR Code Generator
+### 21) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -237,7 +248,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 21) Wi-Fi QR Code Generator
+### 22) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -247,7 +258,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 22) YAML JSON TOML Converter
+### 23) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -273,6 +284,7 @@ Then open:
 - `http://localhost:8080/byte-storage-converter/`
 - `http://localhost:8080/chmod-file-permission-calculator/`
 - `http://localhost:8080/cron-expression-generator/`
+- `http://localhost:8080/csv-json-sql-converter/`
 - `http://localhost:8080/docker-compose-validator-formatter/`
 - `http://localhost:8080/docker-run-compose-converter/`
 - `http://localhost:8080/favicon-generator/`
@@ -295,7 +307,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (403 tests across 20 modules), powered by the built-in Node.js test runner
+tool (476 tests across 22 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -306,7 +318,8 @@ npm test
 
 The suite covers byte/storage conversion, chmod permissions, cron parsing and
 scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
-password/passphrase entropy, vCard generation, Wi-Fi QR payload escaping and
+password/passphrase entropy, vCard generation, CSV parsing with delimiter/header
+detection, per-dialect SQL literal escaping, Wi-Fi QR payload escaping and
 validation, TOML round-tripping, JWT parsing and claim handling, and MD5 hashing
 (verified against `node:crypto`).
 

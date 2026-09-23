@@ -250,6 +250,7 @@ Keep this list updated to avoid prefix collisions:
 | `bsc`  | Byte & Storage Converter | Built    |
 | `chm`  | Chmod Permission Calc    | Built    |
 | `crn`  | Cron Expression Generator| Built    |
+| `cjs`  | CSV ↔ JSON ↔ SQL Conv.   | Built    |
 | `dcv`  | Docker Compose Validator | Built    |
 | `drc`  | Docker Run ↔ Compose     | Built    |
 | `fvg`  | Favicon Generator        | Built    |
