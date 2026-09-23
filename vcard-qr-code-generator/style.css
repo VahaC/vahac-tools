@@ -37,6 +37,28 @@
   box-sizing: border-box;
 }
 
+/* ── Header ────────────────────────────────────────────── */
+
+.vcg-header {
+  margin-bottom: 1.5rem;
+}
+
+.vcg-title {
+  margin: 0 0 0.4rem;
+  color: var(--vcg-text-primary);
+  font-family: var(--vcg-font-sans);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.vcg-subtitle {
+  margin: 0;
+  color: var(--vcg-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 /* ── Card (shared section container) ───────────────────── */
 
 .vcg-card {
@@ -340,6 +362,10 @@
 @media (max-width: 640px) {
   .vcg-wrapper {
     padding: 16px 10px;
+  }
+
+  .vcg-title {
+    font-size: 1.2rem;
   }
 
   .vcg-form-grid {
