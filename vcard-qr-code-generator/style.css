@@ -324,7 +324,14 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* ── Footer ────────────────────────────────────────────── */
+/* ── Related tools & footer ────────────────────────────── */
+
+.vcg-related {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--vcg-text-secondary);
+}
 
 .vcg-footer {
   margin-top: 20px;

@@ -84,19 +84,48 @@
 
   // ── QR rendering ────────────────────────────────────────
 
+  // UTF-8 encode a string into a "byte string" (one char per byte, 0–255)
+  function toUtf8ByteString(str) {
+    str = String(str == null ? '' : str);
+    if (typeof TextEncoder !== 'undefined') {
+      var bytes = new TextEncoder().encode(str);
+      var out = '';
+      for (var i = 0; i < bytes.length; i++) out += String.fromCharCode(bytes[i]);
+      return out;
+    }
+    return unescape(encodeURIComponent(str));
+  }
+
+  // Encode text as UTF-8 bytes. The library's default converter keeps one byte per
+  // char (charCode & 0xff), so feeding it a UTF-8 byte string gives correct output
+  // for Cyrillic, accented letters and emoji.
+  function makeQr(text, ecl) {
+    var lib = window.qrcode;
+    if (typeof lib !== 'function') {
+      throw new Error('qrcode-generator library not loaded.');
+    }
+    var saved = lib.stringToBytes;
+    if (lib.stringToBytesFuncs && lib.stringToBytesFuncs['default']) {
+      lib.stringToBytes = lib.stringToBytesFuncs['default'];
+    }
+    var qr;
+    try {
+      // qrcode-generator API: typeNumber 0 = auto, ecl = L/M/Q/H
+      qr = lib(0, ecl);
+      qr.addData(toUtf8ByteString(text), 'Byte');
+      qr.make();
+    } finally {
+      lib.stringToBytes = saved;
+    }
+    return qr;
+  }
+
   function renderQr(text, opts) {
     var canvas = $('vcg-qr-canvas');
     var status = $('vcg-status');
 
     try {
-      if (typeof window.qrcode !== 'function') {
-        throw new Error('qrcode-generator library not loaded.');
-      }
-
-      // qrcode-generator API: typeNumber 0 = auto, ecl = L/M/Q/H
-      var qr = window.qrcode(0, opts.ecl);
-      qr.addData(text);
-      qr.make();
+      var qr = makeQr(text, opts.ecl);
 
       // Create PNG data URL (cellSize, margin)
       var dataUrl = qr.createDataURL(opts.scale, opts.margin);
@@ -108,7 +137,7 @@
         canvas.height = img.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        status.textContent = 'QR generated. Payload: ' + text.length + ' chars.';
+        status.textContent = 'QR generated. Payload: ' + toUtf8ByteString(text).length + ' bytes (UTF-8).';
       };
 
       img.onerror = function () {
@@ -167,12 +196,7 @@
   }
 
   function generateSvgString(text, opts) {
-    if (typeof window.qrcode !== 'function') {
-      throw new Error('qrcode-generator library not loaded.');
-    }
-    var qr = window.qrcode(0, opts.ecl);
-    qr.addData(text);
-    qr.make();
+    var qr = makeQr(text, opts.ecl);
 
     // qrcode-generator may expose createSvgTag or createSVGTag
     var makeSvg = qr.createSvgTag || qr.createSVGTag;
@@ -314,7 +338,9 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       vcardEscape: vcardEscape,
-      buildVCard: buildVCard
+      buildVCard: buildVCard,
+      toUtf8ByteString: toUtf8ByteString,
+      makeQr: makeQr
     };
   }
 
