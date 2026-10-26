@@ -255,6 +255,7 @@ Keep this list updated to avoid prefix collisions:
 | `csh`  | CSP & Security Headers   | Built    |
 | `dcv`  | Docker Compose Validator | Built    |
 | `drc`  | Docker Run ↔ Compose     | Built    |
+| `egp`  | ESP32 GPIO Pin Picker    | Built    |
 | `fvg`  | Favicon Generator        | Built    |
 | `hsg`  | Hash Generator           | Built    |
 | `icr`  | Image Compressor/Resizer | Built    |

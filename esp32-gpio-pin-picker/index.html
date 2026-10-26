@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 GPIO Pin Picker — Logs from VahaC</title>
+  <meta name="description" content="Free ESP32 GPIO pin picker for ESP32, S3, C3 and C6: strapping, flash, USB, ADC, touch and deep-sleep flags from Espressif datasheets, plus an ESPHome pin snippet.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="egp-wrapper" id="egp-wrapper">
+
+    <header class="egp-header">
+      <h1 class="egp-title">ESP32 GPIO Pin Picker</h1>
+      <p class="egp-subtitle">Pick a chip and what you need the pin for, and get every GPIO ranked from safe to avoid, with the reason for each verdict: strapping pins and their boot levels, flash and PSRAM pins, USB, UART0, input-only pins, ADC1 and ADC2, touch, deep-sleep wake and DAC. Pin data comes from Espressif's datasheets and ESP-IDF, cross-checked against ESPHome's own pin validation.</p>
+    </header>
+
+    <div class="egp-alert" role="note">
+      <span class="egp-alert-icon" aria-hidden="true">!</span>
+      <p class="egp-alert-text"><strong>This is chip-level data.</strong> Your dev board may already wire a pin to a BOOT button, an LED, a USB-UART bridge, a display or a sensor, and a module may not lead every pin out. Check your board's schematic before you solder.</p>
+    </div>
+
+    <section class="egp-card egp-controls" aria-label="Chip, module and need">
+      <fieldset class="egp-fieldset">
+        <legend class="egp-label">Chip</legend>
+        <div class="egp-segment" role="radiogroup" aria-label="Chip">
+          <label class="egp-seg-opt">
+            <input class="egp-seg-input" type="radio" name="egp-chip" value="esp32">
+            <span class="egp-seg-text">ESP32</span>
+          </label>
+          <label class="egp-seg-opt">
+            <input class="egp-seg-input" type="radio" name="egp-chip" value="esp32s3">
+            <span class="egp-seg-text">ESP32-S3</span>
+          </label>
+          <label class="egp-seg-opt">
+            <input class="egp-seg-input" type="radio" name="egp-chip" value="esp32c3">
+            <span class="egp-seg-text">ESP32-C3</span>
+          </label>
+          <label class="egp-seg-opt">
+            <input class="egp-seg-input" type="radio" name="egp-chip" value="esp32c6">
+            <span class="egp-seg-text">ESP32-C6</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="egp-grid-2">
+        <div class="egp-field">
+          <label class="egp-label" for="egp-module">Module, chip variant or package</label>
+          <select class="egp-input egp-select" id="egp-module" aria-describedby="egp-module-hint"></select>
+          <p class="egp-hint" id="egp-module-hint"></p>
+        </div>
+        <div class="egp-field">
+          <span class="egp-label">Radio</span>
+          <label class="egp-check">
+            <input class="egp-check-input" type="checkbox" id="egp-wifi" aria-describedby="egp-wifi-hint">
+            <span class="egp-check-text">Wi-Fi is on</span>
+          </label>
+          <p class="egp-hint" id="egp-wifi-hint"></p>
+        </div>
+      </div>
+
+      <fieldset class="egp-fieldset">
+        <legend class="egp-label">What do you need the pin for?</legend>
+        <div class="egp-needs" id="egp-needs" role="radiogroup" aria-label="Need"></div>
+      </fieldset>
+    </section>
+
+    <div class="egp-layout">
+
+      <section class="egp-card egp-results" aria-labelledby="egp-results-title">
+        <div class="egp-card-head">
+          <h2 class="egp-card-title" id="egp-results-title">Pins, best first</h2>
+          <p class="egp-summary" id="egp-summary" aria-live="polite"></p>
+        </div>
+        <p class="egp-chipnote" id="egp-chipnote"></p>
+        <ol class="egp-list" id="egp-list" aria-label="Pins that can do this"></ol>
+        <details class="egp-more" id="egp-unfit">
+          <summary class="egp-more-summary">Pins that can't do this or aren't bonded out (<span id="egp-unfit-count">0</span>)</summary>
+          <ol class="egp-list egp-list--muted" id="egp-unfit-list" aria-label="Pins that can't do this"></ol>
+        </details>
+      </section>
+
+      <section class="egp-card egp-detail" id="egp-detail" aria-label="Selected pin">
+        <div id="egp-detail-body" aria-live="polite"></div>
+        <div class="egp-snippet-head">
+          <h3 class="egp-sub">ESPHome snippet</h3>
+          <button class="egp-btn egp-btn--secondary egp-btn--compact" type="button" onclick="egpCopySnippet()">Copy</button>
+        </div>
+        <pre class="egp-pre" id="egp-snippet"></pre>
+        <p class="egp-hint">Options come from ESPHome 2026.10.0's pin schema. <code class="egp-code">GPIOXX</code> marks a second pin you still have to choose; ESPHome refuses to compile until you replace it.</p>
+      </section>
+
+    </div>
+
+    <section class="egp-card egp-sources-card" aria-labelledby="egp-sources-title">
+      <h2 class="egp-card-title" id="egp-sources-title">Where the data comes from</h2>
+      <p class="egp-hint">Verdicts follow the datasheet's own pin priorities: pins it lists as free are <strong>safe</strong>, pins it says to use with caution (strapping, USB, JTAG, UART0) are <strong>use with care</strong>, and flash, PSRAM and VDD_SPI pins are <strong>avoid</strong>. Where the datasheet, ESP-IDF and ESPHome disagree, the stricter verdict wins and the pin's note says why.</p>
+      <ul class="egp-sources" id="egp-sources"></ul>
+    </section>
+
+    <div class="egp-share">
+      <button class="egp-btn egp-btn--secondary egp-btn--compact" type="button" onclick="egpCopyLink()">Copy link to this selection</button>
+      <span class="egp-hint">The link stores the chip, module, need, Wi-Fi setting and selected pin. Nothing is sent anywhere.</span>
+    </div>
+
+    <div class="egp-toast" id="egp-toast" role="status" aria-live="polite">Copied</div>
+
+    <footer class="egp-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
