@@ -278,3 +278,4 @@ Keep this list updated to avoid prefix collisions:
 | `wgc`  | WireGuard Config Gen.    | Built    |
 | `wqr`  | Wi-Fi QR Code Generator  | Built    |
 | `yjt`  | YAML / JSON / TOML Conv. | Built    |
+| `zrc`  | ZFS & RAID Capacity Calc.| Built    |

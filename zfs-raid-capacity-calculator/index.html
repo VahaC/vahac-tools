@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZFS and RAID Capacity Calculator — Logs from VahaC</title>
+  <meta name="description" content="Free ZFS RAID capacity calculator: usable TB and TiB for stripe, mirror and RAIDZ1/2/3 after parity, padding and slop space, disks that may fail, and RAID 0/1/5/6/10.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="zrc-wrapper" id="zrc-wrapper">
+
+    <header class="zrc-header">
+      <h1 class="zrc-title">ZFS and RAID Capacity Calculator</h1>
+      <p class="zrc-subtitle">Enter your disks and pick a layout to see how much space a ZFS pool really gives you: raw, after parity or mirroring, after RAIDZ padding at your record size, after slop space, and at a target fill level, in TB and TiB. It also shows how many disks may fail, compares every layout your disks allow, and lists classic RAID 0/1/5/6/10 for mdadm or hardware RAID.</p>
+    </header>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-disks">
+      <div class="zrc-card-head">
+        <h2 class="zrc-card-title" id="zrc-h-disks">Disks</h2>
+        <span class="zrc-card-meta" id="zrc-disk-meta"></span>
+      </div>
+      <p class="zrc-hint">Use the size printed on the disk label (TB and GB are decimal, TiB and GiB are binary). Disks are placed into vdevs in the order listed, and hot spares are taken from the end of the list.</p>
+
+      <div class="zrc-groups" id="zrc-groups"></div>
+
+      <div class="zrc-actions">
+        <button type="button" class="zrc-btn zrc-btn--secondary" id="zrc-add" onclick="zrcAddGroup()">+ Add disk size</button>
+        <span class="zrc-hint zrc-hidden" id="zrc-add-hint">Up to 12 rows. Put identical disks in one row with a quantity.</span>
+      </div>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-layout">
+      <h2 class="zrc-card-title" id="zrc-h-layout">ZFS layout</h2>
+
+      <fieldset class="zrc-fieldset">
+        <legend class="zrc-label">Vdev type</legend>
+        <div class="zrc-segment" id="zrc-layouts" role="radiogroup" aria-label="Vdev type">
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="stripe"><span class="zrc-seg-text">Stripe</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="mirror2"><span class="zrc-seg-text">Mirror 2-way</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="mirror3"><span class="zrc-seg-text">Mirror 3-way</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="mirror4"><span class="zrc-seg-text">Mirror 4-way</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="raidz1"><span class="zrc-seg-text">RAIDZ1</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="raidz2"><span class="zrc-seg-text">RAIDZ2</span></label>
+          <label class="zrc-seg-opt"><input class="zrc-seg-input" type="radio" name="zrc-layout" value="raidz3"><span class="zrc-seg-text">RAIDZ3</span></label>
+        </div>
+      </fieldset>
+
+      <div class="zrc-grid zrc-grid--layout">
+        <div class="zrc-field">
+          <label class="zrc-label" for="zrc-vdevs">Number of vdevs</label>
+          <input class="zrc-input" id="zrc-vdevs" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="auto" aria-describedby="zrc-vdevs-hint">
+        </div>
+        <div class="zrc-field">
+          <label class="zrc-label" for="zrc-spares">Hot spares</label>
+          <input class="zrc-input" id="zrc-spares" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="0">
+        </div>
+        <div class="zrc-field">
+          <label class="zrc-label" for="zrc-ashift">ashift (sector size)</label>
+          <select class="zrc-input zrc-select" id="zrc-ashift">
+            <option value="9">9 (512 B)</option>
+            <option value="10">10 (1 KiB)</option>
+            <option value="11">11 (2 KiB)</option>
+            <option value="12">12 (4 KiB)</option>
+            <option value="13">13 (8 KiB)</option>
+            <option value="14">14 (16 KiB)</option>
+            <option value="15">15 (32 KiB)</option>
+            <option value="16">16 (64 KiB)</option>
+          </select>
+        </div>
+        <div class="zrc-field">
+          <label class="zrc-label" for="zrc-recordsize">Record size</label>
+          <select class="zrc-input zrc-select" id="zrc-recordsize">
+            <option value="4096">4K</option>
+            <option value="8192">8K</option>
+            <option value="16384">16K</option>
+            <option value="32768">32K</option>
+            <option value="65536">64K</option>
+            <option value="131072">128K (default)</option>
+            <option value="262144">256K</option>
+            <option value="524288">512K</option>
+            <option value="1048576">1M</option>
+            <option value="2097152">2M</option>
+            <option value="4194304">4M</option>
+            <option value="8388608">8M</option>
+            <option value="16777216">16M</option>
+          </select>
+        </div>
+        <div class="zrc-field">
+          <label class="zrc-label" for="zrc-fill">Target fill, %</label>
+          <input class="zrc-input" id="zrc-fill" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="80">
+        </div>
+      </div>
+      <p class="zrc-hint" id="zrc-vdevs-hint"></p>
+      <p class="zrc-hint">ashift is fixed when a vdev is created: 12 suits disks with 4 KiB physical sectors. Record size is the dataset <code class="zrc-code">recordsize</code>; the space shown assumes your files are stored in full records of that size. Target fill is the share of the pool you plan to use, as the CAP column of <code class="zrc-code">zpool list</code> shows it.</p>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-results">
+      <h2 class="zrc-card-title" id="zrc-h-results">Usable capacity</h2>
+      <ul class="zrc-issues zrc-hidden" id="zrc-issues"></ul>
+      <div class="zrc-results" id="zrc-results">
+        <div class="zrc-kpis" id="zrc-kpis"></div>
+        <div class="zrc-stack" id="zrc-stack"></div>
+        <div class="zrc-table-wrap">
+          <table class="zrc-table zrc-table--steps" id="zrc-steps"></table>
+        </div>
+        <div class="zrc-fail" id="zrc-fail"></div>
+        <details class="zrc-details" id="zrc-details">
+          <summary class="zrc-summary">Vdevs and what <code class="zrc-code">zpool list</code> / <code class="zrc-code">zfs list</code> will show</summary>
+          <div class="zrc-details-body">
+            <div class="zrc-report" id="zrc-report"></div>
+            <div class="zrc-table-wrap">
+              <table class="zrc-table zrc-table--vdevs" id="zrc-vdev-table"></table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="zrc-actions">
+        <button type="button" class="zrc-btn zrc-btn--secondary" onclick="zrcCopySummary()">Copy summary</button>
+        <button type="button" class="zrc-btn zrc-btn--secondary" onclick="zrcCopyLink()">Copy link</button>
+        <span class="zrc-hint">The link holds your disks and layout in the part after #, so you can bookmark or share it.</span>
+      </div>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-compare">
+      <div class="zrc-card-head">
+        <h2 class="zrc-card-title" id="zrc-h-compare">Every ZFS layout for these disks</h2>
+        <span class="zrc-card-meta" id="zrc-compare-meta"></span>
+      </div>
+      <p class="zrc-hint">Same disks, ashift, record size and fill target; only the vdev layout changes. Press <strong>Use</strong> to load a layout above.</p>
+      <div class="zrc-table-wrap">
+        <table class="zrc-table zrc-table--compare" id="zrc-compare"></table>
+      </div>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-classic">
+      <h2 class="zrc-card-title" id="zrc-h-classic">Classic RAID 0/1/5/6/10 (mdadm or hardware RAID)</h2>
+      <p class="zrc-hint">The same disks (without hot spares) as one classic array, using the textbook definitions: every member counts only up to the smallest disk.</p>
+      <div class="zrc-table-wrap">
+        <table class="zrc-table zrc-table--classic" id="zrc-classic"></table>
+      </div>
+      <ul class="zrc-assume" id="zrc-classic-notes"></ul>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-later">
+      <h2 class="zrc-card-title" id="zrc-h-later">Growing the pool later</h2>
+      <ul class="zrc-assume">
+        <li class="zrc-assume-item"><strong>Add a vdev.</strong> <code class="zrc-code">zpool add</code> appends another vdev and new writes spread across all of them, but existing data is not rebalanced. Give it the same redundancy as the others: <code class="zrc-code">zpool add</code> warns about a mismatch, and a pool with a RAIDZ vdev can never remove a vdev again. Try <code class="zrc-code">zpool add -n</code> first.</li>
+        <li class="zrc-assume-item"><strong>Bigger disks.</strong> Replace the disks of one vdev one at a time and let each resilver finish. The extra space appears only after every disk in that vdev is replaced (with <code class="zrc-code">autoexpand=on</code> or <code class="zrc-code">zpool online -e</code>).</li>
+        <li class="zrc-assume-item"><strong>RAIDZ expansion</strong> (OpenZFS 2.3 and later, <code class="zrc-code">raidz_expansion</code> feature). <code class="zrc-code">zpool attach pool raidz2-0 newdisk</code> adds one disk to an existing RAIDZ vdev. Parity stays the same (a RAIDZ2 stays a RAIDZ2). Blocks written before the expansion keep their old data-to-parity ratio until they are rewritten, and ZFS keeps converting space with the original width's ratio, so <code class="zrc-code">zfs list</code> and <code class="zrc-code">df</code> show a little less space than a pool created at the new width.</li>
+        <li class="zrc-assume-item"><strong>Mirrors.</strong> <code class="zrc-code">zpool attach</code> turns a single disk into a 2-way mirror or a 2-way mirror into a 3-way one. That adds redundancy, not space.</li>
+      </ul>
+    </section>
+
+    <section class="zrc-card" aria-labelledby="zrc-h-assume">
+      <h2 class="zrc-card-title" id="zrc-h-assume">What the math assumes</h2>
+      <ul class="zrc-assume">
+        <li class="zrc-assume-item">The space accounting is ported from the OpenZFS 2.4.4 source: the partition table <code class="zrc-code">zpool create</code> writes on a whole disk under Linux (1 MiB at the start, an 8 MiB reserved partition at the end, 512-byte logical sectors), the four vdev labels and boot area (4.5 MiB per disk), metaslab sizing (the space after the last whole metaslab is never used), RAIDZ parity and padding per block, and slop space.</li>
+        <li class="zrc-assume-item">Every vdev has the same type and width, and each disk counts only up to the smallest disk in its vdev.</li>
+        <li class="zrc-assume-item">No compression and no deduplication: files are incompressible and stored in full records of the chosen size. With the default <code class="zrc-code">compression=on</code>, compressible data takes less space; small files and partial records take more on RAIDZ.</li>
+        <li class="zrc-assume-item">Slop space is 1/32 of the pool (<code class="zrc-code">spa_slop_shift=5</code>), at least 128 MiB (but no more than half the pool) and at most 128 GiB. ZFS keeps it free for its own use, so normal writes stop when only the slop space is left. Each vdev with more than 64 metaslabs also sets one metaslab aside for the intent log; ZFS subtracts that from the slop space, so on most pools the two together still come to 1/32 of the pool or 128 GiB.</li>
+        <li class="zrc-assume-item">Not modelled, so real free space is lower: file system metadata (dnodes, directories, indirect blocks; at 128K records the block pointers alone take about 0.2% before compression, because the default <code class="zrc-code">redundant_metadata=all</code> stores them twice), snapshots, reservations, special, log and cache devices, dRAID, and any swap or other partitions a NAS system creates on the disks itself.</li>
+        <li class="zrc-assume-item"><code class="zrc-code">zpool list</code> and <code class="zrc-code">zfs list</code> print binary units: their T means TiB. <code class="zrc-code">zfs list</code> always converts space with the 128K block ratio of each vdev, so at other record sizes it shows a little more or less than the data you actually stored.</li>
+        <li class="zrc-assume-item">The result is only as exact as the disk sizes you enter, and the round number on a disk label is not always its exact size; for an exact figure, enter the size in bytes from <code class="zrc-code">lsblk -b</code> or the disk's data sheet. On an empty pool, the USED + AVAIL that <code class="zrc-code">zfs list</code> prints is shown under the results, apart from the metadata ZFS writes when it creates the pool.</li>
+        <li class="zrc-assume-item">"May fail" counts whole-disk failures only. It says nothing about the chance of a failure or about read errors during a rebuild.</li>
+      </ul>
+    </section>
+
+    <footer class="zrc-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+    <div class="zrc-toast" id="zrc-toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

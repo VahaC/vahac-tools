@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-26 (Homelab Power Cost Calculator added)
+- Last updated: 2026-10-26 (ZFS and RAID Capacity Calculator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -43,6 +43,7 @@ Documentation status:
 - `wifi-qr-code-generator/` - Wi-Fi network QR codes (WPA/WPA2/WPA3, WEP, open, hidden) with PNG/SVG export and a printable card.
 - `wireguard-config-generator/` - WireGuard server and client configs: X25519 key pairs and preshared keys made in the browser, an IPv4 (and optional IPv6) address plan, full or split tunnel, the server `wg0.conf` with a `[Peer]` block per client, and a `.conf` download and QR code per client.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
+- `zfs-raid-capacity-calculator/` - usable ZFS pool capacity in TB and TiB for stripe, 2/3/4-way mirror and RAIDZ1/2/3 layouts with any number of vdevs, mixed disk sizes and hot spares: raw, after parity or mirroring, after ZFS reserves and RAIDZ padding at a chosen record size and ashift, after slop space and at a target fill level, using OpenZFS 2.4.4 space accounting; disks that may fail (guaranteed and best case), every layout the disks allow side by side, and classic RAID 0/1/5/6/10.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
 ## Tool Overview
@@ -367,6 +368,16 @@ Features:
 - Useful for infra, app config, and serialization workflows.
 - Runs fully client-side without backend processing.
 
+### 33) ZFS and RAID Capacity Calculator
+
+Path:
+- `zfs-raid-capacity-calculator/index.html`
+
+Features:
+- Disk rows (quantity, size in TB, TiB, GB, GiB or bytes), hot spares, vdev type (stripe, 2/3/4-way mirror, RAIDZ1/2/3), number of vdevs, ashift 9–16, record size 4K–16M and a target fill level (80% by default); disks fill vdevs in list order and each counts up to the smallest disk in its vdev.
+- Space model ported from the OpenZFS 2.4.4 source: the whole-disk GPT partition, vdev labels and boot area, metaslab sizing, the RAIDZ allocation size per record (parity and padding), the 128K deflate ratio `zfs list` uses, and slop space with its 128 MiB / 128 GiB limits and the embedded intent-log metaslab. Shows raw, after parity/mirroring, after reserves, after padding, after slop and at the fill target in TB and TiB, plus the expected `zpool list` SIZE and `zfs list` USED + AVAIL.
+- Disks that may fail per vdev and for the pool (guaranteed versus best case), every valid layout for the disk count side by side, classic RAID 0/1/5/6/10 with mdadm notes, warnings that name the values and the fix (uneven splits, RAIDZ minimum widths, mixed sizes), a plain-text summary and the setup in the URL hash.
+
 ## Local Usage
 
 These are static tools, so you can run them in either of these ways:
@@ -411,11 +422,12 @@ Then open:
 - `http://localhost:8080/wifi-qr-code-generator/`
 - `http://localhost:8080/wireguard-config-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
+- `http://localhost:8080/zfs-raid-capacity-calculator/`
 
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (955 tests across 30 modules), powered by the built-in Node.js test runner
+tool (991 tests across 31 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -452,7 +464,12 @@ ESPHome snippets), homelab power costs (average watts, kWh and cost per day,
 month and year, quantities, day/night splits for 24/7, hours-per-day and
 past-midnight time windows, fixed charges, payback and "never" cases, limits,
 paper-style rounding, ISO and symbol currency formatting, CSV and the URL
-hash), Traefik Docker labels (label output for every option, `$`
+hash), ZFS and RAID capacity (RAIDZ allocation sizes checked against a
+direct port of the OpenZFS formula for widths 2–24, parity 1–3 and ashift
+9/12/13, hand-worked partition, label, metaslab, deflate and slop values
+including the 128 MiB and 128 GiB clamps, TB/TiB input, fill targets,
+multiple vdevs, mixed disk sizes, fault tolerance, classic RAID levels,
+invalid layouts and the URL hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats
