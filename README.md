@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-26 (Proxmox LXC idmap Generator added)
+- Last updated: 2026-10-26 (WireGuard Config Generator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -38,6 +38,7 @@ Documentation status:
 - `utm-campaign-url-builder/` - UTM-tagged campaign links with presets, a GA4 default-channel check, saved presets, a CSV link list, and QR export.
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
 - `wifi-qr-code-generator/` - Wi-Fi network QR codes (WPA/WPA2/WPA3, WEP, open, hidden) with PNG/SVG export and a printable card.
+- `wireguard-config-generator/` - WireGuard server and client configs: X25519 key pairs and preshared keys made in the browser, an IPv4 (and optional IPv6) address plan, full or split tunnel, the server `wg0.conf` with a `[Peer]` block per client, and a `.conf` download and QR code per client.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
@@ -313,7 +314,17 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 28) YAML JSON TOML Converter
+### 28) WireGuard Config Generator
+
+Path:
+- `wireguard-config-generator/index.html`
+
+Features:
+- Generates X25519 key pairs with WebCrypto (TweetNaCl.js fallback, loaded only when the browser lacks X25519), clamped like `wg genkey`, after an RFC 7748 self-test; preshared keys come from `crypto.getRandomValues`. Public keys can be pasted instead, so the server or a device keeps its own private key.
+- Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
+- Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
+
+### 29) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -362,12 +373,13 @@ Then open:
 - `http://localhost:8080/utm-campaign-url-builder/`
 - `http://localhost:8080/vcard-qr-code-generator/`
 - `http://localhost:8080/wifi-qr-code-generator/`
+- `http://localhost:8080/wireguard-config-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
 
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (757 tests across 26 modules), powered by the built-in Node.js test runner
+tool (805 tests across 27 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -397,8 +409,11 @@ security header checks (HSTS, X-Frame-Options, RFC 9651 Permissions-Policy),
 per-server config escaping, curl command parsing (POSIX, cmd and
 PowerShell quoting) and code generation, CSV parsing with delimiter/header
 detection, per-dialect SQL literal escaping, Wi-Fi QR payload escaping and
-validation, UTM link building (URL parsing, encoding round-trips through the
-WHATWG URL parser, GA4 default-channel rules for every preset), TOML
+validation, WireGuard config generation (RFC 7748 X25519 vectors, generated
+key pairs checked against `node:crypto`, `wg genkey` clamping and key format,
+server/client key pairing, address allocation, configs the mobile apps
+accept, no secrets in the URL), UTM link building (URL parsing, encoding
+round-trips through the WHATWG URL parser, GA4 default-channel rules for every preset), TOML
 round-tripping, JWT parsing and claim handling, and MD5 hashing (verified against
 `node:crypto`).
 

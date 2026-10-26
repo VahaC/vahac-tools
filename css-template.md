@@ -272,5 +272,6 @@ Keep this list updated to avoid prefix collisions:
 | `urc`  | URL Encoder / Decoder    | Built    |
 | `uts`  | Unix Timestamp Converter | Built    |
 | `vcg`  | vCard QR Code Generator  | Live     |
+| `wgc`  | WireGuard Config Gen.    | Built    |
 | `wqr`  | Wi-Fi QR Code Generator  | Built    |
 | `yjt`  | YAML / JSON / TOML Conv. | Built    |

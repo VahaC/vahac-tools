@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WireGuard Config Generator — Logs from VahaC</title>
+  <meta name="description" content="Free WireGuard config generator: server wg0.conf plus one client config per peer, X25519 keys and preshared keys made in your browser, .conf download and QR code.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wgc-wrapper" id="wgc-wrapper">
+
+    <header class="wgc-header">
+      <h1 class="wgc-title">WireGuard Config Generator</h1>
+      <p class="wgc-subtitle">Plan a WireGuard server and its clients in one go: the server's <code class="wgc-code">wg0.conf</code> with a <code class="wgc-code">[Peer]</code> block per client, and a ready <code class="wgc-code">.conf</code> file and QR code for every phone, laptop or router. Keys are created in your browser and never leave this page.</p>
+    </header>
+
+    <div class="wgc-alert" role="note">
+      <span class="wgc-alert-icon" aria-hidden="true">!</span>
+      <p class="wgc-alert-text"><strong>Every client config and QR code contains that device's private key</strong>, and the server's <code class="wgc-code">wg0.conf</code> contains the server's. Anyone who gets one can connect as that device. Scan QR codes straight from this screen, move files over a channel you trust, and delete downloaded copies once they are imported.</p>
+    </div>
+
+    <div class="wgc-layout">
+
+      <div class="wgc-col">
+
+        <section class="wgc-card" aria-labelledby="wgc-server-title">
+          <div class="wgc-card-head">
+            <h2 class="wgc-card-title" id="wgc-server-title">Server</h2>
+          </div>
+
+          <div class="wgc-grid-2">
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-iface">Interface name</label>
+              <input class="wgc-input wgc-input--mono" id="wgc-iface" type="text" placeholder="wg0"
+                     autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="15" aria-describedby="wgc-iface-hint">
+              <p class="wgc-hint" id="wgc-iface-hint">The file becomes <code class="wgc-code">/etc/wireguard/&lt;name&gt;.conf</code>.</p>
+            </div>
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-port">Listen port (UDP)</label>
+              <input class="wgc-input wgc-input--mono" id="wgc-port" type="text" inputmode="numeric" placeholder="51820"
+                     autocomplete="off" spellcheck="false" maxlength="5">
+            </div>
+          </div>
+
+          <div class="wgc-field">
+            <label class="wgc-label" for="wgc-endpoint">Public endpoint</label>
+            <input class="wgc-input wgc-input--mono" id="wgc-endpoint" type="text" placeholder="vpn.example.com or 203.0.113.10:51820"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="260" aria-describedby="wgc-endpoint-hint">
+            <p class="wgc-hint" id="wgc-endpoint-hint">The public IP or DNS name clients connect to, optionally with a port if your router forwards a different one. IPv6 goes in brackets: <code class="wgc-code">[2001:db8::1]:51820</code>.</p>
+          </div>
+
+          <fieldset class="wgc-fieldset">
+            <legend class="wgc-label">Server key</legend>
+            <div class="wgc-segment" role="radiogroup" aria-label="Server key">
+              <label class="wgc-seg-opt">
+                <input class="wgc-seg-input" type="radio" name="wgc-server-key" id="wgc-server-key-gen" value="generate">
+                <span class="wgc-seg-text">Generate here</span>
+              </label>
+              <label class="wgc-seg-opt">
+                <input class="wgc-seg-input" type="radio" name="wgc-server-key" id="wgc-server-key-paste" value="paste">
+                <span class="wgc-seg-text">Paste public key <span class="wgc-seg-badge">safer</span></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="wgc-paste-box wgc-hidden" id="wgc-server-paste">
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-server-pub">Server public key</label>
+              <input class="wgc-input wgc-input--mono" id="wgc-server-pub" type="text" placeholder="44 characters ending in ="
+                     autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60">
+            </div>
+            <p class="wgc-hint">Create the key on the server and paste only the public key it prints. The command saves the private key with owner-only permissions:</p>
+            <div class="wgc-cmd">
+              <pre class="wgc-pre wgc-pre--cmd" id="wgc-genkey-cmd"></pre>
+              <button class="wgc-link-btn" type="button" onclick="wgcCopy('genkey')">Copy</button>
+            </div>
+          </div>
+
+          <p class="wgc-hint" id="wgc-server-key-hint"></p>
+        </section>
+
+        <section class="wgc-card" aria-labelledby="wgc-addr-title">
+          <div class="wgc-card-head">
+            <h2 class="wgc-card-title" id="wgc-addr-title">Tunnel addresses</h2>
+          </div>
+
+          <div class="wgc-field">
+            <label class="wgc-label" for="wgc-pool4">IPv4 network</label>
+            <input class="wgc-input wgc-input--mono" id="wgc-pool4" type="text" placeholder="10.8.0.0/24"
+                   autocomplete="off" spellcheck="false" maxlength="18" aria-describedby="wgc-pool4-hint">
+            <p class="wgc-hint" id="wgc-pool4-hint">A private range that isn't used on your LAN or on the networks your clients join. The server takes the first address, peers get the next ones; the network and broadcast addresses are skipped.</p>
+          </div>
+
+          <details class="wgc-more" id="wgc-addr-more">
+            <summary class="wgc-more-summary">Choose addresses <span class="wgc-more-sub">server address, first peer address</span></summary>
+            <div class="wgc-more-body">
+              <div class="wgc-grid-2">
+                <div class="wgc-field">
+                  <label class="wgc-label" for="wgc-server-ip4">Server address</label>
+                  <input class="wgc-input wgc-input--mono" id="wgc-server-ip4" type="text" placeholder="first address"
+                         autocomplete="off" spellcheck="false" maxlength="15">
+                </div>
+                <div class="wgc-field">
+                  <label class="wgc-label" for="wgc-first-peer4">First peer address</label>
+                  <input class="wgc-input wgc-input--mono" id="wgc-first-peer4" type="text" placeholder="next free"
+                         autocomplete="off" spellcheck="false" maxlength="15">
+                </div>
+              </div>
+              <p class="wgc-hint">Set the first peer address when you add clients to a server that already has some, so the new ones don't reuse taken addresses.</p>
+            </div>
+          </details>
+
+          <label class="wgc-check">
+            <input class="wgc-checkbox" id="wgc-v6" type="checkbox">
+            <span class="wgc-check-text">
+              <span>Add IPv6 addresses</span>
+              <span class="wgc-check-sub">Each peer also gets a /128 from an IPv6 network, with the same host number as its IPv4 address.</span>
+            </span>
+          </label>
+
+          <div class="wgc-v6-box wgc-hidden" id="wgc-v6-box">
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-pool6">IPv6 network</label>
+              <div class="wgc-inline">
+                <input class="wgc-input wgc-input--mono" id="wgc-pool6" type="text" placeholder="fd12:3456:789a::/64"
+                       autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="49">
+                <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcRandomUla()">New random</button>
+              </div>
+              <p class="wgc-hint">A unique local (ULA) prefix from <code class="wgc-code">fd00::/8</code> with a random 40-bit ID, as RFC 4193 describes, or a routed prefix from your ISP.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="wgc-card" aria-labelledby="wgc-client-title">
+          <div class="wgc-card-head">
+            <h2 class="wgc-card-title" id="wgc-client-title">Client settings</h2>
+          </div>
+
+          <fieldset class="wgc-fieldset">
+            <legend class="wgc-label">What goes through the tunnel</legend>
+            <div class="wgc-segment" role="radiogroup" aria-label="Tunnel mode">
+              <label class="wgc-seg-opt">
+                <input class="wgc-seg-input" type="radio" name="wgc-mode" id="wgc-mode-full" value="full">
+                <span class="wgc-seg-text">Everything (full tunnel)</span>
+              </label>
+              <label class="wgc-seg-opt">
+                <input class="wgc-seg-input" type="radio" name="wgc-mode" id="wgc-mode-split" value="split">
+                <span class="wgc-seg-text">Only some networks (split)</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="wgc-mode-box" id="wgc-full-box">
+            <p class="wgc-hint">Clients send all traffic to the server: <code class="wgc-code">AllowedIPs = 0.0.0.0/0</code>. wg-quick then routes the default route through the tunnel.</p>
+            <label class="wgc-check" id="wgc-block6-row">
+              <input class="wgc-checkbox" id="wgc-block6" type="checkbox">
+              <span class="wgc-check-text">
+                <span>Also send IPv6 into the tunnel (<code class="wgc-code">::/0</code>)</span>
+                <span class="wgc-check-sub" id="wgc-block6-sub"></span>
+              </span>
+            </label>
+          </div>
+
+          <div class="wgc-mode-box wgc-hidden" id="wgc-split-box">
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-nets">Networks behind the server</label>
+              <input class="wgc-input wgc-input--mono" id="wgc-nets" type="text" placeholder="192.168.1.0/24, 10.10.0.0/16"
+                     autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="2000" aria-describedby="wgc-nets-hint">
+              <p class="wgc-hint" id="wgc-nets-hint">Comma-separated, for example your home LAN. The tunnel network itself is always added, so clients reach the server and each other.</p>
+            </div>
+          </div>
+
+          <div class="wgc-field">
+            <label class="wgc-label" for="wgc-dns">DNS servers <span class="wgc-optional">optional</span></label>
+            <input class="wgc-input wgc-input--mono" id="wgc-dns" type="text" placeholder="10.8.0.1 or 1.1.1.1, 9.9.9.9"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="500" aria-describedby="wgc-dns-hint">
+            <p class="wgc-hint" id="wgc-dns-hint">Comma-separated IP addresses; a name such as <code class="wgc-code">home.lan</code> becomes a search domain. Use the server's tunnel address only if it runs a DNS resolver (Pi-hole, AdGuard Home, Unbound). Empty: clients keep the DNS of the network they are on.</p>
+          </div>
+
+          <div class="wgc-grid-2">
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-keepalive">Persistent keepalive</label>
+              <select class="wgc-input wgc-select" id="wgc-keepalive" aria-describedby="wgc-keepalive-hint">
+                <option value="off">Off (default)</option>
+                <option value="25">Every 25 seconds</option>
+                <option value="custom">Custom…</option>
+              </select>
+              <input class="wgc-input wgc-input--mono wgc-hidden" id="wgc-keepalive-custom" type="text" inputmode="numeric"
+                     placeholder="1–65535 seconds" autocomplete="off" spellcheck="false" maxlength="5" aria-label="Keepalive interval in seconds">
+            </div>
+            <div class="wgc-field">
+              <label class="wgc-label" for="wgc-mtu">MTU <span class="wgc-optional">optional</span></label>
+              <input class="wgc-input wgc-input--mono" id="wgc-mtu" type="text" inputmode="numeric" placeholder="automatic"
+                     autocomplete="off" spellcheck="false" maxlength="5" aria-describedby="wgc-mtu-hint">
+            </div>
+          </div>
+          <p class="wgc-hint" id="wgc-keepalive-hint">Keepalive is for clients behind NAT that must stay reachable while idle; most setups don't need it. MTU applies to the server and every client. Left empty, wg-quick uses the outgoing link's MTU minus 80 (1420 on a normal 1500-byte link) and the Android and iOS apps use 1280.</p>
+
+          <label class="wgc-check">
+            <input class="wgc-checkbox" id="wgc-psk" type="checkbox">
+            <span class="wgc-check-text">
+              <span>Add a preshared key per peer</span>
+              <span class="wgc-check-sub">A separate random 32-byte key for each server ↔ client pair, mixed into the handshake for post-quantum resistance (wg(8)). The same key goes into both configs.</span>
+            </span>
+          </label>
+        </section>
+
+        <section class="wgc-card" aria-labelledby="wgc-peers-title">
+          <div class="wgc-card-head">
+            <h2 class="wgc-card-title" id="wgc-peers-title">Peers (clients)</h2>
+            <span class="wgc-count" id="wgc-peer-count">0</span>
+          </div>
+          <p class="wgc-hint">Name each device. <strong>Generate key</strong> gives you a complete config and QR code. <strong>Paste public key</strong> is for a device that created its own key (the app's <em>Create from scratch</em>, or <code class="wgc-code">wg genkey</code> on a laptop): its private key never leaves the device, and you type the settings into it by hand.</p>
+          <div class="wgc-peer-rows" id="wgc-peer-rows"></div>
+          <div class="wgc-actions">
+            <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" id="wgc-add-peer" type="button" onclick="wgcAddPeer()">+ Add peer</button>
+          </div>
+        </section>
+
+        <section class="wgc-card" aria-labelledby="wgc-extras-title">
+          <div class="wgc-card-head">
+            <h2 class="wgc-card-title" id="wgc-extras-title">Server extras <span class="wgc-tag">example</span></h2>
+          </div>
+          <label class="wgc-check">
+            <input class="wgc-checkbox" id="wgc-nat" type="checkbox">
+            <span class="wgc-check-text">
+              <span>Add NAT and forwarding rules to wg0.conf</span>
+              <span class="wgc-check-sub">iptables commands in <code class="wgc-code">PostUp</code> / <code class="wgc-code">PostDown</code>, so clients can reach the internet or your LAN through the server. An example to check against your firewall, not a full firewall setup.</span>
+            </span>
+          </label>
+          <div class="wgc-field wgc-hidden" id="wgc-nat-box">
+            <label class="wgc-label" for="wgc-nat-iface">Server's outgoing interface</label>
+            <input class="wgc-input wgc-input--mono" id="wgc-nat-iface" type="text" placeholder="eth0"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="15" aria-describedby="wgc-nat-hint">
+            <p class="wgc-hint" id="wgc-nat-hint">The name after <code class="wgc-code">dev</code> in <code class="wgc-code">ip route show default</code> on the server, for example <code class="wgc-code">eth0</code>, <code class="wgc-code">ens18</code> or <code class="wgc-code">vmbr0</code>. The server needs the <code class="wgc-code">iptables</code> command: if a PostUp command fails, wg-quick takes the interface down again.</p>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="wgc-col">
+
+        <div class="wgc-engine" id="wgc-engine" role="status" aria-live="polite">
+          <span class="wgc-engine-dot" aria-hidden="true"></span>
+          <span class="wgc-engine-text" id="wgc-engine-text">Checking the browser's X25519 support…</span>
+        </div>
+
+        <div class="wgc-messages" id="wgc-messages" role="status" aria-live="polite"></div>
+
+        <div class="wgc-blocked wgc-hidden" id="wgc-blocked">Fix the errors above to see the configs.</div>
+
+        <div class="wgc-output" id="wgc-output">
+
+          <div class="wgc-toolbar">
+            <label class="wgc-check wgc-check--inline">
+              <input class="wgc-checkbox" id="wgc-reveal" type="checkbox">
+              <span class="wgc-check-text"><span>Show private keys</span></span>
+            </label>
+            <div class="wgc-toolbar-btns">
+              <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcRegenerateAll()">New keys for all</button>
+              <button class="wgc-btn wgc-btn--compact" id="wgc-zip-btn" type="button" onclick="wgcDownloadZip()">Download all (.zip)</button>
+            </div>
+          </div>
+          <p class="wgc-hint">Keys are hidden on screen only; Copy, Download and the QR codes always contain the real keys. They exist only in this tab, so download what you need before you reload or close it.</p>
+
+          <section class="wgc-card" aria-labelledby="wgc-srv-out-title">
+            <div class="wgc-card-head">
+              <h2 class="wgc-card-title" id="wgc-srv-out-title"><span class="wgc-step">S</span> Server</h2>
+              <span class="wgc-chip" id="wgc-srv-chip"></span>
+            </div>
+            <p class="wgc-file" id="wgc-srv-file">/etc/wireguard/wg0.conf</p>
+            <div class="wgc-keyline">
+              <span class="wgc-keyline-label">Public key</span>
+              <code class="wgc-keyline-value" id="wgc-srv-pub"></code>
+              <button class="wgc-link-btn" type="button" onclick="wgcCopy('server-pub')">Copy</button>
+            </div>
+            <pre class="wgc-pre" id="wgc-srv-conf"></pre>
+            <p class="wgc-note-warn wgc-hidden" id="wgc-srv-placeholder">This file contains the placeholder <code class="wgc-code">PASTE_SERVER_PRIVATE_KEY_HERE</code>. Replace it with the server's private key (<code class="wgc-code">sudo cat /etc/wireguard/server.key</code> on the server) — or, if WireGuard already runs there, append only the [Peer] blocks below to your existing config.</p>
+            <div class="wgc-actions">
+              <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcCopy('server')">Copy</button>
+              <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcDownload('server')">Download</button>
+            </div>
+
+            <details class="wgc-more" id="wgc-peers-only">
+              <summary class="wgc-more-summary">Only the [Peer] blocks <span class="wgc-more-sub">to add clients to a running server</span></summary>
+              <div class="wgc-more-body">
+                <pre class="wgc-pre" id="wgc-srv-peers"></pre>
+                <div class="wgc-actions">
+                  <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcCopy('server-peers')">Copy [Peer] blocks</button>
+                </div>
+                <p class="wgc-hint">Append them to the server's config file, then apply them without dropping connected clients: <code class="wgc-code" id="wgc-reload-cmd">sudo systemctl reload wg-quick@wg0</code> (the unit runs <code class="wgc-code">wg syncconf</code> on <code class="wgc-code">wg-quick strip</code>).</p>
+              </div>
+            </details>
+
+            <details class="wgc-more" id="wgc-setup">
+              <summary class="wgc-more-summary">Server setup steps <span class="wgc-more-sub">example commands for Linux with systemd</span></summary>
+              <div class="wgc-more-body">
+                <ol class="wgc-steps" id="wgc-setup-steps"></ol>
+              </div>
+            </details>
+          </section>
+
+          <div class="wgc-peer-outs" id="wgc-peer-outs"></div>
+
+        </div>
+
+        <div class="wgc-share">
+          <button class="wgc-btn wgc-btn--secondary wgc-btn--compact" type="button" onclick="wgcCopyLink()">Copy link to these settings</button>
+          <span class="wgc-hint">The link holds settings, peer names and pasted public keys only, never a private or preshared key. Opening it creates new keys. Nothing is sent anywhere.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="wgc-toast" id="wgc-toast" role="status" aria-live="polite">Copied</div>
+
+    <footer class="wgc-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
