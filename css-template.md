@@ -257,6 +257,7 @@ Keep this list updated to avoid prefix collisions:
 | `drc`  | Docker Run ↔ Compose     | Built    |
 | `egp`  | ESP32 GPIO Pin Picker    | Built    |
 | `fvg`  | Favicon Generator        | Built    |
+| `hpc`  | Homelab Power Cost Calc. | Built    |
 | `hsg`  | Hash Generator           | Built    |
 | `icr`  | Image Compressor/Resizer | Built    |
 | `jsf`  | JSON Formatter           | Built    |

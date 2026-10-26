@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homelab Power Cost Calculator — Logs from VahaC</title>
+  <meta name="description" content="Free homelab power cost calculator: kWh and cost per device per day, month and year, day/night tariffs, and payback time for a low-power replacement.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hpc-wrapper" id="hpc-wrapper">
+
+    <header class="hpc-header">
+      <h1 class="hpc-title">Homelab Power Cost Calculator</h1>
+      <p class="hpc-subtitle">List the machines that run in your homelab, type the watts you measured at the wall and the price you pay per kWh, and see the energy and cost per day, month and year for each device and in total. Works with a single rate or a day/night tariff, and shows how long a lower-power replacement takes to pay for itself.</p>
+    </header>
+
+    <section class="hpc-card" aria-labelledby="hpc-h-price">
+      <h2 class="hpc-card-title" id="hpc-h-price">Electricity price</h2>
+
+      <div class="hpc-grid hpc-grid--price">
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-currency">Currency</label>
+          <input class="hpc-input" id="hpc-currency" type="text" maxlength="8" autocomplete="off" spellcheck="false" placeholder="EUR" aria-describedby="hpc-currency-hint">
+        </div>
+        <fieldset class="hpc-fieldset">
+          <legend class="hpc-label">Tariff</legend>
+          <div class="hpc-segment" role="radiogroup" aria-label="Tariff">
+            <label class="hpc-seg-opt">
+              <input class="hpc-seg-input" type="radio" name="hpc-tt" value="single">
+              <span class="hpc-seg-text">Single rate</span>
+            </label>
+            <label class="hpc-seg-opt">
+              <input class="hpc-seg-input" type="radio" name="hpc-tt" value="tou">
+              <span class="hpc-seg-text">Day / night</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+      <p class="hpc-hint" id="hpc-currency-hint"></p>
+
+      <div class="hpc-grid hpc-grid--one" id="hpc-single">
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-price">Price per kWh</label>
+          <input class="hpc-input" id="hpc-price" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.30">
+        </div>
+      </div>
+
+      <div class="hpc-tou hpc-hidden" id="hpc-tou">
+        <div class="hpc-grid hpc-grid--4">
+          <div class="hpc-field">
+            <label class="hpc-label" for="hpc-day-price">Standard price per kWh</label>
+            <input class="hpc-input" id="hpc-day-price" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.35">
+          </div>
+          <div class="hpc-field">
+            <label class="hpc-label" for="hpc-night-price">Cheap-rate price per kWh</label>
+            <input class="hpc-input" id="hpc-night-price" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.15">
+          </div>
+          <div class="hpc-field">
+            <label class="hpc-label" for="hpc-cheap-start">Cheap rate from</label>
+            <input class="hpc-input" id="hpc-cheap-start" type="time" step="60">
+          </div>
+          <div class="hpc-field">
+            <label class="hpc-label" for="hpc-cheap-end">Cheap rate until</label>
+            <input class="hpc-input" id="hpc-cheap-end" type="time" step="60">
+          </div>
+        </div>
+        <p class="hpc-hint" id="hpc-cheap-hint"></p>
+      </div>
+
+      <div class="hpc-grid hpc-grid--fixed">
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-fixed">Fixed charge</label>
+          <input class="hpc-input" id="hpc-fixed" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0" aria-describedby="hpc-fixed-hint">
+        </div>
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-fixed-period">Charged</label>
+          <select class="hpc-input hpc-select" id="hpc-fixed-period">
+            <option value="month">per month</option>
+            <option value="day">per day</option>
+          </select>
+        </div>
+      </div>
+      <p class="hpc-hint" id="hpc-fixed-hint"></p>
+      <p class="hpc-hint">Use the full price per kWh on your bill: energy plus network fees and taxes. Tiered (block) prices and hourly spot prices are not modelled.</p>
+
+      <ul class="hpc-issues hpc-hidden" id="hpc-tariff-issues"></ul>
+    </section>
+
+    <section class="hpc-card" aria-labelledby="hpc-h-devices">
+      <div class="hpc-card-head">
+        <h2 class="hpc-card-title" id="hpc-h-devices">Devices</h2>
+        <span class="hpc-card-meta" id="hpc-dev-count"></span>
+      </div>
+      <p class="hpc-note" id="hpc-example-note">The rows marked <strong>(example)</strong> use made-up round numbers so you can see how the calculator works. They are not typical or measured values: replace them with your own readings, or press <strong>Clear list</strong>.</p>
+      <p class="hpc-hint">Measure each device at the wall with a plug-in energy meter or a smart plug that reports power. Note the idle reading and a reading under its usual work, then estimate the share of its running time spent at load. Leave load watts empty for a device with a steady draw.</p>
+
+      <div class="hpc-devices" id="hpc-devices"></div>
+
+      <div class="hpc-actions">
+        <button type="button" class="hpc-btn" id="hpc-add" onclick="hpcAddDevice()">+ Add device</button>
+        <button type="button" class="hpc-btn hpc-btn--secondary" onclick="hpcClearDevices()">Clear list</button>
+        <span class="hpc-hint hpc-hidden" id="hpc-add-hint">The list holds up to 50 devices. Group identical ones with the quantity field.</span>
+      </div>
+    </section>
+
+    <section class="hpc-card" aria-labelledby="hpc-h-results">
+      <h2 class="hpc-card-title" id="hpc-h-results">Energy and cost</h2>
+      <div class="hpc-kpis" id="hpc-kpis"></div>
+      <div class="hpc-table-wrap">
+        <table class="hpc-table" id="hpc-dev-table"></table>
+      </div>
+      <ul class="hpc-issues hpc-hidden" id="hpc-results-issues"></ul>
+      <div class="hpc-actions">
+        <button type="button" class="hpc-btn hpc-btn--secondary" onclick="hpcCopySummary()">Copy summary</button>
+        <button type="button" class="hpc-btn hpc-btn--secondary" onclick="hpcDownloadCsv()">Download CSV</button>
+        <button type="button" class="hpc-btn hpc-btn--secondary" onclick="hpcCopyLink()">Copy link</button>
+        <span class="hpc-hint">The link holds your whole setup in the part after #, so you can bookmark it or share it. Nothing is stored anywhere else.</span>
+      </div>
+    </section>
+
+    <section class="hpc-card" aria-labelledby="hpc-h-payback">
+      <h2 class="hpc-card-title" id="hpc-h-payback">Replace an old machine: payback</h2>
+      <p class="hpc-hint">Compare an old machine with a lower-power replacement that does the same job. The saving uses the electricity price above.</p>
+      <div class="hpc-field">
+        <label class="hpc-label" for="hpc-pb-from">Old machine from the list</label>
+        <select class="hpc-input hpc-select" id="hpc-pb-from"></select>
+      </div>
+      <div class="hpc-grid hpc-grid--pb">
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-pb-old">Old machine, average W</label>
+          <input class="hpc-input" id="hpc-pb-old" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="W">
+        </div>
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-pb-new">New machine, average W</label>
+          <input class="hpc-input" id="hpc-pb-new" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="W">
+        </div>
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-pb-hours">Hours a day they run</label>
+          <input class="hpc-input" id="hpc-pb-hours" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="24">
+        </div>
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-pb-price">New machine price</label>
+          <input class="hpc-input" id="hpc-pb-price" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0">
+        </div>
+        <div class="hpc-field">
+          <label class="hpc-label" for="hpc-pb-resale">Money back for the old one</label>
+          <input class="hpc-input" id="hpc-pb-resale" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="optional">
+        </div>
+      </div>
+      <ul class="hpc-issues hpc-hidden" id="hpc-pb-issues"></ul>
+      <div class="hpc-pb-out" id="hpc-pb-out"></div>
+    </section>
+
+    <section class="hpc-card" aria-labelledby="hpc-h-assume">
+      <h2 class="hpc-card-title" id="hpc-h-assume">What the math assumes</h2>
+      <ul class="hpc-assume">
+        <li class="hpc-assume-item">A year has 365 days (8,760 hours); leap days are ignored. A month is 365 ÷ 12 = 30.42 days, an average month, so a monthly figure will not match a 28- or 31-day bill exactly.</li>
+        <li class="hpc-assume-item">Average draw while on = idle W + (load W − idle W) × share of time at load. The time at load is spread evenly over the time the device runs.</li>
+        <li class="hpc-assume-item">A device set to hours per day or a time window draws nothing for the rest of the day. If it sleeps instead of switching off, add its sleep draw as a second row for the remaining hours.</li>
+        <li class="hpc-assume-item">Every day is the same: the cheap window applies every day of the week, and weekend, holiday and seasonal rates are not modelled. Times are local clock time; daylight-saving changes are ignored.</li>
+        <li class="hpc-assume-item">With a day/night tariff, a device set to hours per day is assumed to run spread evenly over the day, so the cheap window's share of the day (8 h of 24 is 33.3%) is also its share of energy at the cheap rate. Use a time window when you know when it runs.</li>
+        <li class="hpc-assume-item">The watts are what each device draws at the wall, power supply losses included. Nothing is added for a UPS; if your gear runs through one, measure at the UPS input or add the UPS as its own row.</li>
+        <li class="hpc-assume-item">The fixed charge goes into the totals only. It is not split across devices and does not change their share.</li>
+        <li class="hpc-assume-item">Payback: saving = (old W − new W) × hours a day × 365 ÷ 1,000 × price per kWh. Break-even = (new machine price − money back for the old one) ÷ saving a month. Price changes, interest and how long the machines last are not considered.</li>
+        <li class="hpc-assume-item">Everything is computed unrounded and rounded only for display, so rows may differ from the total in the last digit.</li>
+      </ul>
+    </section>
+
+    <footer class="hpc-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+    <div class="hpc-toast" id="hpc-toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

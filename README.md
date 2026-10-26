@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-26 (Traefik Docker Labels Generator added)
+- Last updated: 2026-10-26 (Homelab Power Cost Calculator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -23,6 +23,7 @@ Documentation status:
 - `esp32-gpio-pin-picker/` - ESP32, ESP32-S3, ESP32-C3 and ESP32-C6 GPIO pins ranked from safe to avoid for a chosen use (digital I/O, I2C, SPI, UART, PWM, ADC, touch, deep-sleep wake, DAC), with strapping, flash/PSRAM, USB, UART0, input-only, ADC1/ADC2, touch and RTC flags from Espressif datasheets, module and package options, an ESPHome cross-check and a `pin:` snippet.
 - `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
+- `homelab-power-cost-calculator/` - energy and electricity cost per day, month and year for a list of homelab devices (idle and load watts, share of time at load, always on, hours per day or a time window, quantity), with a single or day/night tariff, an optional fixed charge, each device's share of the cost, a payback calculator for a lower-power replacement, a plain-text summary and CSV export.
 - `image-compressor-resizer/` - client-side image compression and resizing.
 - `json-formatter/` - JSON formatting and validation.
 - `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
@@ -166,7 +167,17 @@ Features:
 - Useful for integrity checks and comparison workflows.
 - Runs directly in the browser without server-side processing.
 
-### 13) Image Compressor and Resizer
+### 13) Homelab Power Cost Calculator
+
+Path:
+- `homelab-power-cost-calculator/index.html`
+
+Features:
+- Device list with name, quantity, idle and load watts, share of time at load, and always on, hours per day or a clock time window (past midnight included); average draw = idle + (load - idle) x share at load.
+- kWh and cost per day, month (365 / 12 days) and year (365 days) for every device and in total, each device's share of the cost with a bar, a single rate or a day/night tariff with the cheap window's exact overlap per device, and an optional fixed charge kept out of per-device costs.
+- Payback for replacing an old machine (old and new watts, hours a day, price, money back for the old one): saving a month and a year, months to break even or "never", net after 1, 3 and 5 years. ISO currency codes via `Intl.NumberFormat` or a plain symbol, every assumption listed on the page, warnings that name the value and the fix, plain-text summary, CSV export and the whole setup in the URL hash.
+
+### 14) Image Compressor and Resizer
 
 Path:
 - `image-compressor-resizer/index.html`
@@ -176,7 +187,7 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 14) JSON Formatter and Validator
+### 15) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -186,7 +197,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 15) JWT Decoder
+### 16) JWT Decoder
 
 Path:
 - `jwt-decoder/index.html`
@@ -196,7 +207,7 @@ Features:
 - Explains registered claims and converts `exp`, `nbf`, and `iat` into readable dates with a validity badge.
 - Optionally verifies HS/RS/ES/PS signatures with a shared secret, PEM public key, or JWK — all via the Web Crypto API in the browser.
 
-### 16) Merge Text Tool
+### 17) Merge Text Tool
 
 Path:
 - `merge-text-tool/index.html`
@@ -206,7 +217,7 @@ Features:
 - Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
 - Options to ignore whitespace or case differences; copy either side's result when done.
 
-### 17) Password and Passphrase Generator
+### 18) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -216,7 +227,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 18) Proxmox LXC idmap Generator
+### 19) Proxmox LXC idmap Generator
 
 Path:
 - `proxmox-lxc-idmap-generator/index.html`
@@ -226,7 +237,7 @@ Features:
 - Rejects overlaps the way Proxmox and the kernel do (two rows on one container ID, two container IDs on one host ID, a host ID inside the shifted range) and warns when an ID maps to host root, when container root is remapped, or when a row changes nothing.
 - Lists the `root:<start>:<count>` lines `/etc/subuid` and `/etc/subgid` need (marking the default `root:100000:65536`), idempotent commands to add them, the `mpN:` line and `pct set` command, a `chown` for the host folder, restart/check commands, and the per-mount-point `idmap=` option of Proxmox VE 9.2+; inputs live in the URL hash.
 
-### 19) Regex Tester
+### 20) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -236,7 +247,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 20) robots.txt Generator and Validator
+### 21) robots.txt Generator and Validator
 
 Path:
 - `robots-txt-generator-validator/index.html`
@@ -246,7 +257,7 @@ Features:
 - Validates pasted or uploaded files line by line following RFC 9309 and Google's parser: typos, missing colons, rules outside groups, paths that never match, relative sitemaps, unsupported directives (Noindex, Host), groups merged by blank lines, and the 500 KiB limit.
 - Tests URLs per crawler (Googlebot, Bingbot, GPTBot, custom tokens, with documented Googlebot fallbacks) and explains which group and rule decide: the longest match wins and Allow wins ties.
 
-### 21) Uptime / SLA Calculator
+### 22) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -256,7 +267,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 22) IP Subnet Calculator
+### 23) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -266,7 +277,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 23) Text Diff Tool
+### 24) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -276,7 +287,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 24) Traefik Docker Labels Generator
+### 25) Traefik Docker Labels Generator
 
 Path:
 - `traefik-docker-labels-generator/index.html`
@@ -286,7 +297,7 @@ Features:
 - Middlewares: basic auth from pasted htpasswd lines (MD5, SHA1 and bcrypt, the hashes Traefik's BasicAuth accepts; every `$` doubled to `$$` for Compose only), an IP allowlist (`ipAllowList`, or `ipWhiteList` before v2.11) and a small security-headers set, linking to the CSP builder for the rest.
 - Outputs the labels in list and map syntax, a service snippet, the equivalent file-provider YAML and the static config it expects; explains every label and warns with the concrete value and the fix (unsupported hash, router without TLS on an HTTPS entrypoint, missing network, wildcard certificates needing DNS-01). Targets Traefik v3 with v2.11 and pre-v2.11 switches; settings live in the URL hash, never the htpasswd line.
 
-### 25) Unix Timestamp Converter
+### 26) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -296,7 +307,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 26) URL Encoder / Decoder
+### 27) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -306,7 +317,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 27) UTM Campaign URL Builder
+### 28) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -316,7 +327,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 28) vCard QR Code Generator
+### 29) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -326,7 +337,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 29) Wi-Fi QR Code Generator
+### 30) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -336,7 +347,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 30) WireGuard Config Generator
+### 31) WireGuard Config Generator
 
 Path:
 - `wireguard-config-generator/index.html`
@@ -346,7 +357,7 @@ Features:
 - Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
 - Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
 
-### 31) YAML JSON TOML Converter
+### 32) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -380,6 +391,7 @@ Then open:
 - `http://localhost:8080/esp32-gpio-pin-picker/`
 - `http://localhost:8080/favicon-generator/`
 - `http://localhost:8080/hash-generator-for-files-and-text/`
+- `http://localhost:8080/homelab-power-cost-calculator/`
 - `http://localhost:8080/image-compressor-resizer/`
 - `http://localhost:8080/json-formatter/`
 - `http://localhost:8080/jwt-decoder/`
@@ -403,7 +415,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (909 tests across 29 modules), powered by the built-in Node.js test runner
+tool (955 tests across 30 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -436,7 +448,11 @@ detection, per-dialect SQL literal escaping, Wi-Fi QR payload escaping and
 validation, ESP32 GPIO pin data (GPIO lists, strapping, flash/PSRAM, USB,
 ADC, touch and wake pins checked against tables transcribed from the Espressif
 datasheets and against ESPHome's own pin validation lists, verdict ranking,
-ESPHome snippets), Traefik Docker labels (label output for every option, `$`
+ESPHome snippets), homelab power costs (average watts, kWh and cost per day,
+month and year, quantities, day/night splits for 24/7, hours-per-day and
+past-midnight time windows, fixed charges, payback and "never" cases, limits,
+paper-style rounding, ISO and symbol currency formatting, CSV and the URL
+hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats
