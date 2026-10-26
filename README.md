@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-26 (ESP32 GPIO Pin Picker added)
+- Last updated: 2026-10-26 (Traefik Docker Labels Generator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -34,6 +34,7 @@ Documentation status:
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
 - `subnet-calculator/` - IPv4 subnet calculation and network planning.
 - `text-diff-tool/` - line/word/character text comparison with diff highlighting.
+- `traefik-docker-labels-generator/` - Traefik v3 and v2 labels for a Compose service (host and path rules, entrypoints, TLS and certificate resolver, HTTP to HTTPS redirect, Docker network, `traefik.enable`, basic auth from an htpasswd line, IP allowlist, security headers) in list and map syntax, plus a service snippet, the equivalent file-provider YAML and the static config they expect.
 - `unix-timestamp-converter/` - Unix epoch to ISO/UTC/local date conversion and back.
 - `url-encoder-decoder/` - percent-encoding and decoding for URLs, query strings, and form data.
 - `utm-campaign-url-builder/` - UTM-tagged campaign links with presets, a GA4 default-channel check, saved presets, a CSV link list, and QR export.
@@ -275,7 +276,17 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 24) Unix Timestamp Converter
+### 24) Traefik Docker Labels Generator
+
+Path:
+- `traefik-docker-labels-generator/index.html`
+
+Features:
+- Builds Traefik labels for a Compose service: Host rules for one or more domains with an optional path prefix (and StripPrefix), entrypoints, container port and backend scheme, TLS with a certificate resolver, an HTTP to HTTPS redirect router or the entrypoint-wide static config, `traefik.docker.network` (with the Compose project prefix for a network defined in the same file) and `traefik.enable`.
+- Middlewares: basic auth from pasted htpasswd lines (MD5, SHA1 and bcrypt, the hashes Traefik's BasicAuth accepts; every `$` doubled to `$$` for Compose only), an IP allowlist (`ipAllowList`, or `ipWhiteList` before v2.11) and a small security-headers set, linking to the CSP builder for the rest.
+- Outputs the labels in list and map syntax, a service snippet, the equivalent file-provider YAML and the static config it expects; explains every label and warns with the concrete value and the fix (unsupported hash, router without TLS on an HTTPS entrypoint, missing network, wildcard certificates needing DNS-01). Targets Traefik v3 with v2.11 and pre-v2.11 switches; settings live in the URL hash, never the htpasswd line.
+
+### 25) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -285,7 +296,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 25) URL Encoder / Decoder
+### 26) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -295,7 +306,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 26) UTM Campaign URL Builder
+### 27) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -305,7 +316,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 27) vCard QR Code Generator
+### 28) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -315,7 +326,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 28) Wi-Fi QR Code Generator
+### 29) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -325,7 +336,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 29) WireGuard Config Generator
+### 30) WireGuard Config Generator
 
 Path:
 - `wireguard-config-generator/index.html`
@@ -335,7 +346,7 @@ Features:
 - Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
 - Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
 
-### 30) YAML JSON TOML Converter
+### 31) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -380,6 +391,7 @@ Then open:
 - `http://localhost:8080/sla-calculator/`
 - `http://localhost:8080/subnet-calculator/`
 - `http://localhost:8080/text-diff-tool/`
+- `http://localhost:8080/traefik-docker-labels-generator/`
 - `http://localhost:8080/unix-timestamp-converter/`
 - `http://localhost:8080/url-encoder-decoder/`
 - `http://localhost:8080/utm-campaign-url-builder/`
@@ -391,7 +403,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (865 tests across 28 modules), powered by the built-in Node.js test runner
+tool (909 tests across 29 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -424,7 +436,11 @@ detection, per-dialect SQL literal escaping, Wi-Fi QR payload escaping and
 validation, ESP32 GPIO pin data (GPIO lists, strapping, flash/PSRAM, USB,
 ADC, touch and wake pins checked against tables transcribed from the Espressif
 datasheets and against ESPHome's own pin validation lists, verdict ranking,
-ESPHome snippets), WireGuard config generation (RFC 7748 X25519 vectors, generated
+ESPHome snippets), Traefik Docker labels (label output for every option, `$`
+doubled for Compose and checked against Compose's interpolation rules, list
+and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
+file-provider YAML decoded and compared with the labels, the htpasswd formats
+Traefik accepts, name, domain, port, network and CIDR validation), WireGuard config generation (RFC 7748 X25519 vectors, generated
 key pairs checked against `node:crypto`, `wg genkey` clamping and key format,
 server/client key pairing, address allocation, configs the mobile apps
 accept, no secrets in the URL), UTM link building (URL parsing, encoding

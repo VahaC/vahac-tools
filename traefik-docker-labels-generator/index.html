@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traefik Docker Labels Generator — Logs from VahaC</title>
+  <meta name="description" content="Free Traefik Docker labels generator: routers, TLS, HTTPS redirect, basic auth, IP allowlist and security headers as Compose labels and file-provider YAML, for Traefik v3 and v2.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="tdl-wrapper" id="tdl-wrapper">
+
+    <header class="tdl-header">
+      <h1 class="tdl-title">Traefik Docker Labels Generator</h1>
+      <p class="tdl-subtitle">Describe your service and get the Traefik labels for <code class="tdl-code">docker-compose.yml</code> in list and map syntax, a ready service snippet, and the same routers, middlewares and service as file-provider YAML. Each label comes with a one-line explanation, and every warning names the value to fix. Built from the Traefik v3.7 and v2.11 documentation and source.</p>
+    </header>
+
+    <div class="tdl-layout">
+
+      <form class="tdl-form" id="tdl-form" autocomplete="off" novalidate>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-service">
+          <h2 class="tdl-card-title" id="tdl-h-service">Traefik and service</h2>
+
+          <fieldset class="tdl-fieldset">
+            <legend class="tdl-label">Traefik version</legend>
+            <div class="tdl-segment" role="radiogroup" aria-label="Traefik version">
+              <label class="tdl-seg-opt">
+                <input class="tdl-seg-input" type="radio" name="tdl-v" value="3">
+                <span class="tdl-seg-text">v3</span>
+              </label>
+              <label class="tdl-seg-opt">
+                <input class="tdl-seg-input" type="radio" name="tdl-v" value="2.11">
+                <span class="tdl-seg-text">v2.11</span>
+              </label>
+              <label class="tdl-seg-opt">
+                <input class="tdl-seg-input" type="radio" name="tdl-v" value="2.10">
+                <span class="tdl-seg-text">v2.0–2.10</span>
+              </label>
+            </div>
+            <p class="tdl-hint" id="tdl-v-hint"></p>
+          </fieldset>
+
+          <div class="tdl-grid-2">
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-svc">Compose service name</label>
+              <input class="tdl-input" id="tdl-svc" type="text" spellcheck="false" placeholder="whoami">
+            </div>
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-img">Image</label>
+              <input class="tdl-input" id="tdl-img" type="text" spellcheck="false" placeholder="traefik/whoami">
+            </div>
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-router">Router name</label>
+              <input class="tdl-input" id="tdl-router" type="text" spellcheck="false" aria-describedby="tdl-router-hint">
+              <p class="tdl-hint" id="tdl-router-hint">Optional. Also names the service and middlewares.</p>
+            </div>
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-port">Container port</label>
+              <input class="tdl-input" id="tdl-port" type="text" inputmode="numeric" spellcheck="false" placeholder="80" aria-describedby="tdl-port-hint">
+              <p class="tdl-hint" id="tdl-port-hint">The port the app listens on inside the container, not a published host port.</p>
+            </div>
+          </div>
+
+          <div class="tdl-field">
+            <label class="tdl-label" for="tdl-scheme">Backend speaks</label>
+            <select class="tdl-input tdl-select" id="tdl-scheme">
+              <option value="http">HTTP (most apps)</option>
+              <option value="https">HTTPS (the app terminates TLS itself)</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-routing">
+          <h2 class="tdl-card-title" id="tdl-h-routing">Routing</h2>
+
+          <div class="tdl-field">
+            <label class="tdl-label" for="tdl-domains">Domains</label>
+            <textarea class="tdl-input tdl-textarea" id="tdl-domains" rows="2" spellcheck="false" placeholder="app.example.com" aria-describedby="tdl-domains-hint"></textarea>
+            <p class="tdl-hint" id="tdl-domains-hint">One or more host names, separated by commas, spaces or new lines. <code class="tdl-code">*.example.com</code> works on Traefik v3.7 and newer.</p>
+          </div>
+
+          <div class="tdl-grid-2">
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-path">Path prefix</label>
+              <input class="tdl-input" id="tdl-path" type="text" spellcheck="false" placeholder="/app (optional)">
+            </div>
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-eps">Entrypoints</label>
+              <input class="tdl-input" id="tdl-eps" type="text" spellcheck="false" placeholder="websecure" aria-describedby="tdl-eps-hint">
+              <p class="tdl-hint" id="tdl-eps-hint">Names from Traefik's static config, comma-separated.</p>
+            </div>
+          </div>
+
+          <label class="tdl-check" id="tdl-strip-row">
+            <input class="tdl-check-input" type="checkbox" id="tdl-strip">
+            <span class="tdl-check-text">Strip the path prefix before forwarding</span>
+          </label>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-https">
+          <h2 class="tdl-card-title" id="tdl-h-https">HTTPS</h2>
+
+          <label class="tdl-check">
+            <input class="tdl-check-input" type="checkbox" id="tdl-tls">
+            <span class="tdl-check-text">TLS on this router</span>
+          </label>
+
+          <div class="tdl-grid-2" id="tdl-tls-fields">
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-resolver">Certificate resolver</label>
+              <input class="tdl-input" id="tdl-resolver" type="text" spellcheck="false" placeholder="letsencrypt" aria-describedby="tdl-resolver-hint">
+              <p class="tdl-hint" id="tdl-resolver-hint">The name under <code class="tdl-code">certificatesResolvers</code>. Leave empty to use certificates you load yourself.</p>
+            </div>
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-redirect">HTTP → HTTPS redirect</label>
+              <select class="tdl-input tdl-select" id="tdl-redirect">
+                <option value="router">Redirect router in these labels</option>
+                <option value="entrypoint">Entrypoint-wide, in the static config</option>
+                <option value="none">No redirect</option>
+              </select>
+            </div>
+            <div class="tdl-field" id="tdl-httpep-field">
+              <label class="tdl-label" for="tdl-httpep">Plain-HTTP entrypoint</label>
+              <input class="tdl-input" id="tdl-httpep" type="text" spellcheck="false" placeholder="web" aria-describedby="tdl-httpep-hint">
+              <p class="tdl-hint" id="tdl-httpep-hint">Port 80 entrypoint, used by the redirect and the ACME HTTP challenge.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-docker">
+          <h2 class="tdl-card-title" id="tdl-h-docker">Docker provider and network</h2>
+
+          <label class="tdl-check">
+            <input class="tdl-check-input" type="checkbox" id="tdl-enable">
+            <span class="tdl-check-text">Add <code class="tdl-code">traefik.enable=true</code> (provider runs with <code class="tdl-code">exposedByDefault: false</code>)</span>
+          </label>
+
+          <div class="tdl-grid-2">
+            <div class="tdl-field">
+              <label class="tdl-label" for="tdl-net">Network shared with Traefik</label>
+              <input class="tdl-input" id="tdl-net" type="text" spellcheck="false" placeholder="proxy">
+            </div>
+            <div class="tdl-field" id="tdl-project-field">
+              <label class="tdl-label" for="tdl-project">Compose project name</label>
+              <input class="tdl-input" id="tdl-project" type="text" spellcheck="false" placeholder="myproject" aria-describedby="tdl-project-hint">
+              <p class="tdl-hint" id="tdl-project-hint">Defaults to the folder name of the Compose file.</p>
+            </div>
+          </div>
+
+          <label class="tdl-check" id="tdl-ext-row">
+            <input class="tdl-check-input" type="checkbox" id="tdl-ext">
+            <span class="tdl-check-text">Network was created outside this file (<code class="tdl-code">external: true</code>)</span>
+          </label>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-mw">
+          <h2 class="tdl-card-title" id="tdl-h-mw">Middlewares</h2>
+
+          <div class="tdl-mw">
+            <label class="tdl-check">
+              <input class="tdl-check-input" type="checkbox" id="tdl-hdr">
+              <span class="tdl-check-text">Security headers</span>
+            </label>
+            <div class="tdl-mw-body" id="tdl-hdr-body">
+              <div class="tdl-grid-2">
+                <div class="tdl-field">
+                  <label class="tdl-label" for="tdl-sts">Strict-Transport-Security</label>
+                  <select class="tdl-input tdl-select" id="tdl-sts">
+                    <option value="0">Off</option>
+                    <option value="86400">1 day (for testing)</option>
+                    <option value="15552000">180 days</option>
+                    <option value="31536000">1 year</option>
+                    <option value="63072000">2 years</option>
+                  </select>
+                </div>
+                <div class="tdl-field">
+                  <label class="tdl-label" for="tdl-frame">X-Frame-Options</label>
+                  <select class="tdl-input tdl-select" id="tdl-frame">
+                    <option value="DENY">DENY</option>
+                    <option value="SAMEORIGIN">SAMEORIGIN</option>
+                    <option value="off">Off</option>
+                  </select>
+                </div>
+                <div class="tdl-field">
+                  <label class="tdl-label" for="tdl-referrer">Referrer-Policy</label>
+                  <select class="tdl-input tdl-select" id="tdl-referrer">
+                    <option value="strict-origin-when-cross-origin">strict-origin-when-cross-origin</option>
+                    <option value="same-origin">same-origin</option>
+                    <option value="strict-origin">strict-origin</option>
+                    <option value="no-referrer">no-referrer</option>
+                    <option value="off">Off</option>
+                  </select>
+                </div>
+                <div class="tdl-field tdl-field--checks">
+                  <label class="tdl-check">
+                    <input class="tdl-check-input" type="checkbox" id="tdl-stssub">
+                    <span class="tdl-check-text">HSTS includeSubDomains</span>
+                  </label>
+                  <label class="tdl-check">
+                    <input class="tdl-check-input" type="checkbox" id="tdl-nosniff">
+                    <span class="tdl-check-text">X-Content-Type-Options: nosniff</span>
+                  </label>
+                </div>
+              </div>
+              <p class="tdl-hint">For a Content-Security-Policy, Permissions-Policy and the other headers, use the <a class="tdl-link" href="https://vahac.com/tools/content-security-policy-generator/" target="_blank" rel="noopener">CSP and HTTP Security Headers Builder</a>: it writes Traefik labels and file config too.</p>
+            </div>
+          </div>
+
+          <div class="tdl-mw">
+            <label class="tdl-check">
+              <input class="tdl-check-input" type="checkbox" id="tdl-ipon">
+              <span class="tdl-check-text">IP allowlist</span>
+            </label>
+            <div class="tdl-mw-body" id="tdl-ipon-body">
+              <div class="tdl-field">
+                <label class="tdl-label" for="tdl-ips">Allowed IPs and CIDR ranges</label>
+                <textarea class="tdl-input tdl-textarea" id="tdl-ips" rows="2" spellcheck="false" placeholder="192.168.1.0/24, 10.8.0.0/24"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="tdl-mw">
+            <label class="tdl-check">
+              <input class="tdl-check-input" type="checkbox" id="tdl-auth">
+              <span class="tdl-check-text">Basic auth</span>
+            </label>
+            <div class="tdl-mw-body" id="tdl-auth-body">
+              <div class="tdl-field">
+                <label class="tdl-label" for="tdl-users">htpasswd line(s)</label>
+                <textarea class="tdl-input tdl-textarea" id="tdl-users" rows="2" spellcheck="false" placeholder="admin:$2y$05$..." aria-describedby="tdl-users-hint"></textarea>
+                <p class="tdl-hint" id="tdl-users-hint">Paste the output of <code class="tdl-code">htpasswd -nB admin</code> (package apache2-utils) as it is. This tool does not create hashes. The line stays in this page: it is not sent anywhere and not saved in the share link.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+
+      <div class="tdl-results">
+        <section class="tdl-card" aria-labelledby="tdl-h-check">
+          <h2 class="tdl-card-title" id="tdl-h-check">Checks</h2>
+          <ul class="tdl-issues" id="tdl-issues" aria-live="polite"></ul>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-out">
+          <div class="tdl-out-head">
+            <h2 class="tdl-card-title" id="tdl-h-out">Output</h2>
+            <button class="tdl-btn tdl-btn--compact" type="button" id="tdl-copy" onclick="tdlCopy()">Copy</button>
+          </div>
+          <div class="tdl-tabs" role="tablist" aria-label="Output format" id="tdl-tabs">
+            <button class="tdl-tab" type="button" role="tab" id="tdl-tab-list" data-tab="list" aria-controls="tdl-out">Labels: list</button>
+            <button class="tdl-tab" type="button" role="tab" id="tdl-tab-map" data-tab="map" aria-controls="tdl-out">Labels: map</button>
+            <button class="tdl-tab" type="button" role="tab" id="tdl-tab-snippet" data-tab="snippet" aria-controls="tdl-out">Compose service</button>
+            <button class="tdl-tab" type="button" role="tab" id="tdl-tab-file" data-tab="file" aria-controls="tdl-out">File provider</button>
+            <button class="tdl-tab" type="button" role="tab" id="tdl-tab-static" data-tab="static" aria-controls="tdl-out">Static config</button>
+          </div>
+          <p class="tdl-hint" id="tdl-out-hint"></p>
+          <pre class="tdl-pre" id="tdl-out" role="tabpanel" tabindex="0"></pre>
+        </section>
+
+        <section class="tdl-card" aria-labelledby="tdl-h-why">
+          <h2 class="tdl-card-title" id="tdl-h-why">What each label does</h2>
+          <ul class="tdl-why" id="tdl-why"></ul>
+        </section>
+
+        <section class="tdl-card tdl-share" aria-label="Share">
+          <button class="tdl-btn tdl-btn--secondary" type="button" id="tdl-share-btn" onclick="tdlCopyLink()">Copy link to these settings</button>
+          <p class="tdl-hint">The link holds every setting except the htpasswd line.</p>
+        </section>
+      </div>
+    </div>
+
+    <section class="tdl-card" aria-labelledby="tdl-h-sources">
+      <h2 class="tdl-card-title" id="tdl-h-sources">Sources and limits</h2>
+      <ul class="tdl-sources">
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://doc.traefik.io/traefik/reference/routing-configuration/other-providers/docker/" target="_blank" rel="noopener">Traefik Docker routing labels</a>
+          <span class="tdl-source-ver">Traefik v3.7.16 docs</span>
+          <span class="tdl-source-used">Label names, traefik.enable, traefik.docker.network, service port, no @ in names.</span>
+        </li>
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://doc.traefik.io/traefik/reference/routing-configuration/http/routing/rules-and-priority/" target="_blank" rel="noopener">Router rules</a>
+          <span class="tdl-source-ver">v3.7.16 docs, v2.11.60 routers page</span>
+          <span class="tdl-source-used">Host and PathPrefix, one value per matcher in v3, lists in v2, wildcard Host since v3.7.0.</span>
+        </li>
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://doc.traefik.io/traefik/migrate/v2-to-v3-details/" target="_blank" rel="noopener">v2 to v3 migration details</a>
+          <span class="tdl-source-ver">v3.7.16 docs</span>
+          <span class="tdl-source-used">Rule syntax changes, IPWhiteList renamed to IPAllowList (deprecated in v2.11).</span>
+        </li>
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/" target="_blank" rel="noopener">BasicAuth middleware</a>
+          <span class="tdl-source-ver">v3.7.16 docs and source</span>
+          <span class="tdl-source-used">Accepted hashes (MD5 apr1 and $1$, SHA1, bcrypt) checked in Traefik's go-http-auth fork; $$ in Compose.</span>
+        </li>
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/" target="_blank" rel="noopener">Entrypoints and redirections</a>
+          <span class="tdl-source-ver">v3.7.16 docs</span>
+          <span class="tdl-source-used">Entrypoint-wide HTTP to HTTPS redirect, router TLS replacing entrypoint TLS.</span>
+        </li>
+        <li class="tdl-source">
+          <a class="tdl-source-link" href="https://docs.docker.com/reference/compose-file/interpolation/" target="_blank" rel="noopener">Compose interpolation</a>
+          <span class="tdl-source-ver">Compose Specification, 2026-10-23</span>
+          <span class="tdl-source-used">Why every $ in a label becomes $$, list and map label syntax, network names.</span>
+        </li>
+      </ul>
+      <p class="tdl-hint">Not covered: TCP and UDP routers, Docker Swarm (labels go under <code class="tdl-code">deploy.labels</code> and v3.2.2+ reads <code class="tdl-code">traefik.swarm.network</code>), Kubernetes, and middlewares other than the ones above. The generator cannot see your Traefik static config, so entrypoint and resolver names are taken as you type them.</p>
+    </section>
+
+    <footer class="tdl-footer">
+      Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+    <div class="tdl-toast" id="tdl-toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
