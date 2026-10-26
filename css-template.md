@@ -260,6 +260,7 @@ Keep this list updated to avoid prefix collisions:
 | `icr`  | Image Compressor/Resizer | Built    |
 | `jsf`  | JSON Formatter           | Built    |
 | `jwt`  | JWT Decoder              | Built    |
+| `lxi`  | Proxmox LXC idmap Gen.   | Built    |
 | `mtx`  | Merge Text Tool          | Built    |
 | `pwg`  | Password Generator       | Built    |
 | `rbt`  | robots.txt Gen/Validator | Built    |

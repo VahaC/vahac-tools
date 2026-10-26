@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-09-24 (CSP and HTTP Security Headers Builder added)
+- Last updated: 2026-10-26 (Proxmox LXC idmap Generator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -27,6 +27,7 @@ Documentation status:
 - `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
 - `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
 - `password-passphrase-generator/` - secure password and passphrase generation.
+- `proxmox-lxc-idmap-generator/` - Proxmox LXC UID/GID mapping: `lxc.idmap` lines that cover the whole container range around the mapped IDs, matching `/etc/subuid` and `/etc/subgid` entries, the bind mount line, a `chown` command, and the Proxmox VE 9.2+ per-mount-point `idmap` alternative.
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
 - `robots-txt-generator-validator/` - guided robots.txt builder (groups, AI crawler block, sitemaps), line-by-line validator with explanations, and a per-crawler URL tester.
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
@@ -202,7 +203,17 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 17) Regex Tester
+### 17) Proxmox LXC idmap Generator
+
+Path:
+- `proxmox-lxc-idmap-generator/index.html`
+
+Features:
+- Maps container UIDs and GIDs (set separately, single IDs or ranges) to host IDs and fills every other container ID 0–65535 with the shifted range Proxmox uses (`100000 + ID`), merging lines that continue each other, in `lxc.idmap: u|g <container> <host> <count>` form for `/etc/pve/lxc/<ID>.conf`.
+- Rejects overlaps the way Proxmox and the kernel do (two rows on one container ID, two container IDs on one host ID, a host ID inside the shifted range) and warns when an ID maps to host root, when container root is remapped, or when a row changes nothing.
+- Lists the `root:<start>:<count>` lines `/etc/subuid` and `/etc/subgid` need (marking the default `root:100000:65536`), idempotent commands to add them, the `mpN:` line and `pct set` command, a `chown` for the host folder, restart/check commands, and the per-mount-point `idmap=` option of Proxmox VE 9.2+; inputs live in the URL hash.
+
+### 18) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -212,7 +223,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 18) robots.txt Generator and Validator
+### 19) robots.txt Generator and Validator
 
 Path:
 - `robots-txt-generator-validator/index.html`
@@ -222,7 +233,7 @@ Features:
 - Validates pasted or uploaded files line by line following RFC 9309 and Google's parser: typos, missing colons, rules outside groups, paths that never match, relative sitemaps, unsupported directives (Noindex, Host), groups merged by blank lines, and the 500 KiB limit.
 - Tests URLs per crawler (Googlebot, Bingbot, GPTBot, custom tokens, with documented Googlebot fallbacks) and explains which group and rule decide: the longest match wins and Allow wins ties.
 
-### 19) Uptime / SLA Calculator
+### 20) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -232,7 +243,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 20) IP Subnet Calculator
+### 21) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -242,7 +253,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 21) Text Diff Tool
+### 22) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -252,7 +263,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 22) Unix Timestamp Converter
+### 23) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -262,7 +273,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 23) URL Encoder / Decoder
+### 24) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -272,7 +283,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 24) UTM Campaign URL Builder
+### 25) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -282,7 +293,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 25) vCard QR Code Generator
+### 26) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -292,7 +303,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 26) Wi-Fi QR Code Generator
+### 27) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -302,7 +313,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 27) YAML JSON TOML Converter
+### 28) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -340,6 +351,7 @@ Then open:
 - `http://localhost:8080/jwt-decoder/`
 - `http://localhost:8080/merge-text-tool/`
 - `http://localhost:8080/password-passphrase-generator/`
+- `http://localhost:8080/proxmox-lxc-idmap-generator/`
 - `http://localhost:8080/regex-tester/`
 - `http://localhost:8080/robots-txt-generator-validator/`
 - `http://localhost:8080/sla-calculator/`
@@ -355,7 +367,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (699 tests across 25 modules), powered by the built-in Node.js test runner
+tool (757 tests across 26 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -377,7 +389,9 @@ node --test tests/jwt-decoder.test.js
 
 The suite covers byte/storage conversion, chmod permissions, cron parsing and
 scheduling, SLA downtime maths, IPv4 subnetting, JSON formatting and stats,
-password/passphrase entropy, vCard generation, CSP parsing and security
+password/passphrase entropy, Proxmox LXC idmap maths (complete 0–65535
+coverage, overlap rules mirroring Proxmox and the kernel, subuid/subgid ranges,
+the Proxmox wiki example line for line), vCard generation, CSP parsing and security
 evaluation (CSP3 policy lists, sources, nonces and hashes against `node:crypto`),
 security header checks (HSTS, X-Frame-Options, RFC 9651 Permissions-Policy),
 per-server config escaping, curl command parsing (POSIX, cmd and

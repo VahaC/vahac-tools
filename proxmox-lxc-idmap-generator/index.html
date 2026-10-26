@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxmox LXC idmap Generator — Logs from VahaC</title>
+  <meta name="description" content="Free Proxmox LXC idmap generator: map container UIDs and GIDs to host IDs and get lxc.idmap lines, /etc/subuid and /etc/subgid entries, the mp0 line and chown.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="lxi-wrapper" id="lxi-wrapper">
+
+    <header class="lxi-header">
+      <h1 class="lxi-title">Proxmox LXC idmap Generator</h1>
+      <p class="lxi-subtitle">Let an unprivileged container read and write a host folder as a real host user. Enter which container UIDs and GIDs should map to which host IDs, and get the <code class="lxi-code">lxc.idmap</code> lines for <code class="lxi-code">/etc/pve/lxc/&lt;ID&gt;.conf</code>, the <code class="lxi-code">/etc/subuid</code> and <code class="lxi-code">/etc/subgid</code> entries, the bind mount line and the <code class="lxi-code">chown</code> command. Everything runs in your browser.</p>
+    </header>
+
+    <div class="lxi-layout">
+
+      <div class="lxi-col">
+
+        <section class="lxi-card" aria-labelledby="lxi-ct-title">
+          <div class="lxi-card-head">
+            <h2 class="lxi-card-title" id="lxi-ct-title">Container</h2>
+            <div class="lxi-card-tools">
+              <button class="lxi-link-btn" type="button" onclick="lxiPreset('user')">User 1000</button>
+              <button class="lxi-link-btn" type="button" onclick="lxiPreset('wiki')">Proxmox wiki example</button>
+              <button class="lxi-link-btn" type="button" onclick="lxiPreset('group')">Shared group</button>
+              <button class="lxi-link-btn" type="button" onclick="lxiPreset('reset')">Reset</button>
+            </div>
+          </div>
+
+          <div class="lxi-field">
+            <label class="lxi-label" for="lxi-ctid">Container ID (CTID)</label>
+            <input class="lxi-input lxi-input--mono" id="lxi-ctid" type="text" inputmode="numeric" placeholder="100"
+                   autocomplete="off" spellcheck="false" aria-describedby="lxi-ctid-hint">
+            <p class="lxi-hint" id="lxi-ctid-hint">Its config file is <code class="lxi-code">/etc/pve/lxc/&lt;CTID&gt;.conf</code>. Use this on an unprivileged container (<code class="lxi-code">unprivileged: 1</code>).</p>
+          </div>
+
+          <details class="lxi-more" id="lxi-advanced">
+            <summary class="lxi-more-summary">Advanced <span class="lxi-more-sub">host base and range size</span></summary>
+            <div class="lxi-more-body">
+              <div class="lxi-grid-2">
+                <div class="lxi-field">
+                  <label class="lxi-label" for="lxi-base">Host base ID</label>
+                  <input class="lxi-input lxi-input--mono" id="lxi-base" type="text" inputmode="numeric" placeholder="100000"
+                         autocomplete="off" spellcheck="false" aria-describedby="lxi-base-hint">
+                </div>
+                <div class="lxi-field">
+                  <label class="lxi-label" for="lxi-size">IDs per container</label>
+                  <input class="lxi-input lxi-input--mono" id="lxi-size" type="text" inputmode="numeric" placeholder="65536"
+                         autocomplete="off" spellcheck="false" aria-describedby="lxi-base-hint">
+                </div>
+              </div>
+              <p class="lxi-hint" id="lxi-base-hint">Proxmox maps unprivileged containers as <code class="lxi-code">u 0 100000 65536</code> and <code class="lxi-code">g 0 100000 65536</code>: container ID 0–65535 becomes host ID 100000–165535. Change these only if you already run a different range.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="lxi-card" aria-labelledby="lxi-u-title">
+          <div class="lxi-card-head">
+            <h2 class="lxi-card-title" id="lxi-u-title">User IDs (UID)</h2>
+            <span class="lxi-count" id="lxi-u-count">0</span>
+          </div>
+          <p class="lxi-hint">Each row maps container UIDs to host UIDs. Count maps a run of consecutive IDs. Every container UID you don't list keeps the shifted host ID (base + ID).</p>
+          <div class="lxi-pair-head" aria-hidden="true">
+            <span>Container</span><span></span><span>Host</span><span>Count</span><span></span>
+          </div>
+          <div class="lxi-rows" id="lxi-u-rows"></div>
+          <div class="lxi-actions">
+            <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" id="lxi-u-add" type="button" onclick="lxiAddPair('u')">+ Add UID pair</button>
+          </div>
+        </section>
+
+        <section class="lxi-card" aria-labelledby="lxi-g-title">
+          <div class="lxi-card-head">
+            <h2 class="lxi-card-title" id="lxi-g-title">Group IDs (GID)</h2>
+            <span class="lxi-count" id="lxi-g-count">0</span>
+          </div>
+          <label class="lxi-check">
+            <input class="lxi-checkbox" id="lxi-same" type="checkbox" checked>
+            <span class="lxi-check-text">
+              <span>Map groups the same way as users</span>
+              <span class="lxi-check-sub">Untick to set GID pairs separately, for example a shared media group.</span>
+            </span>
+          </label>
+          <div class="lxi-g-body lxi-hidden" id="lxi-g-body">
+            <div class="lxi-pair-head" aria-hidden="true">
+              <span>Container</span><span></span><span>Host</span><span>Count</span><span></span>
+            </div>
+            <div class="lxi-rows" id="lxi-g-rows"></div>
+            <div class="lxi-actions">
+              <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" id="lxi-g-add" type="button" onclick="lxiAddPair('g')">+ Add GID pair</button>
+              <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" type="button" onclick="lxiCopyUidRows()">Copy UID pairs</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="lxi-card" aria-labelledby="lxi-mp-title">
+          <div class="lxi-card-head">
+            <h2 class="lxi-card-title" id="lxi-mp-title">Bind mount</h2>
+          </div>
+          <div class="lxi-mp-grid">
+            <div class="lxi-field lxi-field--mp">
+              <label class="lxi-label" for="lxi-mp">Mount point</label>
+              <div class="lxi-mp-index">
+                <span class="lxi-mp-prefix" aria-hidden="true">mp</span>
+                <input class="lxi-input lxi-input--mono" id="lxi-mp" type="text" inputmode="numeric" placeholder="0"
+                       autocomplete="off" spellcheck="false" aria-describedby="lxi-mp-hint">
+              </div>
+            </div>
+            <div class="lxi-field lxi-field--host">
+              <label class="lxi-label" for="lxi-host-path">Host path</label>
+              <input class="lxi-input lxi-input--mono" id="lxi-host-path" type="text" placeholder="/mnt/bindmounts/shared"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="lxi-mp-hint">
+            </div>
+            <div class="lxi-field lxi-field--ct">
+              <label class="lxi-label" for="lxi-ct-path">Path in container</label>
+              <input class="lxi-input lxi-input--mono" id="lxi-ct-path" type="text" placeholder="/shared"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="lxi-mp-hint">
+            </div>
+          </div>
+          <p class="lxi-hint" id="lxi-mp-hint">Proxmox allows <code class="lxi-code">mp0</code> to <code class="lxi-code">mp255</code>. Use a folder reserved for sharing, never <code class="lxi-code">/</code>, <code class="lxi-code">/etc</code> or <code class="lxi-code">/var</code>, and no symlinks in either path. Leave the host path empty to skip the mount.</p>
+        </section>
+
+      </div>
+
+      <div class="lxi-col">
+
+        <div class="lxi-messages" id="lxi-messages" role="status" aria-live="polite"></div>
+
+        <div class="lxi-blocked lxi-hidden" id="lxi-blocked">Fix the errors above to see the generated config.</div>
+
+        <div class="lxi-output" id="lxi-output">
+
+          <section class="lxi-card" aria-labelledby="lxi-conf-title">
+            <div class="lxi-card-head">
+              <h2 class="lxi-card-title" id="lxi-conf-title"><span class="lxi-step">1</span> Container config</h2>
+              <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" type="button" onclick="lxiCopy('conf')">Copy</button>
+            </div>
+            <p class="lxi-file" id="lxi-conf-file">/etc/pve/lxc/100.conf</p>
+            <pre class="lxi-pre" id="lxi-conf-out"></pre>
+            <ul class="lxi-explain" id="lxi-conf-explain"></ul>
+            <p class="lxi-hint">Add the lines to the main part of the file, above the first <code class="lxi-code">[snapshot]</code> section if there is one. Don't paste <code class="lxi-code">#</code> comment lines: Proxmox turns lines that start with <code class="lxi-code">#</code> into the container's Notes.</p>
+          </section>
+
+          <section class="lxi-card" aria-labelledby="lxi-sub-title">
+            <div class="lxi-card-head">
+              <h2 class="lxi-card-title" id="lxi-sub-title"><span class="lxi-step">2</span> Subordinate IDs for root</h2>
+            </div>
+            <p class="lxi-hint">Proxmox starts containers as root and LXC hands IDs to them through <code class="lxi-code">newuidmap</code> and <code class="lxi-code">newgidmap</code>, so root needs every host ID of the map in these files. If a range is missing, the container fails to start.</p>
+            <div class="lxi-grid-2">
+              <div class="lxi-sub">
+                <div class="lxi-sub-head">
+                  <p class="lxi-file">/etc/subuid</p>
+                  <button class="lxi-link-btn" type="button" onclick="lxiCopy('subuid')">Copy</button>
+                </div>
+                <ul class="lxi-sub-list" id="lxi-subuid-out"></ul>
+              </div>
+              <div class="lxi-sub">
+                <div class="lxi-sub-head">
+                  <p class="lxi-file">/etc/subgid</p>
+                  <button class="lxi-link-btn" type="button" onclick="lxiCopy('subgid')">Copy</button>
+                </div>
+                <ul class="lxi-sub-list" id="lxi-subgid-out"></ul>
+              </div>
+            </div>
+            <p class="lxi-hint"><span class="lxi-tag lxi-tag--ok">default</span> lines are already in both files on a standard Proxmox VE install (the lxc-pve package adds <code class="lxi-code">root:100000:65536</code>). Add the lines marked <span class="lxi-tag lxi-tag--add">add</span>.</p>
+            <div class="lxi-cmd-block">
+              <div class="lxi-sub-head">
+                <p class="lxi-file">Add the missing lines (safe to run twice)</p>
+                <button class="lxi-link-btn" type="button" onclick="lxiCopy('subcmd')">Copy</button>
+              </div>
+              <pre class="lxi-pre" id="lxi-subcmd-out"></pre>
+            </div>
+          </section>
+
+          <section class="lxi-card" id="lxi-mount-card" aria-labelledby="lxi-mount-title">
+            <div class="lxi-card-head">
+              <h2 class="lxi-card-title" id="lxi-mount-title"><span class="lxi-step">3</span> Bind mount and host owner</h2>
+            </div>
+            <div class="lxi-mount-body" id="lxi-mount-body">
+              <div class="lxi-sub-head">
+                <p class="lxi-file">Mount point line for the same .conf file</p>
+                <button class="lxi-link-btn" type="button" onclick="lxiCopy('mpline')">Copy</button>
+              </div>
+              <pre class="lxi-pre" id="lxi-mpline-out"></pre>
+              <div class="lxi-sub-head">
+                <p class="lxi-file">…or add it with pct</p>
+                <button class="lxi-link-btn" type="button" onclick="lxiCopy('pctset')">Copy</button>
+              </div>
+              <pre class="lxi-pre" id="lxi-pctset-out"></pre>
+              <div class="lxi-sub-head">
+                <p class="lxi-file">Give the host folder to the mapped IDs</p>
+                <button class="lxi-link-btn" type="button" onclick="lxiCopy('chown')">Copy</button>
+              </div>
+              <pre class="lxi-pre" id="lxi-chown-out"></pre>
+              <p class="lxi-hint" id="lxi-chown-note"></p>
+            </div>
+            <p class="lxi-hint lxi-hidden" id="lxi-mount-empty">Enter a host path and a path in the container to get the <code class="lxi-code">mp</code> line and the <code class="lxi-code">chown</code> command.</p>
+          </section>
+
+          <section class="lxi-card" aria-labelledby="lxi-apply-title">
+            <div class="lxi-card-head">
+              <h2 class="lxi-card-title" id="lxi-apply-title"><span class="lxi-step">4</span> Restart and check</h2>
+              <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" type="button" onclick="lxiCopy('apply')">Copy</button>
+            </div>
+            <pre class="lxi-pre" id="lxi-apply-out"></pre>
+            <p class="lxi-hint" id="lxi-apply-note"></p>
+          </section>
+
+          <details class="lxi-more lxi-alt" id="lxi-alt">
+            <summary class="lxi-more-summary">Proxmox VE 9.2 and later: map on the mount point instead <span class="lxi-more-sub">no lxc.idmap, no subuid changes</span></summary>
+            <div class="lxi-more-body">
+              <p class="lxi-hint">Proxmox VE 9.2 added an <code class="lxi-code">idmap</code> option to mount points (<code class="lxi-code">type:container:disk:count</code>). It changes the IDs on that one mount only and leaves the rest of the container on its normal mapping, so you skip steps 1 and 2. Use it instead of the lines above, not together with them.</p>
+              <div class="lxi-alt-body" id="lxi-alt-body">
+                <div class="lxi-sub-head">
+                  <p class="lxi-file">Mount point line with idmap</p>
+                  <button class="lxi-link-btn" type="button" onclick="lxiCopy('altline')">Copy</button>
+                </div>
+                <pre class="lxi-pre" id="lxi-altline-out"></pre>
+                <div class="lxi-sub-head">
+                  <p class="lxi-file">…or with pct</p>
+                  <button class="lxi-link-btn" type="button" onclick="lxiCopy('altset')">Copy</button>
+                </div>
+                <pre class="lxi-pre" id="lxi-altset-out"></pre>
+              </div>
+              <p class="lxi-hint lxi-hidden" id="lxi-alt-empty">Add at least one UID or GID pair and a host path to get the mount point line.</p>
+              <ul class="lxi-notes">
+                <li class="lxi-note">Works only in unprivileged containers; Proxmox ignores the option on privileged ones and logs a warning.</li>
+                <li class="lxi-note">IDs you don't list fall back to the container's own mapping. The host folder still needs the owner from step 3, because the disk IDs here are the host IDs you entered.</li>
+                <li class="lxi-note">It is built on Linux idmapped mounts, so the file system under the host path must support them. Check this first for network shares such as NFS or SMB.</li>
+                <li class="lxi-note">Versions before 9.2 don't know the option. Run <code class="lxi-code">man pct.conf</code> on your node and look for <code class="lxi-code">idmap=</code> under the mount point options.</li>
+              </ul>
+            </div>
+          </details>
+
+        </div>
+
+        <div class="lxi-share">
+          <button class="lxi-btn lxi-btn--secondary lxi-btn--compact" type="button" onclick="lxiCopyLink()">Copy link to this mapping</button>
+          <span class="lxi-hint">The inputs are stored in the page address, nothing is sent anywhere.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="lxi-toast" id="lxi-toast" role="status" aria-live="polite">Copied</div>
+
+    <footer class="lxi-footer">
+      Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
