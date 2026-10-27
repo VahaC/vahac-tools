@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-27 (SPF and DMARC Record Generator and Checker added)
+- Last updated: 2026-10-27 (IPv6 Subnet Calculator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -26,6 +26,7 @@ Documentation status:
 - `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
 - `homelab-power-cost-calculator/` - energy and electricity cost per day, month and year for a list of homelab devices (idle and load watts, share of time at load, always on, hours per day or a time window, quantity), with a single or day/night tariff, an optional fixed charge, each device's share of the cost, a payback calculator for a lower-power replacement, a plain-text summary and CSV export.
 - `image-compressor-resizer/` - client-side image compression and resizing.
+- `ipv6-subnet-calculator/` - IPv6 address and prefix calculator: RFC 5952 and expanded forms, network range, exact address count and /64 LANs, the address type from the IANA registries, ip6.arpa reverse zones, a nibble-aware subnet split with paging, a ULA /48 generator (RFC 4193) and a modified EUI-64 interface ID from a MAC.
 - `json-formatter/` - JSON formatting and validation.
 - `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
 - `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
@@ -201,7 +202,17 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 16) JSON Formatter and Validator
+### 16) IPv6 Subnet Calculator
+
+Path:
+- `ipv6-subnet-calculator/index.html`
+
+Features:
+- Accepts every RFC 4291 text form (full, `::` compression, leading zeros, an embedded IPv4 tail, mixed case, URL brackets and RFC 4007 zone IDs such as `fe80::1%eth0`) as `address/length` or with a separate prefix field, and says exactly what is wrong with an invalid one.
+- Shows the RFC 5952 canonical form (mixed notation only for the well-known IPv4-embedding prefixes) and the expanded form, network prefix and mask, first and last address, the exact address count and 2^n, the /64 LANs, /56 blocks and /48 sites it holds, the interface ID (with the MAC behind an EUI-64 one), embedded IPv4 (mapped, NAT64, 6to4, Teredo), the address type and its flags from the IANA IPv6 Address Space, Special-Purpose and Global Unicast Assignments registries, multicast scope, flags and well-known groups, the ip6.arpa PTR name, the reverse zones at nibble boundaries and a prefix map of the 32 hex digits.
+- Splits the prefix into longer ones with nibble-alignment notes, 16 subnets per page, a jump to any subnet number and copy of a page or the whole list (up to 4,096); generates a ULA /48 per RFC 4193 from `crypto.getRandomValues`; builds a modified EUI-64 interface ID and link-local address from a MAC. 128-bit math uses BigInt; the calculator input lives in the URL hash, MAC addresses and generated prefixes never do.
+
+### 17) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -211,7 +222,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 17) JWT Decoder
+### 18) JWT Decoder
 
 Path:
 - `jwt-decoder/index.html`
@@ -221,7 +232,7 @@ Features:
 - Explains registered claims and converts `exp`, `nbf`, and `iat` into readable dates with a validity badge.
 - Optionally verifies HS/RS/ES/PS signatures with a shared secret, PEM public key, or JWK — all via the Web Crypto API in the browser.
 
-### 18) Merge Text Tool
+### 19) Merge Text Tool
 
 Path:
 - `merge-text-tool/index.html`
@@ -231,7 +242,7 @@ Features:
 - Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
 - Options to ignore whitespace or case differences; copy either side's result when done.
 
-### 19) Password and Passphrase Generator
+### 20) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -241,7 +252,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 20) Proxmox LXC idmap Generator
+### 21) Proxmox LXC idmap Generator
 
 Path:
 - `proxmox-lxc-idmap-generator/index.html`
@@ -251,7 +262,7 @@ Features:
 - Rejects overlaps the way Proxmox and the kernel do (two rows on one container ID, two container IDs on one host ID, a host ID inside the shifted range) and warns when an ID maps to host root, when container root is remapped, or when a row changes nothing.
 - Lists the `root:<start>:<count>` lines `/etc/subuid` and `/etc/subgid` need (marking the default `root:100000:65536`), idempotent commands to add them, the `mpN:` line and `pct set` command, a `chown` for the host folder, restart/check commands, and the per-mount-point `idmap=` option of Proxmox VE 9.2+; inputs live in the URL hash.
 
-### 21) Regex Tester
+### 22) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -261,7 +272,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 22) robots.txt Generator and Validator
+### 23) robots.txt Generator and Validator
 
 Path:
 - `robots-txt-generator-validator/index.html`
@@ -271,7 +282,7 @@ Features:
 - Validates pasted or uploaded files line by line following RFC 9309 and Google's parser: typos, missing colons, rules outside groups, paths that never match, relative sitemaps, unsupported directives (Noindex, Host), groups merged by blank lines, and the 500 KiB limit.
 - Tests URLs per crawler (Googlebot, Bingbot, GPTBot, custom tokens, with documented Googlebot fallbacks) and explains which group and rule decide: the longest match wins and Allow wins ties.
 
-### 23) Uptime / SLA Calculator
+### 24) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -281,7 +292,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 24) SPF and DMARC Record Generator and Checker
+### 25) SPF and DMARC Record Generator and Checker
 
 Path:
 - `spf-dmarc-record-generator/index.html`
@@ -291,7 +302,7 @@ Features:
 - DMARC builder following RFC 9989 (May 2026, obsoletes RFC 7489): `p` with the none → quarantine → reject rollout of §5.1 and §7.4, `sp`, `np`, `t=y` test mode in place of the removed `pct`, `adkim`/`aspf`, `rua`/`ruf` with `mailto:` added, and `fo`. Each record comes with its DNS name, the value, a BIND zone-file line split into 255-octet strings, and the `<domain>._report._dmarc.<host>` authorization record for report addresses on another domain.
 - Checker for pasted records (raw values, quoted strings, `dig` and `nslookup` output, zone files with parentheses, included records labelled with their names): the RFC 7208 grammar including macros and CIDR suffixes, a plain-language explanation of every term and tag, the DNS-lookup count across nested includes and redirects (exact when every include is pasted, otherwise "at least N"), loops, multiple records, `+all`, `ptr`, redirect with all, removed DMARC tags and external report destinations, each problem with the exact value, the fix and an RFC link. It makes no DNS queries; the generator settings live in the URL hash.
 
-### 25) IP Subnet Calculator
+### 26) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -301,7 +312,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 26) Text Diff Tool
+### 27) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -311,7 +322,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 27) Traefik Docker Labels Generator
+### 28) Traefik Docker Labels Generator
 
 Path:
 - `traefik-docker-labels-generator/index.html`
@@ -321,7 +332,7 @@ Features:
 - Middlewares: basic auth from pasted htpasswd lines (MD5, SHA1 and bcrypt, the hashes Traefik's BasicAuth accepts; every `$` doubled to `$$` for Compose only), an IP allowlist (`ipAllowList`, or `ipWhiteList` before v2.11) and a small security-headers set, linking to the CSP builder for the rest.
 - Outputs the labels in list and map syntax, a service snippet, the equivalent file-provider YAML and the static config it expects; explains every label and warns with the concrete value and the fix (unsupported hash, router without TLS on an HTTPS entrypoint, missing network, wildcard certificates needing DNS-01). Targets Traefik v3 with v2.11 and pre-v2.11 switches; settings live in the URL hash, never the htpasswd line.
 
-### 28) Unix Timestamp Converter
+### 29) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -331,7 +342,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 29) URL Encoder / Decoder
+### 30) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -341,7 +352,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 30) UTM Campaign URL Builder
+### 31) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -351,7 +362,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 31) vCard QR Code Generator
+### 32) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -361,7 +372,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 32) Wi-Fi QR Code Generator
+### 33) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -371,7 +382,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 33) WireGuard Config Generator
+### 34) WireGuard Config Generator
 
 Path:
 - `wireguard-config-generator/index.html`
@@ -381,7 +392,7 @@ Features:
 - Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
 - Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
 
-### 34) YAML JSON TOML Converter
+### 35) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -391,7 +402,7 @@ Features:
 - Useful for infra, app config, and serialization workflows.
 - Runs fully client-side without backend processing.
 
-### 35) ZFS and RAID Capacity Calculator
+### 36) ZFS and RAID Capacity Calculator
 
 Path:
 - `zfs-raid-capacity-calculator/index.html`
@@ -401,7 +412,7 @@ Features:
 - Space model ported from the OpenZFS 2.4.4 source: the whole-disk GPT partition, vdev labels and boot area, metaslab sizing, the RAIDZ allocation size per record (parity and padding), the 128K deflate ratio `zfs list` uses, and slop space with its 128 MiB / 128 GiB limits and the embedded intent-log metaslab. Shows raw, after parity/mirroring, after reserves, after padding, after slop and at the fill target in TB and TiB, plus the expected `zpool list` SIZE and `zfs list` USED + AVAIL.
 - Disks that may fail per vdev and for the pool (guaranteed versus best case), every valid layout for the disk count side by side, classic RAID 0/1/5/6/10 with mdadm notes, warnings that name the values and the fix (uneven splits, RAIDZ minimum widths, mixed sizes), a plain-text summary and the setup in the URL hash.
 
-### 36) Zigbee and Wi-Fi Channel Planner
+### 37) Zigbee and Wi-Fi Channel Planner
 
 Path:
 - `zigbee-wifi-channel-planner/index.html`
@@ -438,6 +449,7 @@ Then open:
 - `http://localhost:8080/hash-generator-for-files-and-text/`
 - `http://localhost:8080/homelab-power-cost-calculator/`
 - `http://localhost:8080/image-compressor-resizer/`
+- `http://localhost:8080/ipv6-subnet-calculator/`
 - `http://localhost:8080/json-formatter/`
 - `http://localhost:8080/jwt-decoder/`
 - `http://localhost:8080/merge-text-tool/`
@@ -463,7 +475,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (1157 tests across 34 modules), powered by the built-in Node.js test runner
+tool (1210 tests across 35 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -523,7 +535,15 @@ includes and redirects with loops and the limit of 10, multiple records,
 `+all`, `ptr`, redirect with all, every RFC 9989 tag with its default and
 invalid values, the removed `pct`/`rf`/`ri`, report URIs with size
 suffixes, external report authorization, dig/nslookup/zone-file input, both
-generators, 255-octet splitting, zone-file quoting and the URL hash), Traefik Docker labels (label output for every option, `$`
+generators, 255-octet splitting, zone-file quoting and the URL hash), IPv6
+subnetting (every RFC 4291 text form including embedded IPv4, mixed case and
+RFC 4007 zone IDs, the invalid forms, RFC 5952 output with the RFC's own
+examples and its mixed-notation cases, ranges and counts for /0, /1, /48,
+/56, /64, /127 and /128, subnet splits including a 2^128 split that is paged
+rather than listed, nibble alignment, ip6.arpa names and zones, every IANA
+special-purpose entry and its flags, address-space blocks and regional
+registries, multicast scopes and groups, embedded IPv4, ULA generation from
+`crypto.getRandomValues`, modified EUI-64 and the URL hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats

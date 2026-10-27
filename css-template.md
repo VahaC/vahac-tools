@@ -261,6 +261,7 @@ Keep this list updated to avoid prefix collisions:
 | `hpc`  | Homelab Power Cost Calc. | Built    |
 | `hsg`  | Hash Generator           | Built    |
 | `icr`  | Image Compressor/Resizer | Built    |
+| `isc`  | IPv6 Subnet Calculator   | Built    |
 | `jsf`  | JSON Formatter           | Built    |
 | `jwt`  | JWT Decoder              | Built    |
 | `lxi`  | Proxmox LXC idmap Gen.   | Built    |

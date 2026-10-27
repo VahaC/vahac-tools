@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPv6 Subnet Calculator — Logs from VahaC</title>
+  <meta name="description" content="Free IPv6 subnet calculator: RFC 5952 and expanded forms, prefix range, address and /64 counts, IANA address type, ip6.arpa zones, subnet split, ULA generator.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="isc-wrapper" id="isc-wrapper">
+
+    <header class="isc-header">
+      <h1 class="isc-title">IPv6 Subnet Calculator</h1>
+      <p class="isc-subtitle">Enter an IPv6 address or prefix to see its expanded and RFC 5952 forms, the range it covers, how many addresses and /64 LANs it holds, its type from the IANA registries and its ip6.arpa reverse zone. Split it into smaller subnets, generate a unique local /48, or turn a MAC into an EUI-64 interface ID. For IPv4 networks, use the <a class="isc-link" href="https://vahac.com/tools/ip-subnet-calculator-tool/" target="_blank" rel="noopener">IP Subnet Calculator</a>.</p>
+    </header>
+
+    <section class="isc-card" id="isc-input-card" aria-labelledby="isc-h-input">
+      <h2 class="isc-card-title" id="isc-h-input">Address and prefix</h2>
+      <div class="isc-input-row">
+        <div class="isc-field isc-field--addr">
+          <label class="isc-label" for="isc-addr">IPv6 address or prefix</label>
+          <input class="isc-input" id="isc-addr" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="2001:db8:abcd::/48" aria-describedby="isc-error isc-input-hint">
+        </div>
+        <div class="isc-field isc-field--len">
+          <label class="isc-label" for="isc-len">Prefix length</label>
+          <div class="isc-len-wrap">
+            <span class="isc-len-slash" aria-hidden="true">/</span>
+            <input class="isc-input isc-input--len" id="isc-len" type="number" min="0" max="128" step="1" inputmode="numeric" value="48">
+          </div>
+        </div>
+      </div>
+      <p class="isc-error" id="isc-error" role="alert"></p>
+      <div class="isc-chips" id="isc-len-chips"></div>
+      <div class="isc-chips" id="isc-examples"></div>
+      <p class="isc-hint" id="isc-input-hint">Every RFC 4291 form works: full, compressed with ::, with or without leading zeros, an IPv4 tail such as ::ffff:192.0.2.1 and a zone ID such as fe80::1%eth0. A /length typed after the address wins over the prefix field.</p>
+      <div class="isc-actions">
+        <button class="isc-btn isc-btn--secondary" type="button" onclick="iscCopyLink()">Copy link</button>
+        <button class="isc-btn isc-btn--secondary" type="button" onclick="iscReset()">Reset</button>
+      </div>
+    </section>
+
+    <section class="isc-card" id="isc-results-card" aria-labelledby="isc-h-results">
+      <div class="isc-card-head">
+        <h2 class="isc-card-title" id="isc-h-results">Results</h2>
+        <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" onclick="iscCopyAll()">Copy all</button>
+      </div>
+      <div class="isc-notes-out" id="isc-notes-out" aria-live="polite"></div>
+      <div class="isc-results" id="isc-results"></div>
+      <div class="isc-map" id="isc-map"></div>
+    </section>
+
+    <section class="isc-card" aria-labelledby="isc-h-split">
+      <div class="isc-card-head">
+        <h2 class="isc-card-title" id="isc-h-split">Split into smaller subnets</h2>
+        <span class="isc-card-meta">nibble-aware</span>
+      </div>
+      <div class="isc-split-controls">
+        <div class="isc-field isc-field--split">
+          <label class="isc-label" for="isc-split-len">New prefix length</label>
+          <div class="isc-len-wrap">
+            <span class="isc-len-slash" aria-hidden="true">/</span>
+            <input class="isc-input isc-input--len" id="isc-split-len" type="number" min="1" max="128" step="1" inputmode="numeric">
+          </div>
+        </div>
+        <div class="isc-chips" id="isc-split-chips"></div>
+      </div>
+      <p class="isc-field-msg" id="isc-split-msg" role="alert"></p>
+      <div class="isc-split-summary" id="isc-split-summary" aria-live="polite"></div>
+      <div class="isc-sub-list" id="isc-split-list"></div>
+      <div class="isc-pager" id="isc-pager">
+        <div class="isc-pager-nav">
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" id="isc-page-first" data-isc-page="first" aria-label="First page">«</button>
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" id="isc-page-prev" data-isc-page="prev" aria-label="Previous page">‹ Prev</button>
+          <span class="isc-page-info" id="isc-page-info" aria-live="polite"></span>
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" id="isc-page-next" data-isc-page="next" aria-label="Next page">Next ›</button>
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" id="isc-page-last" data-isc-page="last" aria-label="Last page">»</button>
+        </div>
+        <div class="isc-goto-row">
+          <label class="isc-label" for="isc-goto">Go to subnet #</label>
+          <input class="isc-input isc-input--goto" id="isc-goto" type="text" inputmode="numeric" autocomplete="off" spellcheck="false">
+          <button class="isc-btn isc-btn--small" type="button" onclick="iscGoTo()">Go</button>
+        </div>
+        <div class="isc-actions">
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" onclick="iscCopySubnets(false)">Copy this page</button>
+          <button class="isc-btn isc-btn--secondary isc-btn--small" type="button" id="isc-copy-all-subnets" onclick="iscCopySubnets(true)">Copy all</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="isc-card" aria-labelledby="isc-h-ula">
+      <div class="isc-card-head">
+        <h2 class="isc-card-title" id="isc-h-ula">Unique local /48 generator</h2>
+        <span class="isc-card-meta">RFC 4193</span>
+      </div>
+      <p class="isc-text">A unique local address (ULA) prefix is your own private IPv6 space for a LAN, a lab or a VPN, the IPv6 counterpart of 192.168.x.x. It starts with fd, followed by a 40-bit Global ID that must be random, so that two networks you connect later are very unlikely to clash. The ID comes from your browser's crypto.getRandomValues and is never stored or sent.</p>
+      <div class="isc-out" id="isc-ula-out" aria-live="polite"></div>
+      <div class="isc-actions">
+        <button class="isc-btn" type="button" onclick="iscNewUla()">Generate new</button>
+        <button class="isc-btn isc-btn--secondary" type="button" onclick="iscUseUla()">Use in calculator</button>
+      </div>
+      <p class="isc-hint">RFC 4193 §3.2.2 suggests hashing the time and an EUI-64 with SHA-1; any good random source meets §3.2.1 just as well. Unique local addresses are not routed on the Internet, so you still need a global prefix from your ISP for Internet access.</p>
+    </section>
+
+    <section class="isc-card" aria-labelledby="isc-h-eui">
+      <div class="isc-card-head">
+        <h2 class="isc-card-title" id="isc-h-eui">Interface ID from a MAC address</h2>
+        <span class="isc-card-meta">modified EUI-64</span>
+      </div>
+      <div class="isc-field">
+        <label class="isc-label" for="isc-mac">MAC address</label>
+        <input class="isc-input" id="isc-mac" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="00:1a:2b:3c:4d:5e">
+        <p class="isc-field-msg" id="isc-mac-msg" role="alert"></p>
+      </div>
+      <div class="isc-out" id="isc-eui-out" aria-live="polite"></div>
+      <p class="isc-hint">Most desktop and mobile systems no longer build their addresses this way: they use temporary addresses for outgoing connections (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc8981" target="_blank" rel="noopener noreferrer">RFC 8981</a>) and a stable ID that does not reveal the MAC (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc7217" target="_blank" rel="noopener noreferrer">RFC 7217</a>, recommended by <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc8064" target="_blank" rel="noopener noreferrer">RFC 8064</a>). EUI-64 still shows up on routers, embedded devices and in link-local addresses. The MAC stays in this page and never goes into the link.</p>
+    </section>
+
+    <section class="isc-card" aria-labelledby="isc-h-notes">
+      <h2 class="isc-card-title" id="isc-h-notes">Good to know</h2>
+      <ul class="isc-notes">
+        <li class="isc-note-item"><strong>Every LAN gets a /64.</strong> Interface IDs are 64 bits (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4291#section-2.5.1" target="_blank" rel="noopener noreferrer">RFC 4291 §2.5.1</a>), and SLAAC ignores a prefix whose length plus the interface ID is not 128 (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4862#section-5.5.3" target="_blank" rel="noopener noreferrer">RFC 4862 §5.5.3</a>). <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc7421" target="_blank" rel="noopener noreferrer">RFC 7421</a> explains what breaks with longer LAN prefixes.</li>
+        <li class="isc-note-item"><strong>Sites get a /48 or a /56.</strong> <a class="isc-link" href="https://www.ripe.net/publications/docs/ripe-690/" target="_blank" rel="noopener noreferrer">RIPE-690</a> recommends a /48 per end site, or a /56 for residential customers, and calls anything longer than /56 strongly discouraged. A /56 is 256 LANs, a /48 is 65,536.</li>
+        <li class="isc-note-item"><strong>Stay on nibble boundaries.</strong> Each hex digit is 4 bits. Prefix lengths that are multiples of 4 keep subnet numbers readable and give each subnet its own ip6.arpa zone (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc3596#section-2.5" target="_blank" rel="noopener noreferrer">RFC 3596 §2.5</a>, RIPE-690 §4.2).</li>
+        <li class="isc-note-item"><strong>No broadcast, and /127 for router links.</strong> IPv6 has no broadcast address. The all-zero interface ID is the Subnet-Router anycast address (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4291#section-2.6.1" target="_blank" rel="noopener noreferrer">RFC 4291 §2.6.1</a>). Point-to-point links between routers may use a /127, with both addresses in use (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc6164" target="_blank" rel="noopener noreferrer">RFC 6164</a>).</li>
+        <li class="isc-note-item"><strong>Zone IDs stay on your host.</strong> fe80::1%eth0 tells your own system which interface to use (<a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4007#section-11" target="_blank" rel="noopener noreferrer">RFC 4007 §11</a>). Browsers do not accept zone IDs in URLs: <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc9844" target="_blank" rel="noopener noreferrer">RFC 9844</a> (2025) withdrew the URL syntax of RFC 6874 and asks user interfaces to accept them instead.</li>
+        <li class="isc-note-item"><strong>Writing addresses down.</strong> <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc5952" target="_blank" rel="noopener noreferrer">RFC 5952</a> fixes one text form: lowercase, no leading zeros, :: only for the longest run of two or more zero groups. Mixed notation (::ffff:192.0.2.1) is used only for the well-known IPv4-embedding prefixes.</li>
+      </ul>
+    </section>
+
+    <details class="isc-sources">
+      <summary class="isc-sources-sum">Sources</summary>
+      <ul class="isc-source-list">
+        <li><a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4291" target="_blank" rel="noopener noreferrer">RFC 4291</a> IPv6 Addressing Architecture: text forms (§2.2, §2.3), address types (§2.4), interface IDs (§2.5.1), embedded IPv4 (§2.5.5), anycast (§2.6.1), multicast (§2.7), modified EUI-64 (Appendix A). Updated by RFC 5952, RFC 7136, RFC 7346 and RFC 8064.</li>
+        <li><a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc5952" target="_blank" rel="noopener noreferrer">RFC 5952</a> canonical text representation (§4, §5), <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc6052" target="_blank" rel="noopener noreferrer">RFC 6052</a> NAT64 prefix and its text form (§2.4, §3.1).</li>
+        <li><a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4007" target="_blank" rel="noopener noreferrer">RFC 4007</a> zone IDs (§11) and <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc9844" target="_blank" rel="noopener noreferrer">RFC 9844</a> (August 2025), which obsoletes RFC 6874.</li>
+        <li><a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4193" target="_blank" rel="noopener noreferrer">RFC 4193</a> unique local addresses (§3.1, §3.2), <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc3596" target="_blank" rel="noopener noreferrer">RFC 3596</a> ip6.arpa (§2.5), <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc7346" target="_blank" rel="noopener noreferrer">RFC 7346</a> multicast scopes.</li>
+        <li><a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc7421" target="_blank" rel="noopener noreferrer">RFC 7421</a> and <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc4862" target="_blank" rel="noopener noreferrer">RFC 4862</a> on the /64 boundary, <a class="isc-link" href="https://www.rfc-editor.org/rfc/rfc6164" target="_blank" rel="noopener noreferrer">RFC 6164</a> /127 links, <a class="isc-link" href="https://www.ripe.net/publications/docs/ripe-690/" target="_blank" rel="noopener noreferrer">RIPE-690</a> (October 2017) end-user prefix sizes.</li>
+        <li>IANA registries, checked 27 October 2026: <a class="isc-link" href="https://www.iana.org/assignments/ipv6-address-space/" target="_blank" rel="noopener noreferrer">IPv6 Address Space</a> (updated 2025-10-23), <a class="isc-link" href="https://www.iana.org/assignments/iana-ipv6-special-registry/" target="_blank" rel="noopener noreferrer">IPv6 Special-Purpose Address Space</a> (2025-10-09), <a class="isc-link" href="https://www.iana.org/assignments/ipv6-unicast-address-assignments/" target="_blank" rel="noopener noreferrer">IPv6 Global Unicast Address Assignments</a> (2025-10-10) and <a class="isc-link" href="https://www.iana.org/assignments/ipv6-multicast-addresses/" target="_blank" rel="noopener noreferrer">IPv6 Multicast Address Space</a> (2026-04-07).</li>
+      </ul>
+    </details>
+
+    <p class="isc-footer">Built by <a href="https://vahac.com" target="_blank" rel="noopener">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+
+    <div class="isc-toast" id="isc-toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
