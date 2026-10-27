@@ -6,11 +6,12 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-26 (ZFS and RAID Capacity Calculator added)
+- Last updated: 2026-10-27 (Backup Retention (Prune) Simulator added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
 
+- `backup-retention-prune-simulator/` - Proxmox Backup Server, `borg prune` and `restic forget` retention side by side: a backup schedule or a pasted snapshot list, keep-last/hourly/daily/weekly/monthly/yearly and keep-within rules, which snapshots each tool keeps and why (ported from PBS 4.2.8, BorgBackup 1.4.5 and restic 0.19.1), a calendar and a table of kept and pruned snapshots, every difference explained, and the matching commands with dry runs.
 - `base64-encode-decode/` - Base64 encoding and decoding for text and files, with URL-safe and data URI output.
 - `byte-storage-converter/` - SI/IEC storage unit conversion and bitrate/file size calculations.
 - `chmod-file-permission-calculator/` - symbolic/octal permission conversion for Unix-like file modes.
@@ -48,7 +49,17 @@ Documentation status:
 
 ## Tool Overview
 
-### 1) Base64 Encode / Decode
+### 1) Backup Retention (Prune) Simulator
+
+Path:
+- `backup-retention-prune-simulator/index.html`
+
+Features:
+- A backup schedule (chosen weekdays, fixed times or every N hours, a simulated period ending now or at a chosen date, missed days) or a pasted list of snapshot times from `proxmox-backup-client snapshot list`, `borg list` or `restic snapshots`; a time zone; keep-last, hourly, daily, weekly, monthly, yearly and keep-within rules, with -1 or `unlimited` for no limit.
+- The same rules run through ports of Proxmox Backup Server 4.2.8 (`pbs-datastore/src/prune.rs`), BorgBackup 1.4.5 (`prune_split()`, `prune_within()`) and restic 0.19.1 (`ApplyPolicy()`): kept and pruned counts, a calendar per tool coloured by the rule that kept each snapshot, and a table with each tool's own reason (`daily #3`, `yearly[oldest]`, restic's list of matched rules).
+- Explains each difference it finds: restic counting one snapshot for several rules, PBS treating a period as covered as soon as any snapshot in it is kept, the oldest-snapshot fallbacks in borg and restic, keep-within (none in PBS; borg counts back from prune time with 1m = 31 days, restic from its newest snapshot in calendar months), unlimited values and ISO weeks at New Year. Prune runs after every backup (PBS replayed run by run, because it can lose month-end backups that way) or once; outputs `proxmox-backup-client prune` and `proxmox-backup-manager prune-job` commands, `borg prune` and `restic forget` with dry-run variants, and keeps the setup in the URL hash.
+
+### 2) Base64 Encode / Decode
 
 Path:
 - `base64-encode-decode/index.html`
@@ -58,7 +69,7 @@ Features:
 - Supports the standard and URL-safe alphabets, plus MIME line wrapping.
 - Produces data URI output for quick embedding.
 
-### 2) Byte and Storage Converter
+### 3) Byte and Storage Converter
 
 Path:
 - `byte-storage-converter/index.html`
@@ -68,7 +79,7 @@ Features:
 - Includes Bitrate -> File Size and File Size -> Bitrate modes.
 - Provides fast copy actions for outputs.
 
-### 3) Chmod File Permission Calculator
+### 4) Chmod File Permission Calculator
 
 Path:
 - `chmod-file-permission-calculator/index.html`
@@ -78,7 +89,7 @@ Features:
 - Helps verify read/write/execute combinations for owner/group/others.
 - Useful for server, DevOps, and terminal workflows.
 
-### 4) Cron Expression Generator
+### 5) Cron Expression Generator
 
 Path:
 - `cron-expression-generator/index.html`
@@ -88,7 +99,7 @@ Features:
 - Supports frequent scheduling patterns for automation tasks.
 - Reduces manual errors when composing cron syntax.
 
-### 5) CSP and HTTP Security Headers Builder
+### 6) CSP and HTTP Security Headers Builder
 
 Path:
 - `csp-security-headers-builder/index.html`
@@ -98,7 +109,7 @@ Features:
 - Adds HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COOP/COEP/CORP and reporting endpoints, and writes them as raw headers, Nginx, Apache, Caddy, Traefik (labels or file), Netlify/Cloudflare `_headers`, HTML `<meta>`, WordPress/PHP or IIS config with correct escaping.
 - Analyzes pasted headers (curl -I / -v / -IL, wget -S, DevTools), a bare policy or `<meta>` tags: CSP3 parsing (commas, duplicates, missing semicolons, unquoted keywords, nonces, hashes, `strict-dynamic`), RFC 9651 structured fields, cookie flags, CORS and version leaks, with a 100-point score. It does not fetch URLs, because CORS hides most cross-origin response headers from web pages.
 
-### 6) CSV ↔ JSON ↔ SQL Converter
+### 7) CSV ↔ JSON ↔ SQL Converter
 
 Path:
 - `csv-json-sql-converter/index.html`
@@ -108,7 +119,7 @@ Features:
 - Converts CSV to JSON (objects, arrays, or JSON Lines) and JSON back to CSV, flattening nested objects into dot-notation columns.
 - Generates literal-value SQL `INSERT` statements for PostgreSQL, MySQL/MariaDB, SQLite, and SQL Server, with batching, an optional `CREATE TABLE` with inferred types, and validation messages for ragged rows, bad quotes, and invalid JSON.
 
-### 7) cURL to Code Converter
+### 8) cURL to Code Converter
 
 Path:
 - `curl-to-code-converter/index.html`
@@ -118,7 +129,7 @@ Features:
 - Reads curl options with curl's own defaults: method inference, `-d`/`--data-*`/`--json`/`-F`/`-T` bodies, `-G`, `-u` and URL credentials, cookies, proxies, TLS files, timeouts and output flags.
 - Generates fetch (browser), Python requests, Node.js fetch and axios code, and lists every option that is not translated, plus behaviour differences such as redirects, browser-forbidden headers and number precision.
 
-### 8) Docker Compose Validator and Formatter
+### 9) Docker Compose Validator and Formatter
 
 Path:
 - `docker-compose-validator-formatter/index.html`
@@ -128,7 +139,7 @@ Features:
 - Formats Compose files for readability and consistency.
 - Converts common `docker run` command patterns into Compose blocks.
 
-### 9) Docker Run to Compose Converter
+### 10) Docker Run to Compose Converter
 
 Path:
 - `docker-run-compose-converter/index.html`
@@ -138,7 +149,7 @@ Features:
 - Flags unsupported or ambiguous flags with warnings instead of silently dropping them.
 - Runs entirely client-side, no signup or data upload.
 
-### 10) ESP32 GPIO Pin Picker
+### 11) ESP32 GPIO Pin Picker
 
 Path:
 - `esp32-gpio-pin-picker/index.html`
@@ -148,7 +159,7 @@ Features:
 - Pin data transcribed from the Espressif datasheets (ESP32 v5.3, S3 v2.2, C3 v2.4, C6 v1.5) and the ESP-IDF GPIO, ADC and sleep references: strapping pins with what they strap and the level needed at reset, flash/PSRAM and VDD_SPI pins, USB D-/D+, UART0, pad JTAG, input-only pins, ADC1/ADC2 channels with each chip's ADC2 and Wi-Fi rule, touch channels, RTC/LP wake pins and the ESP32 DAC.
 - Module and package options that change the answer (PSRAM on GPIO16/17, ESP32-U4WDH in-package flash, ESP32-S3 octal PSRAM on GPIO33-37 and 1.8 V GPIO47/48, 16-GPIO ESP32-C3 variants, ESP32-C6 QFN40/QFN32), an ESPHome 2026.10.0 validation cross-check, a copyable ESPHome snippet, and URL-hash state for sharing.
 
-### 11) Favicon Generator
+### 12) Favicon Generator
 
 Path:
 - `favicon-generator/index.html`
@@ -158,7 +169,7 @@ Features:
 - Exports common icon sizes and formats for modern platforms.
 - Helps produce a ready-to-use favicon package and markup.
 
-### 12) Hash Generator for Files and Text
+### 13) Hash Generator for Files and Text
 
 Path:
 - `hash-generator-for-files-and-text/index.html`
@@ -168,7 +179,7 @@ Features:
 - Useful for integrity checks and comparison workflows.
 - Runs directly in the browser without server-side processing.
 
-### 13) Homelab Power Cost Calculator
+### 14) Homelab Power Cost Calculator
 
 Path:
 - `homelab-power-cost-calculator/index.html`
@@ -178,7 +189,7 @@ Features:
 - kWh and cost per day, month (365 / 12 days) and year (365 days) for every device and in total, each device's share of the cost with a bar, a single rate or a day/night tariff with the cheap window's exact overlap per device, and an optional fixed charge kept out of per-device costs.
 - Payback for replacing an old machine (old and new watts, hours a day, price, money back for the old one): saving a month and a year, months to break even or "never", net after 1, 3 and 5 years. ISO currency codes via `Intl.NumberFormat` or a plain symbol, every assumption listed on the page, warnings that name the value and the fix, plain-text summary, CSV export and the whole setup in the URL hash.
 
-### 14) Image Compressor and Resizer
+### 15) Image Compressor and Resizer
 
 Path:
 - `image-compressor-resizer/index.html`
@@ -188,7 +199,7 @@ Features:
 - Resizes images with quality control options.
 - Keeps image processing local in the browser.
 
-### 15) JSON Formatter and Validator
+### 16) JSON Formatter and Validator
 
 Path:
 - `json-formatter/index.html`
@@ -198,7 +209,7 @@ Features:
 - Validates JSON syntax.
 - Helps debug API payloads and config blocks.
 
-### 16) JWT Decoder
+### 17) JWT Decoder
 
 Path:
 - `jwt-decoder/index.html`
@@ -208,7 +219,7 @@ Features:
 - Explains registered claims and converts `exp`, `nbf`, and `iat` into readable dates with a validity badge.
 - Optionally verifies HS/RS/ES/PS signatures with a shared secret, PEM public key, or JWK — all via the Web Crypto API in the browser.
 
-### 17) Merge Text Tool
+### 18) Merge Text Tool
 
 Path:
 - `merge-text-tool/index.html`
@@ -218,7 +229,7 @@ Features:
 - Push a differing block left or right with inline gutter arrows, or edit lines directly in place.
 - Options to ignore whitespace or case differences; copy either side's result when done.
 
-### 18) Password and Passphrase Generator
+### 19) Password and Passphrase Generator
 
 Path:
 - `password-passphrase-generator/index.html`
@@ -228,7 +239,7 @@ Features:
 - Allows control over complexity and length.
 - Focused on practical account security improvements.
 
-### 19) Proxmox LXC idmap Generator
+### 20) Proxmox LXC idmap Generator
 
 Path:
 - `proxmox-lxc-idmap-generator/index.html`
@@ -238,7 +249,7 @@ Features:
 - Rejects overlaps the way Proxmox and the kernel do (two rows on one container ID, two container IDs on one host ID, a host ID inside the shifted range) and warns when an ID maps to host root, when container root is remapped, or when a row changes nothing.
 - Lists the `root:<start>:<count>` lines `/etc/subuid` and `/etc/subgid` need (marking the default `root:100000:65536`), idempotent commands to add them, the `mpN:` line and `pct set` command, a `chown` for the host folder, restart/check commands, and the per-mount-point `idmap=` option of Proxmox VE 9.2+; inputs live in the URL hash.
 
-### 20) Regex Tester
+### 21) Regex Tester
 
 Path:
 - `regex-tester/index.html`
@@ -248,7 +259,7 @@ Features:
 - Replace preview for testing substitution patterns.
 - Includes a common patterns cheat sheet.
 
-### 21) robots.txt Generator and Validator
+### 22) robots.txt Generator and Validator
 
 Path:
 - `robots-txt-generator-validator/index.html`
@@ -258,7 +269,7 @@ Features:
 - Validates pasted or uploaded files line by line following RFC 9309 and Google's parser: typos, missing colons, rules outside groups, paths that never match, relative sitemaps, unsupported directives (Noindex, Host), groups merged by blank lines, and the 500 KiB limit.
 - Tests URLs per crawler (Googlebot, Bingbot, GPTBot, custom tokens, with documented Googlebot fallbacks) and explains which group and rule decide: the longest match wins and Allow wins ties.
 
-### 22) Uptime / SLA Calculator
+### 23) Uptime / SLA Calculator
 
 Path:
 - `sla-calculator/index.html`
@@ -268,7 +279,7 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 23) IP Subnet Calculator
+### 24) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -278,7 +289,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 24) Text Diff Tool
+### 25) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -288,7 +299,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 25) Traefik Docker Labels Generator
+### 26) Traefik Docker Labels Generator
 
 Path:
 - `traefik-docker-labels-generator/index.html`
@@ -298,7 +309,7 @@ Features:
 - Middlewares: basic auth from pasted htpasswd lines (MD5, SHA1 and bcrypt, the hashes Traefik's BasicAuth accepts; every `$` doubled to `$$` for Compose only), an IP allowlist (`ipAllowList`, or `ipWhiteList` before v2.11) and a small security-headers set, linking to the CSP builder for the rest.
 - Outputs the labels in list and map syntax, a service snippet, the equivalent file-provider YAML and the static config it expects; explains every label and warns with the concrete value and the fix (unsupported hash, router without TLS on an HTTPS entrypoint, missing network, wildcard certificates needing DNS-01). Targets Traefik v3 with v2.11 and pre-v2.11 switches; settings live in the URL hash, never the htpasswd line.
 
-### 26) Unix Timestamp Converter
+### 27) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -308,7 +319,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 27) URL Encoder / Decoder
+### 28) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -318,7 +329,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 28) UTM Campaign URL Builder
+### 29) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -328,7 +339,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 29) vCard QR Code Generator
+### 30) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -338,7 +349,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 30) Wi-Fi QR Code Generator
+### 31) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -348,7 +359,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 31) WireGuard Config Generator
+### 32) WireGuard Config Generator
 
 Path:
 - `wireguard-config-generator/index.html`
@@ -358,7 +369,7 @@ Features:
 - Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
 - Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
 
-### 32) YAML JSON TOML Converter
+### 33) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -368,7 +379,7 @@ Features:
 - Useful for infra, app config, and serialization workflows.
 - Runs fully client-side without backend processing.
 
-### 33) ZFS and RAID Capacity Calculator
+### 34) ZFS and RAID Capacity Calculator
 
 Path:
 - `zfs-raid-capacity-calculator/index.html`
@@ -390,6 +401,7 @@ python -m http.server 8080
 ```
 
 Then open:
+- `http://localhost:8080/backup-retention-prune-simulator/`
 - `http://localhost:8080/base64-encode-decode/`
 - `http://localhost:8080/byte-storage-converter/`
 - `http://localhost:8080/chmod-file-permission-calculator/`
@@ -427,7 +439,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (991 tests across 31 modules), powered by the built-in Node.js test runner
+tool (1027 tests across 32 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -469,7 +481,12 @@ direct port of the OpenZFS formula for widths 2–24, parity 1–3 and ashift
 9/12/13, hand-worked partition, label, metaslab, deflate and slop values
 including the 128 MiB and 128 GiB clamps, TB/TiB input, fill targets,
 multiple vdevs, mixed disk sizes, fault tolerance, classic RAID levels,
-invalid layouts and the URL hash), Traefik Docker labels (label output for every option, `$`
+invalid layouts and the URL hash), backup retention (each engine against the
+worked examples in its own docs and its project's unit tests, restic's golden
+files for `ApplyPolicy`, ISO weeks across New Year, rule order and overlap,
+keep-within, unlimited values, the oldest-snapshot fallbacks, several backups
+per day and per second, time zones and daylight saving, prune after every
+backup versus once, command generation and the URL hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats

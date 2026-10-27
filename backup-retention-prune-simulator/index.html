@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup Retention (Prune) Simulator — Logs from VahaC</title>
+  <meta name="description" content="Free backup retention simulator: see which snapshots Proxmox Backup Server, borg prune and restic forget keep for the same keep-last, daily, weekly, monthly and yearly rules.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="brp-wrapper" id="brp-wrapper">
+
+    <header class="brp-header">
+      <h1 class="brp-title">Backup Retention (Prune) Simulator</h1>
+      <p class="brp-subtitle">Set a backup schedule (or paste your snapshot list) and the keep-last, hourly, daily, weekly, monthly, yearly and keep-within rules. The simulator runs the same rules through ports of Proxmox Backup Server, <span class="brp-code">borg prune</span> and <span class="brp-code">restic forget</span>, shows which snapshots each tool keeps and why, explains where the three disagree, and writes the matching command for each tool.</p>
+    </header>
+
+    <section class="brp-card" aria-labelledby="brp-h-backups">
+      <div class="brp-card-head">
+        <h2 class="brp-card-title" id="brp-h-backups">Backups</h2>
+        <span class="brp-card-meta" id="brp-count-meta"></span>
+      </div>
+
+      <div class="brp-segment brp-segment--2" role="radiogroup" aria-label="Where the backups come from">
+        <label class="brp-seg-opt"><input class="brp-seg-input" type="radio" name="brp-mode" value="s" checked><span class="brp-seg-text">Schedule</span></label>
+        <label class="brp-seg-opt"><input class="brp-seg-input" type="radio" name="brp-mode" value="p"><span class="brp-seg-text">Paste snapshot times</span></label>
+      </div>
+
+      <div class="brp-panel" id="brp-panel-schedule">
+        <fieldset class="brp-fieldset">
+          <legend class="brp-label">Backup days</legend>
+          <div class="brp-days" id="brp-days">
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-0" checked><span class="brp-chip-text">Mon</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-1" checked><span class="brp-chip-text">Tue</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-2" checked><span class="brp-chip-text">Wed</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-3" checked><span class="brp-chip-text">Thu</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-4" checked><span class="brp-chip-text">Fri</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-5" checked><span class="brp-chip-text">Sat</span></label>
+            <label class="brp-chip"><input class="brp-chip-input" type="checkbox" id="brp-day-6" checked><span class="brp-chip-text">Sun</span></label>
+          </div>
+        </fieldset>
+
+        <div class="brp-grid">
+          <div class="brp-field">
+            <label class="brp-label" for="brp-time-mode">Backup times</label>
+            <select class="brp-input brp-select" id="brp-time-mode">
+              <option value="a">At fixed times</option>
+              <option value="e">Every N hours</option>
+            </select>
+          </div>
+          <div class="brp-field" id="brp-f-at">
+            <label class="brp-label" for="brp-at">Times (HH:MM)</label>
+            <input class="brp-input" id="brp-at" type="text" autocomplete="off" spellcheck="false" placeholder="02:00, 14:00">
+          </div>
+          <div class="brp-field brp-hidden" id="brp-f-every">
+            <label class="brp-label" for="brp-every">Every N hours</label>
+            <input class="brp-input" id="brp-every" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="6">
+          </div>
+          <div class="brp-field brp-hidden" id="brp-f-from">
+            <label class="brp-label" for="brp-from">First backup of the day</label>
+            <input class="brp-input" id="brp-from" type="text" autocomplete="off" spellcheck="false" placeholder="00:00">
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-span">Simulated period</label>
+            <div class="brp-pair">
+              <input class="brp-input" id="brp-span" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="1">
+              <select class="brp-input brp-select" id="brp-span-unit" aria-label="Unit of the simulated period">
+                <option value="d">days</option>
+                <option value="w">weeks</option>
+                <option value="m">months</option>
+                <option value="y">years</option>
+              </select>
+            </div>
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-skip">Missed backup days</label>
+            <input class="brp-input" id="brp-skip" type="text" autocomplete="off" spellcheck="false" placeholder="none, e.g. 2026-10-14">
+          </div>
+        </div>
+        <p class="brp-hint">"Every N hours" starts again at the first backup time each day, like cron's <span class="brp-code">*/N</span>. Missed days (YYYY-MM-DD, comma-separated) show how days without a backup are skipped by the counts.</p>
+      </div>
+
+      <div class="brp-panel brp-hidden" id="brp-panel-paste">
+        <div class="brp-field">
+          <label class="brp-label" for="brp-paste">Snapshot times, one per line</label>
+          <textarea class="brp-input brp-textarea" id="brp-paste" rows="8" spellcheck="false" placeholder="2026-10-27 02:00:00&#10;2026-10-26T02:00:00Z&#10;vm/100/2026-10-25T01:00:00Z"></textarea>
+        </div>
+        <p class="brp-hint">Paste the output of <span class="brp-code">proxmox-backup-client snapshot list</span>, <span class="brp-code">borg list</span> or <span class="brp-code">restic snapshots</span>, or plain timestamps. The simulator reads the last date and time on each line; times without Z or an offset are read in the time zone below. Nothing leaves your browser.</p>
+      </div>
+
+      <div class="brp-grid">
+        <div class="brp-field">
+          <label class="brp-label" for="brp-end-mode">Simulate until</label>
+          <select class="brp-input brp-select" id="brp-end-mode">
+            <option value="now">Now</option>
+            <option value="at">A date and time</option>
+          </select>
+        </div>
+        <div class="brp-field brp-hidden" id="brp-f-end">
+          <label class="brp-label" for="brp-end">Date and time</label>
+          <input class="brp-input" id="brp-end" type="datetime-local">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-tz">Time zone</label>
+          <select class="brp-input brp-select" id="brp-tz"></select>
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-runs">Prune runs</label>
+          <select class="brp-input brp-select" id="brp-runs">
+            <option value="i">After every backup</option>
+            <option value="o">Once, at the end</option>
+          </select>
+        </div>
+      </div>
+      <p class="brp-hint">PBS, borg and restic all sort snapshots into hours, days, weeks, months and years by local time, so the time zone matters around midnight. "After every backup" is the usual setup; with Proxmox Backup Server it can keep different month-end snapshots than one prune over all backups.</p>
+    </section>
+
+    <section class="brp-card" aria-labelledby="brp-h-rules">
+      <div class="brp-card-head">
+        <h2 class="brp-card-title" id="brp-h-rules">Retention rules</h2>
+        <select class="brp-input brp-select brp-example" id="brp-example" aria-label="Load a documented example">
+          <option value="">Load an example from the docs…</option>
+          <option value="pbs">PBS docs: 10 years of daily backups</option>
+          <option value="borg">borg docs: prune-example.txt (2015)</option>
+          <option value="restic">restic docs: keep-daily 5, missed Wednesday</option>
+        </select>
+      </div>
+      <div class="brp-grid brp-grid--rules">
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-last">keep-last</label>
+          <input class="brp-input" id="brp-keep-last" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-hourly">keep-hourly</label>
+          <input class="brp-input" id="brp-keep-hourly" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-daily">keep-daily</label>
+          <input class="brp-input" id="brp-keep-daily" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-weekly">keep-weekly</label>
+          <input class="brp-input" id="brp-keep-weekly" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-monthly">keep-monthly</label>
+          <input class="brp-input" id="brp-keep-monthly" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field">
+          <label class="brp-label" for="brp-keep-yearly">keep-yearly</label>
+          <input class="brp-input" id="brp-keep-yearly" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+        </div>
+        <div class="brp-field brp-field--within">
+          <label class="brp-label" for="brp-keep-within">keep-within (borg, restic)</label>
+          <div class="brp-pair">
+            <input class="brp-input" id="brp-keep-within" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="off">
+            <select class="brp-input brp-select" id="brp-within-unit" aria-label="Unit of keep-within">
+              <option value="h">hours</option>
+              <option value="d">days</option>
+              <option value="w">weeks</option>
+              <option value="m">months</option>
+              <option value="y">years</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <p class="brp-hint">Leave a rule empty (or 0) to turn it off. Type <span class="brp-code">-1</span> or <span class="brp-code">unlimited</span> for no limit: borg and restic support it, Proxmox Backup Server does not. keep-within exists in borg and restic only.</p>
+    </section>
+
+    <ul class="brp-issues brp-hidden" id="brp-issues" aria-live="polite"></ul>
+
+    <div class="brp-results" id="brp-results">
+      <section class="brp-card" aria-labelledby="brp-h-result">
+        <h2 class="brp-card-title" id="brp-h-result">Result</h2>
+        <div class="brp-kpis" id="brp-kpis"></div>
+      </section>
+
+      <section class="brp-card" aria-labelledby="brp-h-diff">
+        <div class="brp-card-head">
+          <h2 class="brp-card-title" id="brp-h-diff">Where the tools differ</h2>
+          <span class="brp-card-meta" id="brp-diff-meta"></span>
+        </div>
+        <ul class="brp-notes" id="brp-diffs"></ul>
+      </section>
+
+      <section class="brp-card" aria-labelledby="brp-h-cal">
+        <div class="brp-card-head">
+          <h2 class="brp-card-title" id="brp-h-cal">Calendar</h2>
+          <span class="brp-card-meta" id="brp-cal-meta"></span>
+        </div>
+        <div class="brp-segment brp-segment--3" role="radiogroup" aria-label="Tool shown in the calendar">
+          <label class="brp-seg-opt"><input class="brp-seg-input" type="radio" name="brp-cal" value="pbs" checked><span class="brp-seg-text">Proxmox Backup Server</span></label>
+          <label class="brp-seg-opt"><input class="brp-seg-input" type="radio" name="brp-cal" value="borg"><span class="brp-seg-text">borg prune</span></label>
+          <label class="brp-seg-opt"><input class="brp-seg-input" type="radio" name="brp-cal" value="restic"><span class="brp-seg-text">restic forget</span></label>
+        </div>
+        <div class="brp-legend" id="brp-legend"></div>
+        <p class="brp-hint">Each dot is a kept snapshot, coloured by the rule that kept it. Hover or long-press a day for the times. Months with nothing kept are folded into one line.</p>
+        <div class="brp-months" id="brp-months"></div>
+      </section>
+
+      <section class="brp-card" aria-labelledby="brp-h-list">
+        <div class="brp-card-head">
+          <h2 class="brp-card-title" id="brp-h-list">Snapshots side by side</h2>
+          <span class="brp-card-meta" id="brp-list-meta"></span>
+        </div>
+        <div class="brp-field brp-field--filter">
+          <label class="brp-label" for="brp-filter">Show</label>
+          <select class="brp-input brp-select" id="brp-filter">
+            <option value="k">Snapshots kept by at least one tool</option>
+            <option value="d">Only snapshots where the tools disagree</option>
+            <option value="a">All snapshots</option>
+          </select>
+        </div>
+        <div class="brp-table-wrap">
+          <table class="brp-table">
+            <thead>
+              <tr>
+                <th class="brp-th" scope="col">Snapshot (local time, ISO week)</th>
+                <th class="brp-th" scope="col">Proxmox Backup Server</th>
+                <th class="brp-th" scope="col">borg prune</th>
+                <th class="brp-th" scope="col">restic forget</th>
+              </tr>
+            </thead>
+            <tbody id="brp-tbody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="brp-btn brp-btn--secondary brp-hidden" id="brp-more">Show more</button>
+        <p class="brp-hint">Labels name the rule and its count, as each tool reports it: <span class="brp-code">daily #3</span> is the third snapshot kept by keep-daily, <span class="brp-code">yearly[oldest]</span> is borg's oldest-archive rule, and restic lists every rule a snapshot matched.</p>
+      </section>
+
+      <section class="brp-card" aria-labelledby="brp-h-cmd">
+        <h2 class="brp-card-title" id="brp-h-cmd">Commands</h2>
+        <div class="brp-grid brp-grid--names">
+          <div class="brp-field">
+            <label class="brp-label" for="brp-pbs-group">PBS backup group</label>
+            <input class="brp-input" id="brp-pbs-group" type="text" autocomplete="off" spellcheck="false" placeholder="vm/100">
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-pbs-store">PBS datastore</label>
+            <input class="brp-input" id="brp-pbs-store" type="text" autocomplete="off" spellcheck="false" placeholder="store1">
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-pbs-schedule">PBS prune job schedule</label>
+            <input class="brp-input" id="brp-pbs-schedule" type="text" autocomplete="off" spellcheck="false" placeholder="daily">
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-borg-repo">borg repository</label>
+            <input class="brp-input" id="brp-borg-repo" type="text" autocomplete="off" spellcheck="false" placeholder="/path/to/repo">
+          </div>
+          <div class="brp-field">
+            <label class="brp-label" for="brp-restic-repo">restic repository</label>
+            <input class="brp-input" id="brp-restic-repo" type="text" autocomplete="off" spellcheck="false" placeholder="/srv/restic-repo">
+          </div>
+        </div>
+
+        <div class="brp-cmd">
+          <div class="brp-cmd-head">
+            <h3 class="brp-sub-title">Proxmox Backup Server 4.2</h3>
+            <button type="button" class="brp-btn brp-btn--secondary brp-btn--small" data-brp-copy="pbs">&#128203; Copy</button>
+          </div>
+          <pre class="brp-pre"><code class="brp-pre-code" id="brp-cmd-pbs"></code></pre>
+        </div>
+        <div class="brp-cmd">
+          <div class="brp-cmd-head">
+            <h3 class="brp-sub-title">borg prune (BorgBackup 1.4)</h3>
+            <button type="button" class="brp-btn brp-btn--secondary brp-btn--small" data-brp-copy="borg">&#128203; Copy</button>
+          </div>
+          <pre class="brp-pre"><code class="brp-pre-code" id="brp-cmd-borg"></code></pre>
+        </div>
+        <div class="brp-cmd">
+          <div class="brp-cmd-head">
+            <h3 class="brp-sub-title">restic forget (restic 0.19)</h3>
+            <button type="button" class="brp-btn brp-btn--secondary brp-btn--small" data-brp-copy="restic">&#128203; Copy</button>
+          </div>
+          <pre class="brp-pre"><code class="brp-pre-code" id="brp-cmd-restic"></code></pre>
+        </div>
+        <p class="brp-hint">Run the dry run first and compare its list with the table above. Garbage collection on PBS, <span class="brp-code">borg compact</span> and <span class="brp-code">restic prune</span> (or <span class="brp-code">--prune</span>) are what free the disk space.</p>
+      </section>
+    </div>
+
+    <section class="brp-card" aria-labelledby="brp-h-notes">
+      <h2 class="brp-card-title" id="brp-h-notes">How the simulator works</h2>
+      <ul class="brp-facts">
+        <li class="brp-fact"><strong>Ported from source.</strong> Each column runs a port of that tool's own prune code: Proxmox Backup Server 4.2.8 (<span class="brp-code">pbs-datastore/src/prune.rs</span>), BorgBackup 1.4.5 (<span class="brp-code">prune_split()</span> and <span class="brp-code">prune_within()</span>) and restic 0.19.1 (<span class="brp-code">ApplyPolicy()</span>). They are checked against the worked examples in each project's docs and against restic's own test data.</li>
+        <li class="brp-fact"><strong>Weeks.</strong> All three use ISO 8601 weeks: Monday to Sunday, and the week that holds 1 January can belong to the year before or after.</li>
+        <li class="brp-fact"><strong>Rule order.</strong> PBS and borg apply the rules in order (borg starts with keep-within) and do not count a period an earlier rule already covered. PBS counts a period as covered when any snapshot in it is kept, borg only when its newest backup is kept. restic applies every rule on its own and keeps a snapshot if any rule wants it.</li>
+        <li class="brp-fact"><strong>Time zone.</strong> PBS uses the server's time zone, borg the time zone of the machine that runs <span class="brp-code">borg prune</span>, and restic the local time stored in each snapshot by the machine that made it. The simulator uses the zone you pick for all three.</li>
+        <li class="brp-fact"><strong>Prune timing.</strong> "After every backup" replays every PBS prune run, because a snapshot PBS removed once cannot come back. For borg and restic one run after the last backup gives the same result, which the tests check on random schedules.</li>
+        <li class="brp-fact"><strong>Not modelled.</strong> Protected snapshots, unfinished backups and borg checkpoints, several backup groups (PBS groups, borg <span class="brp-code">--glob-archives</span>, restic <span class="brp-code">--group-by</span>), restic <span class="brp-code">--keep-tag</span> and <span class="brp-code">--keep-within-daily</span> and the like, borg's minutely, secondly and quarterly rules, and borg 2.0, which is still in beta and has a reworked prune command.</li>
+      </ul>
+      <p class="brp-hint">Sources: <a class="brp-link" href="https://pbs.proxmox.com/docs/maintenance.html#pruning" target="_blank" rel="noopener">PBS pruning docs</a>, <a class="brp-link" href="https://borgbackup.readthedocs.io/en/1.4-maint/usage/prune.html" target="_blank" rel="noopener">borg prune 1.4</a>, <a class="brp-link" href="https://restic.readthedocs.io/en/stable/060_forget.html" target="_blank" rel="noopener">restic forget</a>.</p>
+    </section>
+
+    <div class="brp-actions">
+      <button type="button" class="brp-btn" onclick="brpCopyLink()">&#128279; Copy link to this setup</button>
+    </div>
+
+    <footer class="brp-footer">
+      Built by <a class="brp-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+    <div class="brp-toast" id="brp-toast" role="status" aria-live="polite">Copied</div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

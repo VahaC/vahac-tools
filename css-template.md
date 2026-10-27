@@ -247,6 +247,7 @@ Keep this list updated to avoid prefix collisions:
 | Prefix | Tool                     | Status   |
 |--------|--------------------------|----------|
 | `b64`  | Base64 Encode / Decode   | Built    |
+| `brp`  | Backup Retention (Prune) | Built    |
 | `bsc`  | Byte & Storage Converter | Built    |
 | `chm`  | Chmod Permission Calc    | Built    |
 | `crn`  | Cron Expression Generator| Built    |
