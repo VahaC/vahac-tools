@@ -268,6 +268,7 @@ Keep this list updated to avoid prefix collisions:
 | `pwg`  | Password Generator       | Built    |
 | `rbt`  | robots.txt Gen/Validator | Built    |
 | `rgx`  | Regex Tester             | Built    |
+| `sdr`  | SPF & DMARC Record Gen.  | Built    |
 | `sla`  | Uptime / SLA Calculator  | Built    |
 | `snc`  | Subnet / IP Calculator   | Built    |
 | `tdf`  | Text Diff Tool           | Built    |

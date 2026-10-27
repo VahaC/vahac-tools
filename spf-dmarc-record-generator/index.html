@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPF and DMARC Record Generator and Checker — Logs from VahaC</title>
+  <meta name="description" content="Free SPF and DMARC record generator and checker: build TXT records from documented provider includes, count the 10 SPF DNS lookups and explain every tag.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sdr-wrapper" id="sdr-wrapper">
+
+    <header class="sdr-header">
+      <h1 class="sdr-title">SPF and DMARC Record Generator and Checker</h1>
+      <p class="sdr-subtitle">Build the SPF and DMARC TXT records for your domain from the includes your mail providers document, with the DNS name, the value and a BIND zone-file line. Or paste the records you already publish and get every term explained, the SPF lookup count against the limit of 10, and each problem with the exact value, the fix and the RFC section. Follows RFC 7208 (SPF) and RFC 9989 (DMARC, May 2026). Nothing is looked up or sent anywhere.</p>
+    </header>
+
+    <div class="sdr-tabs" id="sdr-tabs" role="tablist" aria-label="Tool mode">
+      <button class="sdr-tab sdr-active" id="sdr-tab-gen" type="button" role="tab" aria-selected="true" aria-controls="sdr-panel-gen" onclick="sdrSetMode('gen')">Generate</button>
+      <button class="sdr-tab" id="sdr-tab-check" type="button" role="tab" aria-selected="false" aria-controls="sdr-panel-check" tabindex="-1" onclick="sdrSetMode('check')">Check</button>
+    </div>
+
+    <div class="sdr-panel" id="sdr-panel-gen" role="tabpanel" aria-labelledby="sdr-tab-gen">
+
+      <section class="sdr-card" aria-labelledby="sdr-h-domain">
+        <h2 class="sdr-card-title" id="sdr-h-domain">Your domain</h2>
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-domain">Domain in your From address</label>
+          <input class="sdr-input" id="sdr-domain" type="text" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="example.com">
+          <p class="sdr-field-msg" id="sdr-domain-msg"></p>
+        </div>
+        <p class="sdr-hint">International domain names are converted to their xn-- form, which is what DNS and SPF use.</p>
+      </section>
+
+      <section class="sdr-card" aria-labelledby="sdr-h-spf">
+        <div class="sdr-card-head">
+          <h2 class="sdr-card-title" id="sdr-h-spf">SPF: which servers may send</h2>
+          <span class="sdr-card-meta">RFC 7208</span>
+        </div>
+        <p class="sdr-text">SPF lists the servers allowed to send mail for a domain. Receivers check it against the envelope sender (the Return-Path domain), not the From address you see. Many sending services use their own Return-Path domain, so their mail passes SPF without anything in your record. A name may have only one SPF record, so every sender goes into the same one.</p>
+
+        <label class="sdr-check" for="sdr-nomail">
+          <input class="sdr-check-input" type="checkbox" id="sdr-nomail">
+          <span class="sdr-check-text"><span class="sdr-check-main">This domain sends no email at all</span>
+            <span class="sdr-check-sub">Publishes <code class="sdr-code">v=spf1 -all</code>, the standard record for a domain that sends nothing (RFC 7208 §10.1.2). Parked domains and web-only domains get spoofed too.</span>
+          </span>
+        </label>
+
+        <div class="sdr-senders" id="sdr-senders">
+          <h3 class="sdr-sub">Mailbox providers</h3>
+          <div class="sdr-services" id="sdr-svc-mailbox"></div>
+
+          <h3 class="sdr-sub">Sending services</h3>
+          <div class="sdr-services" id="sdr-svc-sending"></div>
+          <p class="sdr-hint">Each include comes from the provider's own setup page (checked 27 October 2026); providers change them, so compare with what your provider's dashboard shows. <a class="sdr-link" href="https://postmarkapp.com/support/article/how-do-i-set-up-spf-for-postmark" target="_blank" rel="noopener noreferrer">Postmark</a> needs no include because its Return-Path domain passes SPF, and <a class="sdr-link" href="https://help.brevo.com/hc/en-us/articles/12163873383186-Authenticate-your-domain-with-Brevo-Brevo-code-DKIM-DMARC" target="_blank" rel="noopener noreferrer">Brevo</a> asks for SPF only with a dedicated IP.</p>
+
+          <h3 class="sdr-sub">Your own servers</h3>
+          <div class="sdr-grid">
+            <div class="sdr-field">
+              <label class="sdr-label" for="sdr-ip4">IPv4 addresses or ranges</label>
+              <input class="sdr-input" id="sdr-ip4" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="203.0.113.25 198.51.100.0/28">
+              <p class="sdr-field-msg" id="sdr-ip4-msg"></p>
+            </div>
+            <div class="sdr-field">
+              <label class="sdr-label" for="sdr-ip6">IPv6 addresses or ranges</label>
+              <input class="sdr-input" id="sdr-ip6" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="2001:db8::25 2001:db8:10::/48">
+              <p class="sdr-field-msg" id="sdr-ip6-msg"></p>
+            </div>
+          </div>
+          <p class="sdr-hint">The public address your mail leaves from, such as a self-hosted mail server or an SMTP relay at home. No DNS lookup is needed for ip4 and ip6, so they are the cheapest way to authorize a server.</p>
+          <label class="sdr-check" for="sdr-a">
+            <input class="sdr-check-input" type="checkbox" id="sdr-a">
+            <span class="sdr-check-text"><span class="sdr-check-main"><code class="sdr-code">a</code> — the domain's own A/AAAA address sends mail</span>
+              <span class="sdr-check-sub">For a mail server on the same host as the website. Costs 1 DNS lookup.</span>
+            </span>
+          </label>
+          <label class="sdr-check" for="sdr-mx">
+            <input class="sdr-check-input" type="checkbox" id="sdr-mx">
+            <span class="sdr-check-text"><span class="sdr-check-main"><code class="sdr-code">mx</code> — the servers in the domain's MX records also send mail</span>
+              <span class="sdr-check-sub">Only when your incoming mail servers send outgoing mail as well, which is not the case with most hosted providers. Costs 1 DNS lookup.</span>
+            </span>
+          </label>
+          <div class="sdr-field">
+            <label class="sdr-label" for="sdr-inc">Other includes</label>
+            <input class="sdr-input" id="sdr-inc" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="spf.provider.example">
+            <p class="sdr-field-msg" id="sdr-inc-msg"></p>
+            <p class="sdr-hint">Names a provider not listed above tells you to include, separated by spaces. Each costs at least 1 DNS lookup.</p>
+          </div>
+        </div>
+
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-sub">Publish at a subdomain (optional)</label>
+          <input class="sdr-input" id="sdr-sub" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="bounce">
+          <p class="sdr-field-msg" id="sdr-sub-msg"></p>
+          <p class="sdr-hint">Leave empty for the domain itself (@). Fill in a label such as <code class="sdr-code">bounce</code> to build the record for a custom MAIL FROM or return-path subdomain, which needs its own SPF record.</p>
+        </div>
+
+        <fieldset class="sdr-fieldset">
+          <legend class="sdr-label">Everyone else</legend>
+          <div class="sdr-segment sdr-segment--2" id="sdr-all-seg" role="radiogroup" aria-label="Result for servers you did not list">
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-all" value="~">
+              <span class="sdr-seg-text">~all · softfail</span>
+            </label>
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-all" value="-">
+              <span class="sdr-seg-text">-all · fail</span>
+            </label>
+          </div>
+          <p class="sdr-note-box" id="sdr-all-note"></p>
+        </fieldset>
+
+        <div class="sdr-out" id="sdr-spf-out" aria-live="polite"></div>
+      </section>
+
+      <section class="sdr-card" aria-labelledby="sdr-h-dmarc">
+        <div class="sdr-card-head">
+          <h2 class="sdr-card-title" id="sdr-h-dmarc">DMARC: what happens to mail that fails</h2>
+          <span class="sdr-card-meta">RFC 9989</span>
+        </div>
+        <p class="sdr-text">DMARC passes when SPF or DKIM passes for a domain that matches (aligns with) the From address. The record tells receivers what to do with mail that fails and where to send reports. It lives at <code class="sdr-code">_dmarc.</code> in front of your domain.</p>
+
+        <fieldset class="sdr-fieldset">
+          <legend class="sdr-label">Policy (p)</legend>
+          <div class="sdr-segment" role="radiogroup" aria-label="DMARC policy">
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-p" value="none">
+              <span class="sdr-seg-text">none</span>
+            </label>
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-p" value="quarantine">
+              <span class="sdr-seg-text">quarantine</span>
+            </label>
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-p" value="reject">
+              <span class="sdr-seg-text">reject</span>
+            </label>
+          </div>
+          <ol class="sdr-steps" aria-label="Rollout">
+            <li class="sdr-step" data-step="none"><span class="sdr-step-name">1 · Monitor</span><span class="sdr-step-sub">p=none, at least a month of reports</span></li>
+            <li class="sdr-step" data-step="quarantine"><span class="sdr-step-name">2 · Quarantine</span><span class="sdr-step-sub">as long again, compare results</span></li>
+            <li class="sdr-step" data-step="reject"><span class="sdr-step-name">3 · Reject</span><span class="sdr-step-sub">only with DKIM on all mail</span></li>
+          </ol>
+          <p class="sdr-note-box" id="sdr-p-note"></p>
+        </fieldset>
+
+        <div class="sdr-grid sdr-grid--4">
+          <div class="sdr-field">
+            <label class="sdr-label" for="sdr-sp">Subdomains (sp)</label>
+            <select class="sdr-input sdr-select" id="sdr-sp">
+              <option value="">Same as p (tag left out)</option>
+              <option value="none">none</option>
+              <option value="quarantine">quarantine</option>
+              <option value="reject">reject</option>
+            </select>
+          </div>
+          <div class="sdr-field">
+            <label class="sdr-label" for="sdr-np">Non-existent subdomains (np)</label>
+            <select class="sdr-input sdr-select" id="sdr-np">
+              <option value="">Same as sp or p (tag left out)</option>
+              <option value="none">none</option>
+              <option value="quarantine">quarantine</option>
+              <option value="reject">reject</option>
+            </select>
+          </div>
+          <div class="sdr-field">
+            <label class="sdr-label" for="sdr-adkim">DKIM alignment (adkim)</label>
+            <select class="sdr-input sdr-select" id="sdr-adkim">
+              <option value="r">Relaxed (default, tag left out)</option>
+              <option value="s">Strict</option>
+            </select>
+          </div>
+          <div class="sdr-field">
+            <label class="sdr-label" for="sdr-aspf">SPF alignment (aspf)</label>
+            <select class="sdr-input sdr-select" id="sdr-aspf">
+              <option value="r">Relaxed (default, tag left out)</option>
+              <option value="s">Strict</option>
+            </select>
+          </div>
+        </div>
+        <p class="sdr-hint">Relaxed alignment accepts subdomains of the same organizational domain (mail.example.com for example.com); strict needs the exact domain. Many sending services use a return-path subdomain, which only relaxed SPF alignment accepts. <code class="sdr-code">np</code> covers names that do not exist in DNS, a common spoofing trick; it is new in RFC 9989 and older receivers ignore it.</p>
+
+        <label class="sdr-check" for="sdr-t">
+          <input class="sdr-check-input" type="checkbox" id="sdr-t">
+          <span class="sdr-check-text"><span class="sdr-check-main">Test mode (<code class="sdr-code">t=y</code>)</span>
+            <span class="sdr-check-sub">Receivers apply one level below the policy: reject is handled as quarantine, quarantine as none. RFC 9989 removed the old <code class="sdr-code">pct</code> tag (values other than 0 and 100 were applied inconsistently) and added <code class="sdr-code">t</code> as the replacement for pct=0.</span>
+          </span>
+        </label>
+
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-rua">Aggregate reports to (rua)</label>
+          <input class="sdr-input" id="sdr-rua" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="dmarc@example.com">
+          <p class="sdr-field-msg" id="sdr-rua-msg"></p>
+          <p class="sdr-hint">Daily XML reports showing who sends mail with your domain and whether it passes. Separate several addresses with spaces or commas; mailto: is added for you. An address on another domain needs an authorization record there (shown below the result).</p>
+        </div>
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-ruf">Failure reports to (ruf, optional)</label>
+          <input class="sdr-input" id="sdr-ruf" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="dmarc-failures@example.com">
+          <p class="sdr-field-msg" id="sdr-ruf-msg"></p>
+          <p class="sdr-hint">Per-message reports that can include headers and content. Many large mailbox providers do not send them.</p>
+        </div>
+        <fieldset class="sdr-fieldset sdr-fo" id="sdr-fo-wrap">
+          <legend class="sdr-label">Failure report options (fo, only with ruf)</legend>
+          <div class="sdr-segment sdr-segment--2" role="radiogroup" aria-label="When to send failure reports">
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-fo" value="0">
+              <span class="sdr-seg-text">0 · when all fail</span>
+            </label>
+            <label class="sdr-seg-opt">
+              <input class="sdr-seg-input" type="radio" name="sdr-fo" value="1">
+              <span class="sdr-seg-text">1 · when any fails</span>
+            </label>
+          </div>
+          <label class="sdr-check" for="sdr-fo-d">
+            <input class="sdr-check-input" type="checkbox" id="sdr-fo-d">
+            <span class="sdr-check-text"><span class="sdr-check-main"><code class="sdr-code">d</code> — a DKIM report for every failed signature</span></span>
+          </label>
+          <label class="sdr-check" for="sdr-fo-s">
+            <input class="sdr-check-input" type="checkbox" id="sdr-fo-s">
+            <span class="sdr-check-text"><span class="sdr-check-main"><code class="sdr-code">s</code> — an SPF report for every SPF failure</span></span>
+          </label>
+        </fieldset>
+
+        <div class="sdr-out" id="sdr-dmarc-out" aria-live="polite"></div>
+      </section>
+
+      <div class="sdr-actions">
+        <button class="sdr-btn" type="button" onclick="sdrCheckGenerated()">Check these records</button>
+        <button class="sdr-btn sdr-btn--secondary" type="button" onclick="sdrCopyLink()">Copy link to these settings</button>
+        <button class="sdr-btn sdr-btn--secondary" type="button" onclick="sdrReset()">Reset to example</button>
+      </div>
+      <p class="sdr-hint">The link keeps your domain, IP addresses and report addresses in the part after #. Browsers do not send that part to any server, but anyone you share the link with can read it.</p>
+    </div>
+
+    <div class="sdr-panel sdr-hidden" id="sdr-panel-check" role="tabpanel" aria-labelledby="sdr-tab-check">
+      <section class="sdr-card" aria-labelledby="sdr-h-check">
+        <h2 class="sdr-card-title" id="sdr-h-check">Check SPF and DMARC records</h2>
+        <p class="sdr-text">Paste the TXT records you publish: raw values, quoted strings, <code class="sdr-code">dig</code> or <code class="sdr-code">nslookup</code> output, or zone-file lines. To count SPF lookups exactly, also paste the records of the domains you include, each under its name followed by a colon. This page does not query DNS, so it only knows what you paste.</p>
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-check-domain">Your domain (optional)</label>
+          <input class="sdr-input" id="sdr-check-domain" type="text" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="example.com">
+          <p class="sdr-hint">Used for records pasted without a name, and to tell whether report addresses are on another domain.</p>
+        </div>
+        <div class="sdr-field">
+          <label class="sdr-label" for="sdr-check-input">Records</label>
+          <textarea class="sdr-input sdr-textarea" id="sdr-check-input" rows="10" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="example.com:&#10;v=spf1 include:_spf.google.com ~all&#10;&#10;_spf.google.com:&#10;(paste its record here)&#10;&#10;_dmarc.example.com:&#10;v=DMARC1; p=none; rua=mailto:dmarc@example.com"></textarea>
+        </div>
+        <div class="sdr-chips">
+          <span class="sdr-chips-label">Examples:</span>
+          <button class="sdr-chip" type="button" data-sdr-example="nested">Nested includes</button>
+          <button class="sdr-chip" type="button" data-sdr-example="broken">Broken records</button>
+          <button class="sdr-chip" type="button" data-sdr-example="lookups">Too many lookups</button>
+          <button class="sdr-chip sdr-chip--clear" type="button" onclick="sdrClearCheck()">Clear</button>
+        </div>
+        <details class="sdr-details">
+          <summary class="sdr-details-sum">How to get your records</summary>
+          <pre class="sdr-pre">dig +short TXT example.com
+dig +short TXT _dmarc.example.com
+nslookup -type=TXT example.com</pre>
+          <p class="sdr-hint">Each line of dig output is one record; several quoted strings on one line belong to the same record and are joined without spaces. Run the same command for every name after include: and redirect= to count lookups exactly. Your DNS panel shows the same values.</p>
+        </details>
+      </section>
+
+      <div class="sdr-results" id="sdr-check-results" aria-live="polite"></div>
+
+      <section class="sdr-card" aria-labelledby="sdr-h-count">
+        <h2 class="sdr-card-title" id="sdr-h-count">How SPF lookups are counted</h2>
+        <ul class="sdr-notes">
+          <li class="sdr-note"><strong>Counted:</strong> include, a, mx, ptr, exists and redirect, each 1, including the ones inside included records. More than 10 in total and receivers return permerror (RFC 7208 §4.6.4).</li>
+          <li class="sdr-note"><strong>Not counted:</strong> all, ip4, ip6 and exp. Mechanisms after all are never evaluated, and redirect is ignored when the record has all.</li>
+          <li class="sdr-note"><strong>Worst case:</strong> receivers stop at the first match, but mail from a server you did not list walks the whole record, so the full count is what matters.</li>
+          <li class="sdr-note"><strong>Separate limits:</strong> one mx may resolve at most 10 mail-server names, and more than two lookups that find nothing (void lookups) also give permerror. Both depend on live DNS, which this page does not query.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="sdr-card" aria-labelledby="sdr-h-notes">
+      <h2 class="sdr-card-title" id="sdr-h-notes">Good to know</h2>
+      <ul class="sdr-notes">
+        <li class="sdr-note"><strong>Mailbox providers expect all three.</strong> <a class="sdr-link" href="https://support.google.com/a/answer/81126" target="_blank" rel="noopener noreferrer">Gmail</a> requires SPF or DKIM from every sender and SPF, DKIM and DMARC (p=none is enough) from anyone sending 5,000 or more messages a day to Gmail. <a class="sdr-link" href="https://senders.yahooinc.com/best-practices/" target="_blank" rel="noopener noreferrer">Yahoo</a> asks bulk senders for SPF, DKIM and DMARC at p=none or stricter, and <a class="sdr-link" href="https://techcommunity.microsoft.com/blog/microsoftdefenderforoffice365blog/strengthening-email-ecosystem-outlook%E2%80%99s-new-requirements-for-high%E2%80%90volume-senders/4399730" target="_blank" rel="noopener noreferrer">Outlook.com</a> has sent non-compliant mail from such senders to Junk since 5 May 2025. Small senders benefit as well.</li>
+        <li class="sdr-note"><strong>DMARC changed in May 2026.</strong> RFC 9989 replaced RFC 7489. It removed <code class="sdr-code">pct</code>, <code class="sdr-code">rf</code>, <code class="sdr-code">ri</code> and the <code class="sdr-code">!size</code> suffix on report addresses, added <code class="sdr-code">np</code>, <code class="sdr-code">t</code> and <code class="sdr-code">psd</code>, and finds the organizational domain with a DNS tree walk instead of the Public Suffix List. This tool follows RFC 9989 and points out what older receivers still read.</li>
+        <li class="sdr-note"><strong>255 characters per string.</strong> One TXT string holds at most 255 octets (RFC 1035). Longer records are split into several quoted strings, which receivers join without adding spaces. Most DNS panels do this for you; the zone-file line shows the split.</li>
+        <li class="sdr-note"><strong>Organizational domain is a guess here.</strong> Whether a report address is on another domain is judged from the last two labels (three for names like example.co.uk). Receivers use the DNS tree walk of RFC 9989 §4.10, which can differ for unusual setups.</li>
+        <li class="sdr-note"><strong>Not covered:</strong> DKIM keys, MTA-STS, BIMI and ARC are separate records. DMARC needs DKIM for p=reject, so set it up with your provider.</li>
+      </ul>
+    </section>
+
+    <details class="sdr-sources">
+      <summary class="sdr-sources-sum">Sources</summary>
+      <ul class="sdr-source-list">
+        <li><a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc7208" target="_blank" rel="noopener noreferrer">RFC 7208</a> Sender Policy Framework (SPF), April 2014: grammar (§12), mechanisms (§5), modifiers (§6), macros (§7), DNS lookup limits (§4.6.4), one record per name (§3.2), multiple strings (§3.3).</li>
+        <li><a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc9989" target="_blank" rel="noopener noreferrer">RFC 9989</a> DMARC, May 2026, Proposed Standard, obsoletes RFC 7489 and RFC 9091 (status confirmed on the <a class="sdr-link" href="https://datatracker.ietf.org/doc/draft-ietf-dmarc-dmarcbis/" target="_blank" rel="noopener noreferrer">IETF datatracker</a>, 27 October 2026): tags (§4.7), grammar (§4.8), policy discovery (§4.10.1), rollout (§5.1, §7.4), SPF -all (§7.1), pct removal (Appendix A.6).</li>
+        <li><a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc9990" target="_blank" rel="noopener noreferrer">RFC 9990</a> DMARC Aggregate Reporting (§4 external destinations) and <a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc9991" target="_blank" rel="noopener noreferrer">RFC 9991</a> DMARC Failure Reporting (§5, §7 privacy), May 2026.</li>
+        <li><a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc7489" target="_blank" rel="noopener noreferrer">RFC 7489</a> DMARC (Informational, 2015), for what older receivers still read; <a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc6376#section-3.2" target="_blank" rel="noopener noreferrer">RFC 6376 §3.2</a> tag=value syntax; <a class="sdr-link" href="https://www.rfc-editor.org/rfc/rfc1035#section-3.3" target="_blank" rel="noopener noreferrer">RFC 1035 §3.3</a> and §5.1, TXT strings and zone-file quoting.</li>
+        <li>Provider includes from each provider's own page, linked next to it above. Sender requirements from Google's email sender guidelines, Yahoo's sender best practices and Microsoft's Outlook.com announcement of 2 April 2025.</li>
+      </ul>
+    </details>
+
+    <p class="sdr-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+
+    <div class="sdr-toast" id="sdr-toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

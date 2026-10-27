@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-27 (Zigbee and Wi-Fi Channel Planner added)
+- Last updated: 2026-10-27 (SPF and DMARC Record Generator and Checker added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -34,6 +34,7 @@ Documentation status:
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
 - `robots-txt-generator-validator/` - guided robots.txt builder (groups, AI crawler block, sitemaps), line-by-line validator with explanations, and a per-crawler URL tester.
 - `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
+- `spf-dmarc-record-generator/` - SPF and DMARC TXT records: an SPF builder with the includes Google Workspace, Microsoft 365, Zoho Mail, Fastmail, Proton Mail, iCloud+, Mailgun, Amazon SES and SendGrid document plus your own ip4/ip6/a/mx, and a DMARC builder following RFC 9989 (p, sp, np, t, alignment, rua/ruf, fo), each with the DNS name, the value, a BIND zone-file line split into 255-octet strings and the authorization record for report addresses on another domain; plus a checker for pasted records (dig, nslookup, zone files) that explains every term, counts SPF DNS lookups across pasted includes and names each problem with the fix and the RFC section.
 - `subnet-calculator/` - IPv4 subnet calculation and network planning.
 - `text-diff-tool/` - line/word/character text comparison with diff highlighting.
 - `traefik-docker-labels-generator/` - Traefik v3 and v2 labels for a Compose service (host and path rules, entrypoints, TLS and certificate resolver, HTTP to HTTPS redirect, Docker network, `traefik.enable`, basic auth from an htpasswd line, IP allowlist, security headers) in list and map syntax, plus a service snippet, the equivalent file-provider YAML and the static config they expect.
@@ -280,7 +281,17 @@ Features:
 - Supports yearly, monthly, weekly, and daily breakdowns.
 - Includes reverse calculations from known downtime budgets.
 
-### 24) IP Subnet Calculator
+### 24) SPF and DMARC Record Generator and Checker
+
+Path:
+- `spf-dmarc-record-generator/index.html`
+
+Features:
+- SPF builder: mailbox providers and sending services with the include each one documents (Google Workspace, Microsoft 365, Zoho Mail, Fastmail, Proton Mail, iCloud+, Mailgun, Amazon SES, SendGrid, each linked to its setup page), ip4/ip6 addresses and ranges, `a` and `mx`, other includes, a subdomain for custom MAIL FROM domains, `~all` or `-all` with the trade-off from RFC 7208 §8.4/§8.5 and RFC 9989 §7.1, the `v=spf1 -all` record for domains that send no mail, and a warning when a service checks SPF on a subdomain instead.
+- DMARC builder following RFC 9989 (May 2026, obsoletes RFC 7489): `p` with the none → quarantine → reject rollout of §5.1 and §7.4, `sp`, `np`, `t=y` test mode in place of the removed `pct`, `adkim`/`aspf`, `rua`/`ruf` with `mailto:` added, and `fo`. Each record comes with its DNS name, the value, a BIND zone-file line split into 255-octet strings, and the `<domain>._report._dmarc.<host>` authorization record for report addresses on another domain.
+- Checker for pasted records (raw values, quoted strings, `dig` and `nslookup` output, zone files with parentheses, included records labelled with their names): the RFC 7208 grammar including macros and CIDR suffixes, a plain-language explanation of every term and tag, the DNS-lookup count across nested includes and redirects (exact when every include is pasted, otherwise "at least N"), loops, multiple records, `+all`, `ptr`, redirect with all, removed DMARC tags and external report destinations, each problem with the exact value, the fix and an RFC link. It makes no DNS queries; the generator settings live in the URL hash.
+
+### 25) IP Subnet Calculator
 
 Path:
 - `subnet-calculator/index.html`
@@ -290,7 +301,7 @@ Features:
 - Helps validate subnet segmentation and addressing plans.
 - Useful for admin, DevOps, and networking study tasks.
 
-### 25) Text Diff Tool
+### 26) Text Diff Tool
 
 Path:
 - `text-diff-tool/index.html`
@@ -300,7 +311,7 @@ Features:
 - Options to ignore whitespace or case differences.
 - Collapses long unchanged runs and copies the diff as plain text.
 
-### 26) Traefik Docker Labels Generator
+### 27) Traefik Docker Labels Generator
 
 Path:
 - `traefik-docker-labels-generator/index.html`
@@ -310,7 +321,7 @@ Features:
 - Middlewares: basic auth from pasted htpasswd lines (MD5, SHA1 and bcrypt, the hashes Traefik's BasicAuth accepts; every `$` doubled to `$$` for Compose only), an IP allowlist (`ipAllowList`, or `ipWhiteList` before v2.11) and a small security-headers set, linking to the CSP builder for the rest.
 - Outputs the labels in list and map syntax, a service snippet, the equivalent file-provider YAML and the static config it expects; explains every label and warns with the concrete value and the fix (unsupported hash, router without TLS on an HTTPS entrypoint, missing network, wildcard certificates needing DNS-01). Targets Traefik v3 with v2.11 and pre-v2.11 switches; settings live in the URL hash, never the htpasswd line.
 
-### 27) Unix Timestamp Converter
+### 28) Unix Timestamp Converter
 
 Path:
 - `unix-timestamp-converter/index.html`
@@ -320,7 +331,7 @@ Features:
 - Converts a date back into a Unix timestamp.
 - Includes a live-ticking current timestamp panel.
 
-### 28) URL Encoder / Decoder
+### 29) URL Encoder / Decoder
 
 Path:
 - `url-encoder-decoder/index.html`
@@ -330,7 +341,7 @@ Features:
 - Supports component, full URL, form, and strict RFC 3986 modes.
 - Includes a URL inspector for breaking down a URL's parts.
 
-### 29) UTM Campaign URL Builder
+### 30) UTM Campaign URL Builder
 
 Path:
 - `utm-campaign-url-builder/index.html`
@@ -340,7 +351,7 @@ Features:
 - Keeps the landing page's own parameters and `#fragment`, replaces or imports existing UTM tags, and drops copied click IDs (gclid, fbclid, msclkid…).
 - Predicts the GA4 default channel group from Google's published rules and source list, with fixes for common mistakes (unrecognised mediums, `x` instead of `twitter`, "shop" in campaign names); 24 built-in presets plus saved presets, a CSV link list, and PNG/SVG QR export.
 
-### 30) vCard QR Code Generator
+### 31) vCard QR Code Generator
 
 Path:
 - `vcard-qr-code-generator/index.html`
@@ -350,7 +361,7 @@ Features:
 - Generates QR codes from vCard data.
 - Supports export to VCF, PNG, SVG, and clipboard copy.
 
-### 31) Wi-Fi QR Code Generator
+### 32) Wi-Fi QR Code Generator
 
 Path:
 - `wifi-qr-code-generator/index.html`
@@ -360,7 +371,7 @@ Features:
 - Escapes special characters and encodes non-ASCII SSIDs as UTF-8; validates SSID byte length and passphrase rules.
 - Exports PNG (512–2048 px) and SVG, and prints a Wi-Fi card (1, 2, 4, or 6 per page) or downloads it as PNG.
 
-### 32) WireGuard Config Generator
+### 33) WireGuard Config Generator
 
 Path:
 - `wireguard-config-generator/index.html`
@@ -370,7 +381,7 @@ Features:
 - Builds the server `wg0.conf` (Address, ListenPort, a `[Peer]` block with a /32 and optional /128 per client) and one client config per peer with DNS, MTU, full-tunnel or split-tunnel `AllowedIPs`, Endpoint and PersistentKeepalive, using only the keys the Android and iOS apps accept.
 - Per-client `.conf` download and QR code (SRI-pinned qrcode-generator, capacity checked), a ZIP of all configs, an optional iptables NAT example and setup steps; private and preshared keys never reach the URL, storage or the network.
 
-### 33) YAML JSON TOML Converter
+### 34) YAML JSON TOML Converter
 
 Path:
 - `yaml-json-toml-converter/index.html`
@@ -380,7 +391,7 @@ Features:
 - Useful for infra, app config, and serialization workflows.
 - Runs fully client-side without backend processing.
 
-### 34) ZFS and RAID Capacity Calculator
+### 35) ZFS and RAID Capacity Calculator
 
 Path:
 - `zfs-raid-capacity-calculator/index.html`
@@ -390,7 +401,7 @@ Features:
 - Space model ported from the OpenZFS 2.4.4 source: the whole-disk GPT partition, vdev labels and boot area, metaslab sizing, the RAIDZ allocation size per record (parity and padding), the 128K deflate ratio `zfs list` uses, and slop space with its 128 MiB / 128 GiB limits and the embedded intent-log metaslab. Shows raw, after parity/mirroring, after reserves, after padding, after slop and at the fill target in TB and TiB, plus the expected `zpool list` SIZE and `zfs list` USED + AVAIL.
 - Disks that may fail per vdev and for the pool (guaranteed versus best case), every valid layout for the disk count side by side, classic RAID 0/1/5/6/10 with mdadm notes, warnings that name the values and the fix (uneven splits, RAIDZ minimum widths, mixed sizes), a plain-text summary and the setup in the URL hash.
 
-### 35) Zigbee and Wi-Fi Channel Planner
+### 36) Zigbee and Wi-Fi Channel Planner
 
 Path:
 - `zigbee-wifi-channel-planner/index.html`
@@ -435,6 +446,7 @@ Then open:
 - `http://localhost:8080/regex-tester/`
 - `http://localhost:8080/robots-txt-generator-validator/`
 - `http://localhost:8080/sla-calculator/`
+- `http://localhost:8080/spf-dmarc-record-generator/`
 - `http://localhost:8080/subnet-calculator/`
 - `http://localhost:8080/text-diff-tool/`
 - `http://localhost:8080/traefik-docker-labels-generator/`
@@ -451,7 +463,7 @@ Then open:
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (1086 tests across 33 modules), powered by the built-in Node.js test runner
+tool (1157 tests across 34 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -504,7 +516,14 @@ the 802.11n and 802.11b transmit masks, grade thresholds at their exact
 edges, 20 versus 40 MHz and HT40+ versus HT40-, several access points,
 hand-worked picks for 1/6/11, 1/5/9/13, one AP on 6 and 40 MHz on 1+5,
 region channel sets, the channel 25/26 rules, Thread, invalid input and
-the URL hash), Traefik Docker labels (label output for every option, `$`
+the URL hash), SPF and DMARC records (the RFC 7208 grammar for every
+mechanism, modifier, qualifier, CIDR suffix and macro, including the RFC's
+own examples, IPv4 and IPv6 text forms, DNS-lookup counting across nested
+includes and redirects with loops and the limit of 10, multiple records,
+`+all`, `ptr`, redirect with all, every RFC 9989 tag with its default and
+invalid values, the removed `pct`/`rf`/`ri`, report URIs with size
+suffixes, external report authorization, dig/nslookup/zone-file input, both
+generators, 255-octet splitting, zone-file quoting and the URL hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats
