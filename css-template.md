@@ -266,6 +266,7 @@ Keep this list updated to avoid prefix collisions:
 | `jwt`  | JWT Decoder              | Built    |
 | `lxi`  | Proxmox LXC idmap Gen.   | Built    |
 | `mtx`  | Merge Text Tool          | Built    |
+| `ogm`  | Open Graph Meta Tag Gen. | Built    |
 | `pwg`  | Password Generator       | Built    |
 | `rbt`  | robots.txt Gen/Validator | Built    |
 | `rgx`  | Regex Tester             | Built    |

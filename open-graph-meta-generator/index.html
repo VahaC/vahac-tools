@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Graph Meta Tag Generator and Checker — Logs from VahaC</title>
+  <meta name="description" content="Free Open Graph meta tag generator and checker: build og:, X card, title, description and canonical tags, check the share image and find duplicate tags.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ogm-wrapper" id="ogm-wrapper">
+
+    <header class="ogm-header">
+      <h1 class="ogm-title">Open Graph Meta Tag Generator and Checker</h1>
+      <p class="ogm-subtitle">Build the <code class="ogm-code">&lt;title&gt;</code>, meta description, canonical link, Open Graph and X (Twitter) card tags for a page, check the share image against the sizes Meta, X and LinkedIn document, and see an approximate preview. Or paste a page's <code class="ogm-code">&lt;head&gt;</code> and get every tag listed with the missing, duplicate and conflicting ones, each with the fix and its source. Nothing is fetched or sent anywhere unless you ask this page to load an image URL.</p>
+    </header>
+
+    <div class="ogm-tabs" id="ogm-tabs" role="tablist" aria-label="Tool mode">
+      <button class="ogm-tab ogm-active" id="ogm-tab-gen" type="button" role="tab" aria-selected="true" aria-controls="ogm-panel-gen" onclick="ogmSetMode('gen')">Generate</button>
+      <button class="ogm-tab" id="ogm-tab-check" type="button" role="tab" aria-selected="false" aria-controls="ogm-panel-check" tabindex="-1" onclick="ogmSetMode('check')">Check</button>
+    </div>
+
+    <div class="ogm-panel" id="ogm-panel-gen" role="tabpanel" aria-labelledby="ogm-tab-gen">
+
+      <section class="ogm-card" aria-labelledby="ogm-h-page">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-page">Page</h2>
+          <span class="ogm-card-meta">title · description · canonical</span>
+        </div>
+        <div class="ogm-field">
+          <div class="ogm-label-row">
+            <label class="ogm-label" for="ogm-title">Page title (&lt;title&gt;)</label>
+            <span class="ogm-count" id="ogm-title-count"></span>
+          </div>
+          <input class="ogm-input" id="ogm-title" type="text" autocomplete="off" placeholder="Back Up a Home Server to a NAS — Example Blog">
+          <p class="ogm-field-msg" id="ogm-title-msg"></p>
+        </div>
+        <div class="ogm-field">
+          <div class="ogm-label-row">
+            <label class="ogm-label" for="ogm-ogtitle">Share title (og:title, optional)</label>
+            <span class="ogm-count" id="ogm-ogtitle-count"></span>
+          </div>
+          <input class="ogm-input" id="ogm-ogtitle" type="text" autocomplete="off" placeholder="Same as the page title">
+          <p class="ogm-hint">Meta asks for the title "without any branding such as your site name"; the site name has its own tag below. Leave this empty to reuse the page title.</p>
+          <p class="ogm-field-msg" id="ogm-ogtitle-msg"></p>
+        </div>
+        <div class="ogm-field">
+          <div class="ogm-label-row">
+            <label class="ogm-label" for="ogm-desc">Description</label>
+            <span class="ogm-count" id="ogm-desc-count"></span>
+          </div>
+          <textarea class="ogm-input ogm-textarea ogm-textarea--short" id="ogm-desc" rows="3" autocomplete="off" placeholder="One or two sentences about the page."></textarea>
+          <p class="ogm-hint">Written as the meta description and og:description. Google sets no length limit and shortens snippets to fit the screen; ogp.me suggests one to two sentences, Meta two to four.</p>
+          <p class="ogm-field-msg" id="ogm-desc-msg"></p>
+        </div>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-url">Canonical URL</label>
+          <input class="ogm-input" id="ogm-url" type="text" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://example.com/blog/home-server-backup/">
+          <p class="ogm-hint">The full address of the page, written as <code class="ogm-code">&lt;link rel="canonical"&gt;</code> and og:url. Leave out tracking parameters such as utm_source.</p>
+          <p class="ogm-field-msg" id="ogm-url-msg"></p>
+        </div>
+        <div class="ogm-grid">
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-site">Site name (og:site_name)</label>
+            <input class="ogm-input" id="ogm-site" type="text" autocomplete="off" placeholder="Example Blog">
+          </div>
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-locale">Locale (og:locale)</label>
+            <input class="ogm-input" id="ogm-locale" type="text" list="ogm-locales" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="en_US">
+            <datalist id="ogm-locales">
+              <option value="en_US"></option>
+              <option value="en_GB"></option>
+              <option value="de_DE"></option>
+              <option value="fr_FR"></option>
+              <option value="es_ES"></option>
+              <option value="it_IT"></option>
+              <option value="nl_NL"></option>
+              <option value="pl_PL"></option>
+              <option value="pt_BR"></option>
+              <option value="uk_UA"></option>
+            </datalist>
+            <p class="ogm-field-msg" id="ogm-locale-msg"></p>
+          </div>
+        </div>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-altlocales">Other languages of this page (og:locale:alternate, optional)</label>
+          <input class="ogm-input" id="ogm-altlocales" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="de_DE, fr_FR">
+          <p class="ogm-hint">Locales use the language_TERRITORY form of ogp.me, such as en_US; leave the locale empty and consumers assume en_US.</p>
+          <p class="ogm-field-msg" id="ogm-altlocales-msg"></p>
+        </div>
+        <label class="ogm-check" for="ogm-basics">
+          <input class="ogm-check-input" type="checkbox" id="ogm-basics">
+          <span class="ogm-check-text"><span class="ogm-check-main">Include <code class="ogm-code">&lt;title&gt;</code>, meta description and canonical link</span>
+            <span class="ogm-check-sub">Turn this off when your template or CMS already writes them and you only need the social tags.</span>
+          </span>
+        </label>
+      </section>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-type">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-type">Content type</h2>
+          <span class="ogm-card-meta">og:type</span>
+        </div>
+        <div class="ogm-segment ogm-segment--2" role="radiogroup" aria-label="og:type">
+          <label class="ogm-seg-opt">
+            <input class="ogm-seg-input" type="radio" name="ogm-type" value="website">
+            <span class="ogm-seg-text">website</span>
+          </label>
+          <label class="ogm-seg-opt">
+            <input class="ogm-seg-input" type="radio" name="ogm-type" value="article">
+            <span class="ogm-seg-text">article</span>
+          </label>
+        </div>
+        <p class="ogm-hint">ogp.me treats any page without a type as website, and so does Meta. Choose article for blog posts and news; it adds the article: properties below.</p>
+        <div class="ogm-article" id="ogm-article">
+          <div class="ogm-grid">
+            <div class="ogm-field">
+              <label class="ogm-label" for="ogm-pub">Published (article:published_time)</label>
+              <div class="ogm-input-row">
+                <input class="ogm-input" id="ogm-pub" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="2026-10-27T09:00:00+02:00">
+                <button class="ogm-btn ogm-btn--secondary ogm-btn--small" type="button" onclick="ogmNow('pub')">Now</button>
+              </div>
+              <p class="ogm-field-msg" id="ogm-pub-msg"></p>
+            </div>
+            <div class="ogm-field">
+              <label class="ogm-label" for="ogm-mod">Last changed (article:modified_time)</label>
+              <div class="ogm-input-row">
+                <input class="ogm-input" id="ogm-mod" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="optional">
+                <button class="ogm-btn ogm-btn--secondary ogm-btn--small" type="button" onclick="ogmNow('mod')">Now</button>
+              </div>
+              <p class="ogm-field-msg" id="ogm-mod-msg"></p>
+            </div>
+          </div>
+          <p class="ogm-hint">ISO 8601, as ogp.me requires: a date such as 2026-10-27, or a date and time with a time zone offset such as +02:00 or Z. "Now" fills in this device's current time and offset.</p>
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-author">Author (article:author, optional)</label>
+            <input class="ogm-input" id="ogm-author" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://example.com/about/">
+            <p class="ogm-hint">ogp.me types this as a profile array, so the value is the URL of an author page. Separate several with commas.</p>
+            <p class="ogm-field-msg" id="ogm-author-msg"></p>
+          </div>
+          <div class="ogm-grid">
+            <div class="ogm-field">
+              <label class="ogm-label" for="ogm-section">Section (article:section)</label>
+              <input class="ogm-input" id="ogm-section" type="text" autocomplete="off" placeholder="Homelab">
+            </div>
+            <div class="ogm-field">
+              <label class="ogm-label" for="ogm-tags">Tags (article:tag)</label>
+              <input class="ogm-input" id="ogm-tags" type="text" autocomplete="off" placeholder="backup, NAS">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-image">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-image">Share image</h2>
+          <span class="ogm-card-meta">og:image</span>
+        </div>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-img">Image URL</label>
+          <input class="ogm-input" id="ogm-img" type="text" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://example.com/images/home-server-backup-1200x630.jpg">
+          <p class="ogm-field-msg" id="ogm-img-msg"></p>
+        </div>
+        <div class="ogm-grid ogm-grid--3">
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-img-w">Width in pixels</label>
+            <input class="ogm-input" id="ogm-img-w" type="text" inputmode="numeric" autocomplete="off" placeholder="1200">
+          </div>
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-img-h">Height in pixels</label>
+            <input class="ogm-input" id="ogm-img-h" type="text" inputmode="numeric" autocomplete="off" placeholder="630">
+          </div>
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-img-type">Type (og:image:type)</label>
+            <select class="ogm-input ogm-select" id="ogm-img-type">
+              <option value="auto">From the file extension</option>
+              <option value="image/jpeg">image/jpeg</option>
+              <option value="image/png">image/png</option>
+              <option value="image/webp">image/webp</option>
+              <option value="image/gif">image/gif</option>
+              <option value="none">Leave out</option>
+            </select>
+          </div>
+        </div>
+        <p class="ogm-field-msg" id="ogm-img-dim-msg"></p>
+        <p class="ogm-field-msg" id="ogm-img-type-msg"></p>
+        <div class="ogm-field">
+          <div class="ogm-label-row">
+            <label class="ogm-label" for="ogm-img-alt">Image description (og:image:alt)</label>
+            <span class="ogm-count" id="ogm-img-alt-count"></span>
+          </div>
+          <input class="ogm-input" id="ogm-img-alt" type="text" autocomplete="off" placeholder="What the image shows">
+          <p class="ogm-hint">Describe what is in the image, not a caption (ogp.me). X reads it as the image's alt text when twitter:image:alt is not set.</p>
+          <p class="ogm-field-msg" id="ogm-img-alt-msg"></p>
+        </div>
+
+        <div class="ogm-subcard">
+          <h3 class="ogm-sub">Check the image</h3>
+          <p class="ogm-text">Choose the image file from your computer to read its pixel size, file size and type and compare them with what each platform documents. The file stays on your device.</p>
+          <div class="ogm-file-row">
+            <input class="ogm-file-input" id="ogm-file" type="file" accept="image/*">
+            <label class="ogm-btn ogm-btn--secondary ogm-file-label" for="ogm-file">Choose image file</label>
+            <button class="ogm-btn ogm-btn--secondary" type="button" onclick="ogmLoadUrlImage()">Load the image URL</button>
+          </div>
+          <p class="ogm-hint">"Load the image URL" makes your browser request the image URL above from its server, which sees your IP address as with any visit. It reads only the pixel size; the file size and type would need a download this page does not make. Nothing is requested until you press it.</p>
+          <p class="ogm-field-msg" id="ogm-load-msg"></p>
+          <div class="ogm-imgcheck" id="ogm-imgcheck" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-x">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-x">X (Twitter) card</h2>
+          <span class="ogm-card-meta">twitter:card</span>
+        </div>
+        <div class="ogm-segment" role="radiogroup" aria-label="X card type">
+          <label class="ogm-seg-opt">
+            <input class="ogm-seg-input" type="radio" name="ogm-card" value="summary_large_image">
+            <span class="ogm-seg-text">Large image</span>
+          </label>
+          <label class="ogm-seg-opt">
+            <input class="ogm-seg-input" type="radio" name="ogm-card" value="summary">
+            <span class="ogm-seg-text">Small image</span>
+          </label>
+          <label class="ogm-seg-opt">
+            <input class="ogm-seg-input" type="radio" name="ogm-card" value="none">
+            <span class="ogm-seg-text">No X tags</span>
+          </label>
+        </div>
+        <p class="ogm-note-box" id="ogm-card-note"></p>
+        <div class="ogm-grid" id="ogm-x-fields">
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-tsite">Site account (twitter:site)</label>
+            <input class="ogm-input" id="ogm-tsite" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="@yoursite">
+            <p class="ogm-field-msg" id="ogm-tsite-msg"></p>
+          </div>
+          <div class="ogm-field">
+            <label class="ogm-label" for="ogm-tcreator">Author account (twitter:creator)</label>
+            <input class="ogm-input" id="ogm-tcreator" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="@author">
+            <p class="ogm-field-msg" id="ogm-tcreator-msg"></p>
+          </div>
+        </div>
+        <label class="ogm-check" for="ogm-trepeat">
+          <input class="ogm-check-input" type="checkbox" id="ogm-trepeat">
+          <span class="ogm-check-text"><span class="ogm-check-main">Also write twitter:title, twitter:description, twitter:image and twitter:image:alt</span>
+            <span class="ogm-check-sub">Usually not needed: X falls back to og:title, og:description, og:image and og:image:alt when its own tags are missing. Turn it on only when another tool expects them.</span>
+          </span>
+        </label>
+      </section>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-fb">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-fb">Facebook app ID (optional)</h2>
+          <span class="ogm-card-meta">fb:app_id</span>
+        </div>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-fbapp">App ID</label>
+          <input class="ogm-input" id="ogm-fbapp" type="text" inputmode="numeric" autocomplete="off" placeholder="leave empty if you do not use Facebook Insights">
+          <p class="ogm-hint">Meta's guide asks for it only to use Facebook Insights, its traffic analytics. Find it in the App Dashboard.</p>
+          <p class="ogm-field-msg" id="ogm-fbapp-msg"></p>
+        </div>
+      </section>
+
+      <section class="ogm-card ogm-card--out" aria-labelledby="ogm-h-out">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-out">Your &lt;head&gt; tags</h2>
+          <button class="ogm-btn ogm-btn--small" type="button" onclick="ogmCopyOutput()">Copy tags</button>
+        </div>
+        <pre class="ogm-pre ogm-pre--out" id="ogm-out" aria-live="polite"></pre>
+        <ul class="ogm-issues" id="ogm-out-issues"></ul>
+        <p class="ogm-note-box ogm-note-box--warn"><strong>Using WordPress?</strong> SEO plugins such as Rank Math and Yoast SEO already print the title, meta description, canonical link, Open Graph and X tags. Pasting this block into your theme as well gives every page two sets. Fill in the plugin's own social fields instead, or switch its output off first; the Check tab shows such duplicates.</p>
+      </section>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-preview">
+        <div class="ogm-card-head">
+          <h2 class="ogm-card-title" id="ogm-h-preview">Preview</h2>
+          <span class="ogm-card-meta">approximation</span>
+        </div>
+        <p class="ogm-hint">These boxes only show which title, description, image and domain a link preview would use, in a large-image and a small-image layout. Real apps use their own fonts, crops and line limits, which differ by device and change over time, so where the text is cut here is not a platform limit. For a real preview, use the debuggers listed on the Check tab.</p>
+        <div class="ogm-previews" id="ogm-preview"></div>
+      </section>
+
+      <div class="ogm-actions">
+        <button class="ogm-btn" type="button" onclick="ogmCheckGenerated()">Check these tags</button>
+        <button class="ogm-btn ogm-btn--secondary" type="button" onclick="ogmCopyLink()">Copy link to these settings</button>
+        <button class="ogm-btn ogm-btn--secondary" type="button" onclick="ogmReset()">Reset to example</button>
+      </div>
+      <p class="ogm-hint">The link keeps everything you typed above in the part after #. Browsers do not send that part to any server, but anyone you share the link with can read it. The image file is never part of it.</p>
+    </div>
+
+    <div class="ogm-panel ogm-hidden" id="ogm-panel-check" role="tabpanel" aria-labelledby="ogm-tab-check">
+      <section class="ogm-card" aria-labelledby="ogm-h-check">
+        <h2 class="ogm-card-title" id="ogm-h-check">Check a page's tags</h2>
+        <p class="ogm-text">Paste the page's <code class="ogm-code">&lt;head&gt;</code> or its whole source (View Source, Ctrl+U or Cmd+Option+U in most browsers, then select all and copy). This page reads only what you paste; it never fetches your site.</p>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-check-url">Page address (optional)</label>
+          <input class="ogm-input" id="ogm-check-url" type="text" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://example.com/blog/home-server-backup/">
+          <p class="ogm-hint">Used to show what relative URLs would resolve to and whether the page is served over HTTPS. Without it, the canonical link or og:url is used.</p>
+        </div>
+        <div class="ogm-field">
+          <label class="ogm-label" for="ogm-check-input">HTML</label>
+          <textarea class="ogm-input ogm-textarea" id="ogm-check-input" rows="12" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="&lt;head&gt;&#10;&lt;title&gt;…&lt;/title&gt;&#10;&lt;meta property=&quot;og:title&quot; content=&quot;…&quot;&gt;&#10;…&#10;&lt;/head&gt;"></textarea>
+        </div>
+        <div class="ogm-chips">
+          <span class="ogm-chips-label">Examples:</span>
+          <button class="ogm-chip" type="button" data-ogm-example="plugin">Theme and plugin both print tags</button>
+          <button class="ogm-chip" type="button" data-ogm-example="bare">Only title and description</button>
+          <button class="ogm-chip" type="button" data-ogm-example="good">Tags from the generator</button>
+          <button class="ogm-chip ogm-chip--clear" type="button" onclick="ogmClearCheck()">Clear</button>
+        </div>
+        <details class="ogm-details">
+          <summary class="ogm-details-sum">Getting the HTML from a terminal</summary>
+          <pre class="ogm-pre">curl -sL https://example.com/page/ -o page.html
+curl -sL -A "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" https://example.com/page/ -o page-meta.html</pre>
+          <p class="ogm-hint">Open the file in a text editor and paste its contents here. The second command sends the user agent of Meta's crawler, which Meta's guide suggests for testing whether your server answers it properly. Some servers send crawlers different HTML; the debuggers below show what each platform actually received.</p>
+        </details>
+      </section>
+
+      <div class="ogm-results" id="ogm-check-results" aria-live="polite"></div>
+
+      <section class="ogm-card" aria-labelledby="ogm-h-debug">
+        <h2 class="ogm-card-title" id="ogm-h-debug">See what each platform scraped</h2>
+        <ul class="ogm-notes">
+          <li class="ogm-note"><strong><a class="ogm-link" href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener noreferrer">Meta Sharing Debugger</a></strong> shows the tags Meta's crawler read with its errors and warnings, and scrapes the page again, which refreshes Meta's cached preview sooner than its standard 24-hour update period. Meta caches images by URL: publish a changed image under a new URL.</li>
+          <li class="ogm-note"><strong><a class="ogm-link" href="https://www.linkedin.com/post-inspector/" target="_blank" rel="noopener noreferrer">LinkedIn Post Inspector</a></strong> refreshes LinkedIn's cached preview for the URL. Posts that already include the link keep their old preview.</li>
+          <li class="ogm-note"><strong>X</strong>: its Cards documentation is no longer on developer.x.com (checked October 2026). The archived guide says X caches card content for 7 days after a link is posted and re-reads the tags roughly every seven days.</li>
+        </ul>
+        <div class="ogm-actions">
+          <button class="ogm-btn ogm-btn--secondary" type="button" onclick="ogmCopyPageUrl()">Copy the page URL</button>
+        </div>
+        <p class="ogm-hint">The links open each tool's start page, where you paste the URL. Using them sends your page address to that platform, which then fetches the page.</p>
+      </section>
+    </div>
+
+    <section class="ogm-card" aria-labelledby="ogm-h-notes">
+      <h2 class="ogm-card-title" id="ogm-h-notes">Good to know</h2>
+      <ul class="ogm-notes">
+        <li class="ogm-note"><strong>X reads Open Graph.</strong> When a twitter: tag is missing, X uses og:title, og:description, og:image and og:image:alt instead, and its parser also accepts the property attribute of Open Graph markup. So a page needs little more than twitter:card on top of its og: tags. Open Graph tags use <code class="ogm-code">property=</code>, X tags <code class="ogm-code">name=</code>.</li>
+        <li class="ogm-note"><strong>First or last wins.</strong> ogp.me gives the first of several values preference, and repeated og:image tags are a list with the first preferred. For twitter:card, X uses the last one on the page.</li>
+        <li class="ogm-note"><strong>Google writes its own title links and snippets.</strong> It publishes no character limit for either and shortens them to fit the device; og:title is one of the sources it may use for a title link.</li>
+        <li class="ogm-note"><strong>Crawlers must reach the page and the image.</strong> X's crawler follows robots.txt, so a blocked page gets no card and a blocked image no picture. Meta reads Open Graph tags only within the first 1 MB of the page, and LinkedIn notes that a site blocking it or an image in a protected directory stops the preview.</li>
+        <li class="ogm-note"><strong>Not covered:</strong> JSON-LD structured data, oEmbed, X app and player cards, and video and audio tags beyond URL checks. Previews in chat apps such as Slack, Discord, Telegram and WhatsApp are not modelled, because this tool only applies rules a platform documents.</li>
+      </ul>
+    </section>
+
+    <details class="ogm-sources">
+      <summary class="ogm-sources-sum">Sources</summary>
+      <ul class="ogm-source-list">
+        <li><a class="ogm-link" href="https://ogp.me/" target="_blank" rel="noopener noreferrer">The Open Graph protocol</a> (ogp.me, read 27 October 2026): the four required properties, optional metadata, structured og:image properties, arrays, object types and article:*, and the data types (URL values use http:// or https://, DateTime is ISO 8601).</li>
+        <li>Meta for Developers, read 27 October 2026: <a class="ogm-link" href="https://developers.facebook.com/docs/sharing/webmasters/" target="_blank" rel="noopener noreferrer">A Guide to Sharing for Webmasters</a> (updated 30 June 2026), <a class="ogm-link" href="https://developers.facebook.com/docs/sharing/webmasters/images/" target="_blank" rel="noopener noreferrer">Images in Link Shares</a> (updated 30 June 2026), <a class="ogm-link" href="https://developers.facebook.com/docs/sharing/best-practices/" target="_blank" rel="noopener noreferrer">Sharing best practices</a> (updated 23 February 2022) and <a class="ogm-link" href="https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/" target="_blank" rel="noopener noreferrer">Meta Web Crawlers</a> (the 1 MB limit).</li>
+        <li>X Cards documentation, no longer on developer.x.com and read in Internet Archive copies: <a class="ogm-link" href="https://web.archive.org/web/20260116124848/https://developer.x.com/en/docs/x-for-websites/cards/overview/markup" target="_blank" rel="noopener noreferrer">Cards markup reference</a> (January 2026; the 70, 200 and 420 character maximums and the Open Graph fallbacks), <a class="ogm-link" href="https://web.archive.org/web/20251101000000/https://developer.x.com/en/docs/x-for-websites/cards/guides/getting-started" target="_blank" rel="noopener noreferrer">Getting started</a>, <a class="ogm-link" href="https://web.archive.org/web/20251101000000/https://developer.x.com/en/docs/x-for-websites/cards/overview/summary" target="_blank" rel="noopener noreferrer">Summary card</a>, <a class="ogm-link" href="https://web.archive.org/web/20251101000000/https://developer.x.com/en/docs/x-for-websites/cards/overview/summary-card-with-large-image" target="_blank" rel="noopener noreferrer">Summary card with large image</a> and <a class="ogm-link" href="https://web.archive.org/web/20251101000000/https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards" target="_blank" rel="noopener noreferrer">Troubleshooting</a> (October 2025); the live <a class="ogm-link" href="https://docs.x.com/developer-terms/policy" target="_blank" rel="noopener noreferrer">X Developer Policy</a> (HTTPS for all card assets) and <a class="ogm-link" href="https://help.x.com/en/managing-your-account/change-x-handle" target="_blank" rel="noopener noreferrer">X Help on usernames</a>.</li>
+        <li>LinkedIn Help, read 27 October 2026: <a class="ogm-link" href="https://www.linkedin.com/help/linkedin/answer/a521928" target="_blank" rel="noopener noreferrer">Make your website shareable on LinkedIn</a> (required og: tags, 1200 x 627 minimum, 1.91:1, 5 MB) and <a class="ogm-link" href="https://www.linkedin.com/help/linkedin/answer/a6233775" target="_blank" rel="noopener noreferrer">Use Post Inspector to refresh URL</a>.</li>
+        <li>Google Search Central: <a class="ogm-link" href="https://developers.google.com/search/docs/appearance/title-link" target="_blank" rel="noopener noreferrer">title links</a> (updated 10 December 2025), <a class="ogm-link" href="https://developers.google.com/search/docs/appearance/snippet" target="_blank" rel="noopener noreferrer">snippets and meta descriptions</a> (updated 20 April 2026) and <a class="ogm-link" href="https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls" target="_blank" rel="noopener noreferrer">canonical URLs</a> (updated 10 July 2026).</li>
+        <li>HTML Living Standard (WHATWG): <a class="ogm-link" href="https://html.spec.whatwg.org/multipage/semantics.html#the-title-element" target="_blank" rel="noopener noreferrer">the title element</a> (one per document), <a class="ogm-link" href="https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element" target="_blank" rel="noopener noreferrer">the meta element</a> and the <a class="ogm-link" href="https://html.spec.whatwg.org/multipage/semantics.html#meta-description" target="_blank" rel="noopener noreferrer">description</a> name (one per document), and <a class="ogm-link" href="https://html.spec.whatwg.org/multipage/syntax.html#attributes-2" target="_blank" rel="noopener noreferrer">attribute syntax</a>.</li>
+        <li>File sizes given in MB are checked as millions of bytes, the stricter reading. An aspect ratio within 5% of the documented one counts as close here; that tolerance is this tool's choice, not a platform rule.</li>
+      </ul>
+    </details>
+
+    <p class="ogm-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+
+    <div class="ogm-toast" id="ogm-toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
