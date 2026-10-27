@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Assistant Automation Schedule Visualizer — Logs from VahaC</title>
+  <meta name="description" content="Free Home Assistant automation schedule visualizer: see the next runs and a 7-day timeline for time, time pattern and sun triggers with time and sun conditions, DST included.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hav-wrapper" id="hav-wrapper">
+
+    <header class="hav-header">
+      <h1 class="hav-title">Home Assistant Automation Schedule Visualizer</h1>
+      <p class="hav-subtitle">Build an automation in the form or paste its YAML, with time, time pattern and sun triggers plus time, sun and trigger conditions. The visualizer runs ports of Home Assistant 2026.10.4's own scheduling code and of astral 2.2, the sun library it uses, lists the next runs with the trigger that fired and whether the conditions let it through, draws a seven-day timeline, and explains the tricky parts: what <span class="hav-code">/5</span> matches, the minute and second defaults, windows that cross midnight and days when the clocks change.</p>
+    </header>
+
+    <section class="hav-card" id="hav-settings" aria-labelledby="hav-h-home">
+      <div class="hav-card-head">
+        <h2 class="hav-card-title" id="hav-h-home">Home Assistant settings</h2>
+        <span class="hav-card-meta">Settings → System → General</span>
+      </div>
+      <div class="hav-grid">
+        <div class="hav-field hav-field--wide">
+          <label class="hav-label" for="hav-tz">Time zone</label>
+          <select class="hav-input hav-select" id="hav-tz"></select>
+        </div>
+        <div class="hav-field hav-field--wide">
+          <label class="hav-label" for="hav-loc-preset">Example location</label>
+          <select class="hav-input hav-select" id="hav-loc-preset"></select>
+        </div>
+      </div>
+      <p class="hav-hint">The zone starts as your browser's. Home Assistant uses the zone set in its own settings, so choose the same one here.</p>
+      <div class="hav-grid hav-grid--3">
+        <div class="hav-field">
+          <label class="hav-label" for="hav-lat">Latitude</label>
+          <input class="hav-input" id="hav-lat" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="50.4501">
+        </div>
+        <div class="hav-field">
+          <label class="hav-label" for="hav-lon">Longitude</label>
+          <input class="hav-input" id="hav-lon" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="30.5234">
+        </div>
+        <div class="hav-field">
+          <label class="hav-label" for="hav-elev">Elevation (m)</label>
+          <input class="hav-input" id="hav-elev" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0">
+        </div>
+      </div>
+      <label class="hav-check"><input class="hav-check-input" type="checkbox" id="hav-keep-loc"><span class="hav-check-text">Put latitude and longitude in the share link</span></label>
+      <p class="hav-hint">Only sun triggers and sun conditions need a location. It stays on this page and is left out of the link unless you tick the box.</p>
+    </section>
+
+    <section class="hav-card" aria-labelledby="hav-h-auto">
+      <div class="hav-card-head">
+        <h2 class="hav-card-title" id="hav-h-auto">Automation</h2>
+        <div class="hav-tabs" role="tablist" aria-label="How to enter the automation">
+          <button type="button" class="hav-tab hav-active" id="hav-tab-form" role="tab" aria-selected="true" aria-controls="hav-panel-form" onclick="havSetMode('form')">Build in a form</button>
+          <button type="button" class="hav-tab" id="hav-tab-yaml" role="tab" aria-selected="false" aria-controls="hav-panel-yaml" onclick="havSetMode('yaml')">Paste YAML</button>
+        </div>
+      </div>
+
+      <div class="hav-panel" id="hav-panel-form" role="tabpanel" aria-labelledby="hav-tab-form">
+        <div class="hav-field">
+          <label class="hav-label" for="hav-alias">Name (alias)</label>
+          <input class="hav-input hav-input--sans" id="hav-alias" type="text" autocomplete="off" spellcheck="false">
+        </div>
+        <h3 class="hav-sub-title">Triggers</h3>
+        <div class="hav-items" id="hav-trig-list"></div>
+        <div class="hav-add-row">
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havAddTrigger('time')">+ Time</button>
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havAddTrigger('pattern')">+ Time pattern</button>
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havAddTrigger('sun')">+ Sun</button>
+        </div>
+        <h3 class="hav-sub-title">Conditions</h3>
+        <div class="hav-items" id="hav-cond-list"></div>
+        <div class="hav-add-row">
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havAddCondition('time')">+ Time window</button>
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havAddCondition('sun')">+ Sun</button>
+        </div>
+      </div>
+
+      <div class="hav-panel hav-hidden" id="hav-panel-yaml" role="tabpanel" aria-labelledby="hav-tab-yaml">
+        <div class="hav-grid">
+          <div class="hav-field hav-field--wide">
+            <label class="hav-label" for="hav-example">Examples</label>
+            <select class="hav-input hav-select" id="hav-example"></select>
+          </div>
+          <div class="hav-field hav-field--wide hav-hidden" id="hav-pick-wrap">
+            <label class="hav-label" for="hav-pick">Automation to simulate</label>
+            <select class="hav-input hav-select" id="hav-pick"></select>
+          </div>
+        </div>
+        <label class="hav-label" for="hav-yaml">Automation YAML</label>
+        <textarea class="hav-input hav-textarea" id="hav-yaml" spellcheck="false" autocomplete="off" placeholder="alias: Night check&#10;triggers:&#10;  - trigger: time_pattern&#10;    minutes: &quot;/5&quot;&#10;conditions:&#10;  - condition: time&#10;    after: &quot;22:00:00&quot;&#10;    before: &quot;06:00:00&quot;&#10;actions: []"></textarea>
+        <div class="hav-add-row">
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" id="hav-to-form" onclick="havYamlToForm()" disabled>Edit in the form</button>
+          <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havClearYaml()">Clear</button>
+        </div>
+        <p class="hav-hint">Paste one automation, a whole <span class="hav-code">automations.yaml</span> (then pick one), or just a list of triggers. The YAML is read with the YAML 1.1 rules Home Assistant applies to files on disk. It stays on this page and is never put in the share link.</p>
+      </div>
+
+      <ul class="hav-issues" id="hav-issues" aria-live="polite"></ul>
+    </section>
+
+    <section class="hav-card" aria-labelledby="hav-h-runs">
+      <div class="hav-card-head">
+        <h2 class="hav-card-title" id="hav-h-runs">Next runs</h2>
+      </div>
+      <div class="hav-grid hav-grid--runs">
+        <div class="hav-field">
+          <label class="hav-label" for="hav-start">Start (local time in that zone)</label>
+          <div class="hav-inline">
+            <input class="hav-input" id="hav-start" type="datetime-local" step="60">
+            <button type="button" class="hav-btn hav-btn--secondary hav-btn--small" onclick="havStartNow()">Now</button>
+          </div>
+        </div>
+        <div class="hav-field">
+          <label class="hav-label" for="hav-list-limit">Show</label>
+          <select class="hav-input hav-select" id="hav-list-limit">
+            <option value="20">Next 20 runs</option>
+            <option value="50">Next 50 runs</option>
+            <option value="100">Next 100 runs</option>
+          </select>
+        </div>
+        <div class="hav-field">
+          <label class="hav-label" for="hav-list-filter">Runs</label>
+          <select class="hav-input hav-select" id="hav-list-filter">
+            <option value="all">All, with blocked ones</option>
+            <option value="fired">Only those that go through</option>
+          </select>
+        </div>
+      </div>
+      <div id="hav-summary"></div>
+      <div class="hav-runs" id="hav-run-list"></div>
+    </section>
+
+    <section class="hav-card" aria-labelledby="hav-h-week">
+      <div class="hav-card-head">
+        <h2 class="hav-card-title" id="hav-h-week">Week timeline</h2>
+        <span class="hav-card-meta" id="hav-week-meta"></span>
+      </div>
+      <ul class="hav-legend" aria-label="Timeline colours">
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--fired"></span>Goes through</li>
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--blocked"></span>Blocked by conditions</li>
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--mixed"></span>Some of each</li>
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--unknown"></span>Depends on a condition that is not simulated</li>
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--gap"></span>Hour skipped (clocks forward)</li>
+        <li class="hav-legend-item"><span class="hav-swatch hav-swatch--rep"></span>Hour repeated (clocks back)</li>
+      </ul>
+      <div class="hav-tl-scroll">
+        <div class="hav-timeline" id="hav-timeline"></div>
+      </div>
+      <div id="hav-tl-note"></div>
+      <p class="hav-hint">Each cell is one local hour and shows how many times a trigger fires in it. Select a cell to list those runs.</p>
+      <div class="hav-cell-detail hav-hidden" id="hav-cell-detail" aria-live="polite"></div>
+    </section>
+
+    <section class="hav-card" aria-labelledby="hav-h-explain">
+      <h2 class="hav-card-title" id="hav-h-explain">How Home Assistant reads this automation</h2>
+      <ul class="hav-notes" id="hav-notes"></ul>
+      <div class="hav-hidden" id="hav-notsim-wrap">
+        <h3 class="hav-sub-title">Not simulated</h3>
+        <ul class="hav-notes" id="hav-notsim"></ul>
+      </div>
+    </section>
+
+    <section class="hav-card" id="hav-out-card" aria-labelledby="hav-h-out">
+      <div class="hav-card-head">
+        <h2 class="hav-card-title" id="hav-h-out">YAML for this automation</h2>
+        <button type="button" class="hav-btn hav-btn--small" onclick="havCopyYaml()">&#128203; Copy YAML</button>
+      </div>
+      <label class="hav-check"><input class="hav-check-input" type="checkbox" id="hav-legacy-sun"><span class="hav-check-text">Write sunrise and sunset as the older <span class="hav-code">trigger: sun</span> (works on every version; <span class="hav-code">sun.sunset</span> with <span class="hav-code">offset_type</span> needs 2026.8 or later)</span></label>
+      <pre class="hav-pre" id="hav-yaml-out"></pre>
+      <p class="hav-hint">In Home Assistant, open the automation, choose ⋮ → Edit in YAML, and paste it; then add your actions. It uses the current spelling: <span class="hav-code">triggers:</span>, <span class="hav-code">trigger:</span>, <span class="hav-code">conditions:</span> and <span class="hav-code">actions:</span> (Home Assistant 2024.10 and later).</p>
+    </section>
+
+    <section class="hav-card" aria-labelledby="hav-h-how">
+      <h2 class="hav-card-title" id="hav-h-how">How the visualizer works</h2>
+      <ul class="hav-facts">
+        <li class="hav-fact"><strong>Ported from source.</strong> The matcher is a line-by-line port of <span class="hav-code">find_next_time_expression_time</span> from Home Assistant 2026.10.4 (<span class="hav-code">homeassistant/util/dt.py</span>), driven the way <span class="hav-code">helpers/event.py</span> drives it: after each run it looks for the next match from one second later. It passes the DST cases in Home Assistant's own tests. Validation follows <span class="hav-code">triggers/time.py</span>, <span class="hav-code">triggers/time_pattern.py</span>, <span class="hav-code">sun/trigger.py</span>, <span class="hav-code">sun/condition.py</span> and the time condition in <span class="hav-code">helpers/condition.py</span>.</li>
+        <li class="hav-fact"><strong>Sun times.</strong> A port of astral 2.2 (the version Home Assistant pins): sunrise and sunset are the moments the sun's upper edge meets the horizon, with astral's refraction formula and the horizon dip for your elevation. The port matches the reference times in Home Assistant's own tests to the microsecond. astral's tests accept a minute of difference from published tables, and Home Assistant notes that its rise and set times get unstable where the sun only grazes the horizon near the poles.</li>
+        <li class="hav-fact"><strong>Time of each run.</strong> Runs show the second a trigger fires. Home Assistant adds a random 0.05 to 0.5 seconds to every time and time pattern run to spread the load, which conditions with whole-second times never notice.</li>
+        <li class="hav-fact"><strong>YAML.</strong> A small parser with PyYAML's YAML 1.1 rules, like Home Assistant's loader for files on disk: an unquoted <span class="hav-code">19:45:00</span> is the number 71100 and <span class="hav-code">010</span> is octal 8. The automation editor's YAML mode parses in your browser with a YAML 1.2 library, where such values stay text. Anchors, aliases and several documents in one paste are refused with a message.</li>
+        <li class="hav-fact"><strong>Not simulated.</strong> Times from helpers, sensors or templates, state and event triggers and conditions, the newer sun triggers other than sunrise, sunset, dawn and dusk, automation modes, and runs missed while Home Assistant is offline. Each one the visualizer meets is listed instead of guessed.</li>
+      </ul>
+      <p class="hav-hint">Sources: <a class="hav-link" href="https://www.home-assistant.io/triggers/time/" target="_blank" rel="noopener">time trigger</a>, <a class="hav-link" href="https://www.home-assistant.io/triggers/time_pattern/" target="_blank" rel="noopener">time pattern trigger</a>, <a class="hav-link" href="https://www.home-assistant.io/triggers/sun.sunrise/" target="_blank" rel="noopener">sunrise trigger</a>, <a class="hav-link" href="https://www.home-assistant.io/conditions/time/" target="_blank" rel="noopener">time condition</a>, <a class="hav-link" href="https://www.home-assistant.io/conditions/sun/" target="_blank" rel="noopener">sun condition</a>, <a class="hav-link" href="https://github.com/home-assistant/core/blob/2026.10.4/homeassistant/util/dt.py" target="_blank" rel="noopener">dt.py at 2026.10.4</a>, <a class="hav-link" href="https://github.com/sffjunkie/astral/blob/2.2/src/astral/sun.py" target="_blank" rel="noopener">astral 2.2 sun.py</a>.</p>
+    </section>
+
+    <div class="hav-actions">
+      <button type="button" class="hav-btn" onclick="havCopyLink()">&#128279; Copy link to this setup</button>
+      <button type="button" class="hav-btn hav-btn--secondary" onclick="havReset()">Reset</button>
+    </div>
+
+    <footer class="hav-footer">
+      Built by <a class="hav-link" href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.
+    </footer>
+
+    <div class="hav-toast" id="hav-toast" role="status" aria-live="polite">Copied</div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
