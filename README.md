@@ -6,7 +6,7 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-27 (Backup Retention (Prune) Simulator added)
+- Last updated: 2026-10-27 (Zigbee and Wi-Fi Channel Planner added)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -45,6 +45,7 @@ Documentation status:
 - `wireguard-config-generator/` - WireGuard server and client configs: X25519 key pairs and preshared keys made in the browser, an IPv4 (and optional IPv6) address plan, full or split tunnel, the server `wg0.conf` with a `[Peer]` block per client, and a `.conf` download and QR code per client.
 - `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
 - `zfs-raid-capacity-calculator/` - usable ZFS pool capacity in TB and TiB for stripe, 2/3/4-way mirror and RAIDZ1/2/3 layouts with any number of vdevs, mixed disk sizes and hot spares: raw, after parity or mirroring, after ZFS reserves and RAIDZ padding at a chosen record size and ashift, after slop space and at a target fill level, using OpenZFS 2.4.4 space accounting; disks that may fail (guaranteed and best case), every layout the disks allow side by side, and classic RAID 0/1/5/6/10.
+- `zigbee-wifi-channel-planner/` - Zigbee channel planning next to 2.4 GHz Wi-Fi: your own and neighbouring access points (20 MHz, or 40 MHz with HT40+/HT40-) for the US, Europe or Japan drawn to scale with Zigbee channels 11–26 on the 802.11 transmit masks, every Zigbee channel graded clear, marginal or overlapped with the gap to the nearest Wi-Fi edge, a recommended channel and runner-up, a Thread channel, channel 25/26 caveats, and the Zigbee2MQTT, ZHA and Thread steps to change channel.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
 ## Tool Overview
@@ -389,6 +390,16 @@ Features:
 - Space model ported from the OpenZFS 2.4.4 source: the whole-disk GPT partition, vdev labels and boot area, metaslab sizing, the RAIDZ allocation size per record (parity and padding), the 128K deflate ratio `zfs list` uses, and slop space with its 128 MiB / 128 GiB limits and the embedded intent-log metaslab. Shows raw, after parity/mirroring, after reserves, after padding, after slop and at the fill target in TB and TiB, plus the expected `zpool list` SIZE and `zfs list` USED + AVAIL.
 - Disks that may fail per vdev and for the pool (guaranteed versus best case), every valid layout for the disk count side by side, classic RAID 0/1/5/6/10 with mdadm notes, warnings that name the values and the fix (uneven splits, RAIDZ minimum widths, mixed sizes), a plain-text summary and the setup in the URL hash.
 
+### 35) Zigbee and Wi-Fi Channel Planner
+
+Path:
+- `zigbee-wifi-channel-planner/index.html`
+
+Features:
+- Up to 12 access points, yours or a neighbour's, on channels 1–14 at 20 MHz or 40 MHz (HT40+ or HT40-); regions US (1–11), Europe and most countries (1–13) and Japan (plus 14 for 802.11b only), with warnings for channels and HT40 secondaries outside the region and errors for combinations that do not exist (HT40+ above 9, HT40- below 5, 40 MHz on 14).
+- An SVG spectrum of 2400–2483.5 MHz with each network drawn as its 802.11n (or 802.11b DSSS) transmit mask and Zigbee channels 11–26 as 2 MHz bars, plus a table with each Zigbee channel's grade, gap to the nearest Wi-Fi edge, the network it comes from and the mask level at the Zigbee edge. Overlapped means inside a Wi-Fi channel, marginal closer than one channel width to its centre (the mask's -20 to -28 dBr skirt), clear farther away.
+- A recommended Zigbee channel and runner-up (best grade, fewest networks, ZLL channels 11/15/20/25 first, the US reduced-power channels 25 and 26 later, widest gap), channel 26 only on request, a Thread suggestion that avoids the Zigbee channel, the Zigbee2MQTT `advanced.channel` snippet, the ZHA and Thread change steps and what they cost, the sources, a plain-text summary and the setup in the URL hash.
+
 ## Local Usage
 
 These are static tools, so you can run them in either of these ways:
@@ -435,11 +446,12 @@ Then open:
 - `http://localhost:8080/wireguard-config-generator/`
 - `http://localhost:8080/yaml-json-toml-converter/`
 - `http://localhost:8080/zfs-raid-capacity-calculator/`
+- `http://localhost:8080/zigbee-wifi-channel-planner/`
 
 ## Tests
 
 The repository ships with a unit-test suite covering the core logic of every
-tool (1027 tests across 32 modules), powered by the built-in Node.js test runner
+tool (1086 tests across 33 modules), powered by the built-in Node.js test runner
 — no external dependencies required.
 
 Requirements: Node.js 20 or newer.
@@ -486,7 +498,13 @@ worked examples in its own docs and its project's unit tests, restic's golden
 files for `ApplyPolicy`, ISO weeks across New Year, rule order and overlap,
 keep-within, unlimited values, the oldest-snapshot fallbacks, several backups
 per day and per second, time zones and daylight saving, prune after every
-backup versus once, command generation and the URL hash), Traefik Docker labels (label output for every option, `$`
+backup versus once, command generation and the URL hash), Zigbee and Wi-Fi
+channel planning (802.15.4 and 802.11 centre frequencies for every channel,
+the 802.11n and 802.11b transmit masks, grade thresholds at their exact
+edges, 20 versus 40 MHz and HT40+ versus HT40-, several access points,
+hand-worked picks for 1/6/11, 1/5/9/13, one AP on 6 and 40 MHz on 1+5,
+region channel sets, the channel 25/26 rules, Thread, invalid input and
+the URL hash), Traefik Docker labels (label output for every option, `$`
 doubled for Compose and checked against Compose's interpolation rules, list
 and map syntax, v3 versus v2 rule syntax and `ipAllowList`/`ipWhiteList`,
 file-provider YAML decoded and compared with the labels, the htpasswd formats

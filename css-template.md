@@ -280,3 +280,4 @@ Keep this list updated to avoid prefix collisions:
 | `wqr`  | Wi-Fi QR Code Generator  | Built    |
 | `yjt`  | YAML / JSON / TOML Conv. | Built    |
 | `zrc`  | ZFS & RAID Capacity Calc.| Built    |
+| `zwc`  | Zigbee/Wi-Fi Channel Plan| Built    |

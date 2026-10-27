@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zigbee and Wi-Fi Channel Planner — Logs from VahaC</title>
+  <meta name="description" content="Free Zigbee and Wi-Fi channel planner: enter your 2.4 GHz Wi-Fi channels and see every Zigbee channel 11–26 graded clear, marginal or overlapped, with a recommended pick.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="zwc-wrapper" id="zwc-wrapper">
+
+    <header class="zwc-header">
+      <h1 class="zwc-title">Zigbee and Wi-Fi Channel Planner</h1>
+      <p class="zwc-subtitle">Enter the 2.4 GHz Wi-Fi channels around you — your own access points and the strong neighbours a Wi-Fi scan shows, 20 or 40 MHz wide — and see them drawn to scale next to Zigbee channels 11–26. Every Zigbee channel is graded clear, marginal or overlapped from the 802.11 transmit masks, with the gap to the nearest Wi-Fi edge in MHz and a recommended channel for Zigbee and for Thread.</p>
+    </header>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-wifi">
+      <div class="zwc-card-head">
+        <h2 class="zwc-card-title" id="zwc-h-wifi">Your 2.4 GHz Wi-Fi</h2>
+        <span class="zwc-card-meta" id="zwc-ap-count"></span>
+      </div>
+
+      <fieldset class="zwc-fieldset">
+        <legend class="zwc-label">Region</legend>
+        <div class="zwc-segment" role="radiogroup" aria-label="Region">
+          <label class="zwc-seg-opt">
+            <input class="zwc-seg-input" type="radio" name="zwc-region" value="us">
+            <span class="zwc-seg-text">United States</span>
+          </label>
+          <label class="zwc-seg-opt">
+            <input class="zwc-seg-input" type="radio" name="zwc-region" value="eu">
+            <span class="zwc-seg-text">Europe / most countries</span>
+          </label>
+          <label class="zwc-seg-opt">
+            <input class="zwc-seg-input" type="radio" name="zwc-region" value="jp">
+            <span class="zwc-seg-text">Japan</span>
+          </label>
+        </div>
+        <p class="zwc-hint" id="zwc-region-note"></p>
+      </fieldset>
+
+      <div class="zwc-presets" id="zwc-presets">
+        <span class="zwc-presets-label">Start from:</span>
+        <button class="zwc-chip" type="button" data-preset="1-6-11">1 / 6 / 11</button>
+        <button class="zwc-chip" type="button" data-preset="1-5-9-13">1 / 5 / 9 / 13</button>
+        <button class="zwc-chip" type="button" data-preset="single-6">One AP on 6</button>
+        <button class="zwc-chip" type="button" data-preset="40-1-5">40 MHz on 1+5</button>
+      </div>
+
+      <div class="zwc-aps" id="zwc-aps"></div>
+
+      <div class="zwc-row-actions">
+        <button class="zwc-btn" type="button" id="zwc-add" onclick="zwcAddAp()">+ Add access point</button>
+        <span class="zwc-hint">Add only networks that are strong where your Zigbee coordinator and routers sit; a phone Wi-Fi analyzer app shows channel and width.</span>
+      </div>
+
+      <ul class="zwc-issues zwc-issues--global zwc-hidden" id="zwc-issues" aria-live="polite"></ul>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-zb">
+      <h2 class="zwc-card-title" id="zwc-h-zb">Zigbee and Thread</h2>
+      <div class="zwc-grid">
+        <div class="zwc-field">
+          <label class="zwc-label" for="zwc-cur">Current Zigbee channel</label>
+          <select class="zwc-input zwc-select" id="zwc-cur"></select>
+        </div>
+        <div class="zwc-field">
+          <label class="zwc-label" for="zwc-thread">Thread network on channel</label>
+          <select class="zwc-input zwc-select" id="zwc-thread"></select>
+        </div>
+      </div>
+      <label class="zwc-check" for="zwc-allow26">
+        <input class="zwc-check-input" type="checkbox" id="zwc-allow26">
+        <span class="zwc-check-text">All my Zigbee devices support channel 26 — let the pick use it</span>
+      </label>
+    </section>
+
+    <section class="zwc-card zwc-card--rec" aria-labelledby="zwc-h-rec">
+      <h2 class="zwc-card-title" id="zwc-h-rec">Recommendation</h2>
+      <div class="zwc-rec" id="zwc-rec" aria-live="polite"></div>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-spec">
+      <div class="zwc-card-head">
+        <h2 class="zwc-card-title" id="zwc-h-spec">Spectrum, drawn to scale</h2>
+        <span class="zwc-card-meta">2400–2483.5 MHz ISM band</span>
+      </div>
+      <div class="zwc-spectrum" id="zwc-spectrum"></div>
+      <ul class="zwc-legend">
+        <li class="zwc-legend-item"><span class="zwc-swatch zwc-swatch--own"></span>Your access point (transmit mask)</li>
+        <li class="zwc-legend-item"><span class="zwc-swatch zwc-swatch--nb"></span>Neighbour</li>
+        <li class="zwc-legend-item"><span class="zwc-swatch zwc-swatch--clear"></span>Zigbee clear</li>
+        <li class="zwc-legend-item"><span class="zwc-swatch zwc-swatch--marginal"></span>Zigbee marginal</li>
+        <li class="zwc-legend-item"><span class="zwc-swatch zwc-swatch--overlap"></span>Zigbee overlapped</li>
+      </ul>
+      <p class="zwc-hint">Wi-Fi shapes show the 802.11 transmit mask from 0 dBr down to −40 dBr (dB below the peak); the dashed line marks −28 dBr, one channel width from the centre. Zigbee bars are 2 MHz wide. On a phone, scroll the chart sideways.</p>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-table">
+      <div class="zwc-card-head">
+        <h2 class="zwc-card-title" id="zwc-h-table">Zigbee channels 11–26</h2>
+        <span class="zwc-card-meta" id="zwc-table-meta"></span>
+      </div>
+      <div class="zwc-table-wrap">
+        <table class="zwc-table" id="zwc-table"></table>
+      </div>
+      <p class="zwc-hint">Gap: empty spectrum between the Zigbee channel edge and the nearest Wi-Fi channel edge; a negative gap means the Zigbee channel sits inside the Wi-Fi channel. ×2 means two Wi-Fi networks share the worst grade.</p>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-grades">
+      <h2 class="zwc-card-title" id="zwc-h-grades">How the grades work</h2>
+      <p class="zwc-text">Each Zigbee channel is checked against every Wi-Fi network you entered, and the worst result counts. A Zigbee (IEEE 802.15.4) channel is its centre ± 1 MHz. A Wi-Fi channel is its centre ± 10 MHz at 20 MHz, ± 20 MHz at 40 MHz, and ± 11 MHz for 802.11b on channel 14.</p>
+      <ul class="zwc-grade-list">
+        <li class="zwc-grade-item zwc-grade-item--overlap"><strong>Overlapped</strong> — the Zigbee channel reaches into the Wi-Fi channel (gap below 0 MHz). There the 802.11n mask allows 0 to −20 dBr.</li>
+        <li class="zwc-grade-item zwc-grade-item--marginal"><strong>Marginal</strong> — outside the Wi-Fi channel, but the near Zigbee edge is closer than one channel width to the Wi-Fi centre: 20 MHz for 20 MHz Wi-Fi, 40 MHz for 40 MHz, 22 MHz for channel 14. That is the mask's first skirt, −20 to −28 dBr (−30 dBr for 802.11b). Gap 0 to under 10 MHz, under 20 MHz at 40 MHz, under 11 MHz on channel 14.</li>
+        <li class="zwc-grade-item zwc-grade-item--clear"><strong>Clear</strong> — the near Zigbee edge is at least one channel width from the Wi-Fi centre, past the −28 dBr point (802.11b: the −50 dBr zone). Gap of 10 MHz or more, 20 MHz or more at 40 MHz, 11 MHz or more on channel 14.</li>
+      </ul>
+      <p class="zwc-text">These three bands are this tool's own reading of the IEEE 802.11 transmit masks; no standard defines a "clear" Zigbee channel. The 802.11a/g, 802.11n and 802.11ax masks for 20 MHz all reach −28 dBr at 20 MHz from the centre. Silicon Labs' measurements with a 20 MHz 802.11n blocker fall on the same lines: Zigbee 12 behaved as co-channel, 15 as adjacent and 17–26 as far away, and its radio tolerated up to 20 dB stronger Wi-Fi far away than adjacent.</p>
+      <h3 class="zwc-sub">How the pick is chosen</h3>
+      <ol class="zwc-steps">
+        <li>Best grade against every Wi-Fi network you entered.</li>
+        <li>Fewest Wi-Fi networks at that grade.</li>
+        <li>Channels 11, 15, 20 and 25 first: Zigbee2MQTT recommends these ZLL channels, ZHA recommends 15, 20 and 25.</li>
+        <li>In the US, channels 25 and 26 after the others (reduced transmit power).</li>
+        <li>The widest gap to the nearest Wi-Fi edge, then the lowest channel number.</li>
+      </ol>
+      <p class="zwc-text">Channel 26 is graded but left out of the Zigbee pick unless you tick the box above. The Thread channel is never picked for Zigbee. The Thread suggestion uses the same rules without step 3, allows 26, and avoids the Zigbee pick and your current Zigbee channel.</p>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-change">
+      <h2 class="zwc-card-title" id="zwc-h-change">Changing the channel and what it costs</h2>
+
+      <div class="zwc-change">
+        <h3 class="zwc-sub">Zigbee2MQTT</h3>
+        <p class="zwc-text">Set <code class="zwc-code">advanced.channel</code> in <code class="zwc-code">configuration.yaml</code> to <strong id="zwc-z2m-ch"></strong> and restart:</p>
+        <div class="zwc-snippet">
+          <pre class="zwc-pre" id="zwc-z2m"></pre>
+          <button class="zwc-btn zwc-btn--secondary zwc-btn--small" type="button" onclick="zwcCopyZ2m()">Copy</button>
+        </div>
+        <ul class="zwc-bullets">
+          <li>On startup Zigbee2MQTT sees that the configured channel differs from the adapter's and broadcasts a network update with the new channel.</li>
+          <li>Supported only for the <code class="zwc-code">zstack</code> and <code class="zwc-code">ember</code> adapters.</li>
+          <li>Sleeping battery devices switch the next time they wake up, so trigger them afterwards. Some devices do not support changing channels: one still unresponsive several minutes after waking may have to be re-paired.</li>
+        </ul>
+      </div>
+
+      <div class="zwc-change">
+        <h3 class="zwc-sub">ZHA (Home Assistant)</h3>
+        <ol class="zwc-steps">
+          <li>Go to <strong>Settings → Connectivity → Zigbee</strong> and select <strong>Network information</strong>.</li>
+          <li>Select the pencil next to the channel and pick <strong id="zwc-zha-ch"></strong> (or <strong>Smart</strong>: a one-time scan that prefers 15, 20 and 25).</li>
+          <li>Select <strong>Change channel</strong>. All devices can take up to an hour to reconnect; power-cycling end devices speeds it up.</li>
+        </ol>
+        <p class="zwc-text">ZHA's docs call keeping the default channel the best practice, and suggest fixing the Wi-Fi channel on your router first when the two overlap.</p>
+      </div>
+
+      <div class="zwc-change">
+        <h3 class="zwc-sub">Thread (Home Assistant OpenThread border router)</h3>
+        <ol class="zwc-steps">
+          <li>Go to <strong>Settings → Connectivity → Thread</strong>.</li>
+          <li>Open the menu next to your OpenThread border router, select <strong>Change channel</strong> and enter <strong id="zwc-thread-ch"></strong>.</li>
+          <li>The border router schedules the switch about five minutes later so the whole mesh moves together. Some Thread devices do not follow and must be added to the network again.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="zwc-card" aria-labelledby="zwc-h-notes">
+      <h2 class="zwc-card-title" id="zwc-h-notes">Good to know</h2>
+      <ul class="zwc-notes">
+        <li class="zwc-note"><strong>Channel 26 is not universal.</strong> Digi lists its XBee-PRO S2B/S2C modules as channels 11–25 only, and ZHA's docs note that channel support depends on the age of the hardware and firmware and on the device's power rating. That is why the pick skips 26 unless you tick the box.</li>
+        <li class="zwc-note zwc-note--hl zwc-hidden" id="zwc-note-us"><strong>US: 25 and 26 at reduced power.</strong> Silicon Labs states that Zigbee channels 25 and 26 require reduced transmit power levels to meet FCC requirements (North America only), so they reach less far. Equally graded channels are ranked ahead of them.</li>
+        <li class="zwc-note"><strong>Thread and Matter over Thread use the same channels.</strong> Thread runs on IEEE 802.15.4 channels 11–26, just like Zigbee. With two radios, give the two networks different channels: on one channel both meshes listen before they transmit and share its airtime. Home Assistant ties them to one channel only with multiprotocol firmware, which it no longer recommends.</li>
+        <li class="zwc-note zwc-note--hl zwc-hidden" id="zwc-note-40"><strong>40 MHz on your own access point.</strong> <span id="zwc-note-40-aps"></span> uses 40 MHz in 2.4 GHz. Silicon Labs recommends 20 MHz Wi-Fi next to 802.15.4 radios; when 40 MHz is needed, put Wi-Fi and Zigbee at opposite ends of the band.</li>
+        <li class="zwc-note"><strong>A mask is a limit, not a measurement.</strong> Real access points are usually quieter outside their channel than the mask allows, and how much Wi-Fi hurts depends on its strength and airtime. Silicon Labs measured that even on far-away channels Wi-Fi above about −40 dBm at the Zigbee radio (at 100% Wi-Fi airtime) reduces its sensitivity, so keep the coordinator away from the router.</li>
+      </ul>
+    </section>
+
+    <details class="zwc-sources">
+      <summary class="zwc-sources-sum">Sources</summary>
+      <ul class="zwc-source-list">
+        <li>IEEE 802.15.4 channel plan, f = 2405 + 5 (k − 11) MHz for k = 11–26: <a href="https://www.ti.com/lit/ug/swru191f/swru191f.pdf" target="_blank" rel="noopener noreferrer">TI CC253x User's Guide SWRU191F</a> (rev. April 2014), quoting IEEE 802.15.4-2006.</li>
+        <li>802.15.4 channels 2 MHz wide at 5 MHz spacing, Wi-Fi impact measurements, US power on 25/26, 20 MHz advice: <a href="https://docs.silabs.com/zigbee/9.1.1/multiprotocol-wifi-coexistence-fundamentals/" target="_blank" rel="noopener noreferrer">Silicon Labs, Wi-Fi Coexistence Fundamentals</a> (Zigbee SDK 9.1.1 docs, replaces UG103.17).</li>
+        <li>802.11n 2.4 GHz transmit masks for 20 and 40 MHz (clause 19.3.18.1): <a href="https://mentor.ieee.org/802.11/dcn/22/11-22-1437-02-000m-ht-transmit-spectrum-mask-alignment.docx" target="_blank" rel="noopener noreferrer">IEEE 802.11-22/1437r2</a>; 802.11a/g and 802.11ax 20 MHz masks: <a href="https://mentor.ieee.org/802.11/dcn/21/11-21-1448-03-000m-psd-floor-of-tx-mask.docx" target="_blank" rel="noopener noreferrer">IEEE 802.11-21/1448r3</a>; 802.11b DSSS mask: <a href="https://mentor.ieee.org/802.11/dcn/22/11-22-2076-00-000m-lb270-dsss-tx-mask-floor.docx" target="_blank" rel="noopener noreferrer">IEEE 802.11-22/2076r0</a>.</li>
+        <li>Wi-Fi channel centres, 2407 + 5 n MHz and 2484 MHz for channel 14: <a href="https://github.com/torvalds/linux/blob/master/net/wireless/util.c" target="_blank" rel="noopener noreferrer">Linux net/wireless/util.c</a>, <code class="zwc-code">ieee80211_channel_to_freq_khz()</code>.</li>
+        <li>Regional channel sets (US 2400–2472 MHz, Europe 2400–2483.5 MHz, Japan channel 14 for 802.11b only): <a href="https://mirrors.edge.kernel.org/pub/software/network/wireless-regdb/" target="_blank" rel="noopener noreferrer">wireless-regdb 2026.09.03</a> <code class="zwc-code">db.txt</code>.</li>
+        <li>HT40+ on primaries 1–7 (1–9 in Europe and Japan), HT40− on 5–13: <a href="https://w1.fi/cgit/hostap/tree/hostapd/hostapd.conf" target="_blank" rel="noopener noreferrer">hostapd 2.11 hostapd.conf</a>, after IEEE 802.11n Annex J.</li>
+        <li><a href="https://www.zigbee2mqtt.io/guide/configuration/zigbee-network.html#changing-the-zigbee-channel" target="_blank" rel="noopener noreferrer">Zigbee2MQTT: Zigbee network</a> (ZLL channels, <code class="zwc-code">advanced.channel</code>, changing the channel).</li>
+        <li><a href="https://www.home-assistant.io/integrations/zha/#defining-the-zigbee-channel-to-use" target="_blank" rel="noopener noreferrer">ZHA: Defining the Zigbee channel to use</a> and <a href="https://www.home-assistant.io/integrations/thread/#changing-the-thread-channel" target="_blank" rel="noopener noreferrer">Thread: Changing the Thread channel</a>.</li>
+        <li>Multiprotocol firmware no longer recommended: <a href="https://www.home-assistant.io/connectzbt1" target="_blank" rel="noopener noreferrer">Home Assistant Connect ZBT-1</a>.</li>
+        <li>XBee channel support: <a href="https://docs.digi.com/resources/documentation/digidocs/90001537/references/r_channels_zigbee.htm" target="_blank" rel="noopener noreferrer">Digi, Channels, Zigbee</a>.</li>
+      </ul>
+    </details>
+
+    <div class="zwc-actions">
+      <button class="zwc-btn" type="button" onclick="zwcCopyLink()">Copy link to this plan</button>
+      <button class="zwc-btn zwc-btn--secondary" type="button" onclick="zwcCopySummary()">Copy summary</button>
+      <button class="zwc-btn zwc-btn--secondary" type="button" onclick="zwcReset()">Reset to example</button>
+    </div>
+
+    <p class="zwc-footer">Built by <a href="https://vahac.com">VahaC</a> — 100% client-side, no data sent anywhere.</p>
+
+    <div class="zwc-toast" id="zwc-toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
