@@ -6,50 +6,79 @@ Main tools page:
 - [vahac.com/tools](https://vahac.com/tools?utm_source=github)
 
 Documentation status:
-- Last updated: 2026-10-27 (Home Assistant Automation Schedule Visualizer added)
+- Last updated: 2026-10-27 (tools grouped by topic here and on the index page)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
 
+Tools are grouped by topic, the same groups the index page (`index.html`) uses.
+
+### Docker and Proxmox
+
+- `docker-compose-validator-formatter/` - validation, formatting, and docker run to Compose conversion for Compose YAML.
+- `docker-run-compose-converter/` - converts `docker run` commands to `docker-compose.yml` and back.
+- `proxmox-lxc-idmap-generator/` - Proxmox LXC UID/GID mapping: `lxc.idmap` lines that cover the whole container range around the mapped IDs, matching `/etc/subuid` and `/etc/subgid` entries, the bind mount line, a `chown` command, and the Proxmox VE 9.2+ per-mount-point `idmap` alternative.
+- `traefik-docker-labels-generator/` - Traefik v3 and v2 labels for a Compose service (host and path rules, entrypoints, TLS and certificate resolver, HTTP to HTTPS redirect, Docker network, `traefik.enable`, basic auth from an htpasswd line, IP allowlist, security headers) in list and map syntax, plus a service snippet, the equivalent file-provider YAML and the static config they expect.
+
+### Networking
+
+- `ipv6-subnet-calculator/` - IPv6 address and prefix calculator: RFC 5952 and expanded forms, network range, exact address count and /64 LANs, the address type from the IANA registries, ip6.arpa reverse zones, a nibble-aware subnet split with paging, a ULA /48 generator (RFC 4193) and a modified EUI-64 interface ID from a MAC.
+- `subnet-calculator/` - IPv4 subnet calculation and network planning.
+- `wireguard-config-generator/` - WireGuard server and client configs: X25519 key pairs and preshared keys made in the browser, an IPv4 (and optional IPv6) address plan, full or split tunnel, the server `wg0.conf` with a `[Peer]` block per client, and a `.conf` download and QR code per client.
+
+### Smart Home
+
+- `esp32-gpio-pin-picker/` - ESP32, ESP32-S3, ESP32-C3 and ESP32-C6 GPIO pins ranked from safe to avoid for a chosen use (digital I/O, I2C, SPI, UART, PWM, ADC, touch, deep-sleep wake, DAC), with strapping, flash/PSRAM, USB, UART0, input-only, ADC1/ADC2, touch and RTC flags from Espressif datasheets, module and package options, an ESPHome cross-check and a `pin:` snippet.
+- `home-assistant-schedule-visualizer/` - Home Assistant automation schedules: `time`, `time_pattern` and sun triggers (`sun.sunrise`, `sun.sunset`, `sun.dawn`, `sun.dusk` and the older `sun` with offsets) plus `time`, `sun` and `trigger` conditions with `and`/`or`/`not`, built in a form or pasted as YAML (`trigger:` or `platform:`, singular or plural keys); lists the next runs with the trigger that fired and whether the conditions let it through, draws a 7-day timeline with skipped and repeated DST hours, and explains `/n` matching, the smaller-unit defaults, windows that cross midnight and YAML 1.1 traps, following ports of the Home Assistant 2026.10.4 source and astral 2.2.
+- `zigbee-wifi-channel-planner/` - Zigbee channel planning next to 2.4 GHz Wi-Fi: your own and neighbouring access points (20 MHz, or 40 MHz with HT40+/HT40-) for the US, Europe or Japan drawn to scale with Zigbee channels 11–26 on the 802.11 transmit masks, every Zigbee channel graded clear, marginal or overlapped with the gap to the nearest Wi-Fi edge, a recommended channel and runner-up, a Thread channel, channel 25/26 caveats, and the Zigbee2MQTT, ZHA and Thread steps to change channel.
+
+### Servers and Storage
+
 - `backup-retention-prune-simulator/` - Proxmox Backup Server, `borg prune` and `restic forget` retention side by side: a backup schedule or a pasted snapshot list, keep-last/hourly/daily/weekly/monthly/yearly and keep-within rules, which snapshots each tool keeps and why (ported from PBS 4.2.8, BorgBackup 1.4.5 and restic 0.19.1), a calendar and a table of kept and pruned snapshots, every difference explained, and the matching commands with dry runs.
-- `base64-encode-decode/` - Base64 encoding and decoding for text and files, with URL-safe and data URI output.
 - `byte-storage-converter/` - SI/IEC storage unit conversion and bitrate/file size calculations.
 - `chmod-file-permission-calculator/` - symbolic/octal permission conversion for Unix-like file modes.
 - `cron-expression-generator/` - assisted cron expression builder for common scheduling patterns.
+- `homelab-power-cost-calculator/` - energy and electricity cost per day, month and year for a list of homelab devices (idle and load watts, share of time at load, always on, hours per day or a time window, quantity), with a single or day/night tariff, an optional fixed charge, each device's share of the cost, a payback calculator for a lower-power replacement, a plain-text summary and CSV export.
+- `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
+- `zfs-raid-capacity-calculator/` - usable ZFS pool capacity in TB and TiB for stripe, 2/3/4-way mirror and RAIDZ1/2/3 layouts with any number of vdevs, mixed disk sizes and hot spares: raw, after parity or mirroring, after ZFS reserves and RAIDZ padding at a chosen record size and ashift, after slop space and at a target fill level, using OpenZFS 2.4.4 space accounting; disks that may fail (guaranteed and best case), every layout the disks allow side by side, and classic RAID 0/1/5/6/10.
+
+### Security
+
 - `csp-security-headers-builder/` - guided Content-Security-Policy builder (presets, third-party services, inline-script hashes) with HSTS, framing, Permissions-Policy and cross-origin headers, output for 10 server formats, and an analyzer that grades pasted response headers.
+- `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
+- `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
+- `password-passphrase-generator/` - secure password and passphrase generation.
+- `spf-dmarc-record-generator/` - SPF and DMARC TXT records: an SPF builder with the includes Google Workspace, Microsoft 365, Zoho Mail, Fastmail, Proton Mail, iCloud+, Mailgun, Amazon SES and SendGrid document plus your own ip4/ip6/a/mx, and a DMARC builder following RFC 9989 (p, sp, np, t, alignment, rua/ruf, fo), each with the DNS name, the value, a BIND zone-file line split into 255-octet strings and the authorization record for report addresses on another domain; plus a checker for pasted records (dig, nslookup, zone files) that explains every term, counts SPF DNS lookups across pasted includes and names each problem with the fix and the RFC section.
+
+### Web and SEO
+
+- `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
+- `image-compressor-resizer/` - client-side image compression and resizing.
+- `open-graph-meta-generator/` - Open Graph and X card meta tags: a generator for the `<title>`, meta description, canonical link, `og:` tags (website or article with `article:*`), the image with its size, type and alt text, `twitter:card` and handles, with an image check against the sizes Meta, X and LinkedIn document and approximate preview cards; plus a checker for a pasted `<head>` or page source that lists every tag, what each platform would use, and the missing, duplicate and conflicting tags with the fix and the source.
+- `robots-txt-generator-validator/` - guided robots.txt builder (groups, AI crawler block, sitemaps), line-by-line validator with explanations, and a per-crawler URL tester.
+- `utm-campaign-url-builder/` - UTM-tagged campaign links with presets, a GA4 default-channel check, saved presets, a CSV link list, and QR export.
+
+### Developer and Data
+
+- `base64-encode-decode/` - Base64 encoding and decoding for text and files, with URL-safe and data URI output.
 - `csv-json-sql-converter/` - CSV ↔ JSON conversion with delimiter/header detection, plus SQL `INSERT` generation for PostgreSQL, MySQL, SQLite, and SQL Server.
 - `curl-to-code-converter/` - converts curl commands (bash, Windows cmd, PowerShell, browser "Copy as cURL") into fetch, Python requests, and Node.js fetch/axios code, with notes for options that do not carry over.
-- `docker-compose-validator-formatter/` - validation, formatting, and docker run to Compose conversion for Compose YAML.
-- `docker-run-compose-converter/` - converts `docker run` commands to `docker-compose.yml` and back.
-- `esp32-gpio-pin-picker/` - ESP32, ESP32-S3, ESP32-C3 and ESP32-C6 GPIO pins ranked from safe to avoid for a chosen use (digital I/O, I2C, SPI, UART, PWM, ADC, touch, deep-sleep wake, DAC), with strapping, flash/PSRAM, USB, UART0, input-only, ADC1/ADC2, touch and RTC flags from Espressif datasheets, module and package options, an ESPHome cross-check and a `pin:` snippet.
-- `favicon-generator/` - favicon pack generation (ICO and platform icons) from uploaded images.
-- `hash-generator-for-files-and-text/` - hash generation for text and uploaded files.
-- `home-assistant-schedule-visualizer/` - Home Assistant automation schedules: `time`, `time_pattern` and sun triggers (`sun.sunrise`, `sun.sunset`, `sun.dawn`, `sun.dusk` and the older `sun` with offsets) plus `time`, `sun` and `trigger` conditions with `and`/`or`/`not`, built in a form or pasted as YAML (`trigger:` or `platform:`, singular or plural keys); lists the next runs with the trigger that fired and whether the conditions let it through, draws a 7-day timeline with skipped and repeated DST hours, and explains `/n` matching, the smaller-unit defaults, windows that cross midnight and YAML 1.1 traps, following ports of the Home Assistant 2026.10.4 source and astral 2.2.
-- `homelab-power-cost-calculator/` - energy and electricity cost per day, month and year for a list of homelab devices (idle and load watts, share of time at load, always on, hours per day or a time window, quantity), with a single or day/night tariff, an optional fixed charge, each device's share of the cost, a payback calculator for a lower-power replacement, a plain-text summary and CSV export.
-- `image-compressor-resizer/` - client-side image compression and resizing.
-- `ipv6-subnet-calculator/` - IPv6 address and prefix calculator: RFC 5952 and expanded forms, network range, exact address count and /64 LANs, the address type from the IANA registries, ip6.arpa reverse zones, a nibble-aware subnet split with paging, a ULA /48 generator (RFC 4193) and a modified EUI-64 interface ID from a MAC.
 - `json-formatter/` - JSON formatting and validation.
-- `jwt-decoder/` - JSON Web Token decoding, claim explanations, expiry checks, and signature verification.
 - `merge-text-tool/` - two-pane text merge tool with inline editing and per-block merge arrows.
-- `open-graph-meta-generator/` - Open Graph and X card meta tags: a generator for the `<title>`, meta description, canonical link, `og:` tags (website or article with `article:*`), the image with its size, type and alt text, `twitter:card` and handles, with an image check against the sizes Meta, X and LinkedIn document and approximate preview cards; plus a checker for a pasted `<head>` or page source that lists every tag, what each platform would use, and the missing, duplicate and conflicting tags with the fix and the source.
-- `password-passphrase-generator/` - secure password and passphrase generation.
-- `proxmox-lxc-idmap-generator/` - Proxmox LXC UID/GID mapping: `lxc.idmap` lines that cover the whole container range around the mapped IDs, matching `/etc/subuid` and `/etc/subgid` entries, the bind mount line, a `chown` command, and the Proxmox VE 9.2+ per-mount-point `idmap` alternative.
 - `regex-tester/` - live regex match highlighting, capture groups, and replace preview.
-- `robots-txt-generator-validator/` - guided robots.txt builder (groups, AI crawler block, sitemaps), line-by-line validator with explanations, and a per-crawler URL tester.
-- `sla-calculator/` - uptime and downtime budget calculations for SLA targets.
-- `spf-dmarc-record-generator/` - SPF and DMARC TXT records: an SPF builder with the includes Google Workspace, Microsoft 365, Zoho Mail, Fastmail, Proton Mail, iCloud+, Mailgun, Amazon SES and SendGrid document plus your own ip4/ip6/a/mx, and a DMARC builder following RFC 9989 (p, sp, np, t, alignment, rua/ruf, fo), each with the DNS name, the value, a BIND zone-file line split into 255-octet strings and the authorization record for report addresses on another domain; plus a checker for pasted records (dig, nslookup, zone files) that explains every term, counts SPF DNS lookups across pasted includes and names each problem with the fix and the RFC section.
-- `subnet-calculator/` - IPv4 subnet calculation and network planning.
 - `text-diff-tool/` - line/word/character text comparison with diff highlighting.
-- `traefik-docker-labels-generator/` - Traefik v3 and v2 labels for a Compose service (host and path rules, entrypoints, TLS and certificate resolver, HTTP to HTTPS redirect, Docker network, `traefik.enable`, basic auth from an htpasswd line, IP allowlist, security headers) in list and map syntax, plus a service snippet, the equivalent file-provider YAML and the static config they expect.
 - `unix-timestamp-converter/` - Unix epoch to ISO/UTC/local date conversion and back.
 - `url-encoder-decoder/` - percent-encoding and decoding for URLs, query strings, and form data.
-- `utm-campaign-url-builder/` - UTM-tagged campaign links with presets, a GA4 default-channel check, saved presets, a CSV link list, and QR export.
+- `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
+
+### QR Codes
+
 - `vcard-qr-code-generator/` - vCard data generation and QR export.
 - `wifi-qr-code-generator/` - Wi-Fi network QR codes (WPA/WPA2/WPA3, WEP, open, hidden) with PNG/SVG export and a printable card.
-- `wireguard-config-generator/` - WireGuard server and client configs: X25519 key pairs and preshared keys made in the browser, an IPv4 (and optional IPv6) address plan, full or split tunnel, the server `wg0.conf` with a `[Peer]` block per client, and a `.conf` download and QR code per client.
-- `yaml-json-toml-converter/` - format conversion between YAML, JSON, and TOML.
-- `zfs-raid-capacity-calculator/` - usable ZFS pool capacity in TB and TiB for stripe, 2/3/4-way mirror and RAIDZ1/2/3 layouts with any number of vdevs, mixed disk sizes and hot spares: raw, after parity or mirroring, after ZFS reserves and RAIDZ padding at a chosen record size and ashift, after slop space and at a target fill level, using OpenZFS 2.4.4 space accounting; disks that may fail (guaranteed and best case), every layout the disks allow side by side, and classic RAID 0/1/5/6/10.
-- `zigbee-wifi-channel-planner/` - Zigbee channel planning next to 2.4 GHz Wi-Fi: your own and neighbouring access points (20 MHz, or 40 MHz with HT40+/HT40-) for the US, Europe or Japan drawn to scale with Zigbee channels 11–26 on the 802.11 transmit masks, every Zigbee channel graded clear, marginal or overlapped with the gap to the nearest Wi-Fi edge, a recommended channel and runner-up, a Thread channel, channel 25/26 caveats, and the Zigbee2MQTT, ZHA and Thread steps to change channel.
+
+### Other files
+
+- `index.html` - index page that lists every tool by group, with search.
 - `css-template.md` - shared CSS/style guidance for tool pages.
 
 ## Tool Overview
@@ -455,46 +484,8 @@ These are static tools, so you can run them in either of these ways:
 python -m http.server 8080
 ```
 
-Then open:
-- `http://localhost:8080/backup-retention-prune-simulator/`
-- `http://localhost:8080/base64-encode-decode/`
-- `http://localhost:8080/byte-storage-converter/`
-- `http://localhost:8080/chmod-file-permission-calculator/`
-- `http://localhost:8080/cron-expression-generator/`
-- `http://localhost:8080/csp-security-headers-builder/`
-- `http://localhost:8080/csv-json-sql-converter/`
-- `http://localhost:8080/curl-to-code-converter/`
-- `http://localhost:8080/docker-compose-validator-formatter/`
-- `http://localhost:8080/docker-run-compose-converter/`
-- `http://localhost:8080/esp32-gpio-pin-picker/`
-- `http://localhost:8080/favicon-generator/`
-- `http://localhost:8080/hash-generator-for-files-and-text/`
-- `http://localhost:8080/home-assistant-schedule-visualizer/`
-- `http://localhost:8080/homelab-power-cost-calculator/`
-- `http://localhost:8080/image-compressor-resizer/`
-- `http://localhost:8080/ipv6-subnet-calculator/`
-- `http://localhost:8080/json-formatter/`
-- `http://localhost:8080/jwt-decoder/`
-- `http://localhost:8080/merge-text-tool/`
-- `http://localhost:8080/open-graph-meta-generator/`
-- `http://localhost:8080/password-passphrase-generator/`
-- `http://localhost:8080/proxmox-lxc-idmap-generator/`
-- `http://localhost:8080/regex-tester/`
-- `http://localhost:8080/robots-txt-generator-validator/`
-- `http://localhost:8080/sla-calculator/`
-- `http://localhost:8080/spf-dmarc-record-generator/`
-- `http://localhost:8080/subnet-calculator/`
-- `http://localhost:8080/text-diff-tool/`
-- `http://localhost:8080/traefik-docker-labels-generator/`
-- `http://localhost:8080/unix-timestamp-converter/`
-- `http://localhost:8080/url-encoder-decoder/`
-- `http://localhost:8080/utm-campaign-url-builder/`
-- `http://localhost:8080/vcard-qr-code-generator/`
-- `http://localhost:8080/wifi-qr-code-generator/`
-- `http://localhost:8080/wireguard-config-generator/`
-- `http://localhost:8080/yaml-json-toml-converter/`
-- `http://localhost:8080/zfs-raid-capacity-calculator/`
-- `http://localhost:8080/zigbee-wifi-channel-planner/`
+Then open `http://localhost:8080/`. The index page lists every tool by group and has a search box;
+each tool also opens directly at `http://localhost:8080/<folder>/`.
 
 ## Tests
 
@@ -612,3 +603,4 @@ leave both blank to run the full matrix.
 
 - All tools are frontend-only and designed for straightforward local execution.
 - Use `css-template.md` as the baseline style guide when creating or redesigning a tool.
+- To list a new tool on the index page, add its entry (name, folder, group, description) to the `TOOLS` list in `index.html` and its line under the matching group in Repository Structure. The groups are defined in `GROUPS` in the same file; counts update by themselves.

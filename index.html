@@ -15,17 +15,16 @@
       --hub-bg-primary: #0a0f1e;
       --hub-bg-secondary: #111827;
       --hub-bg-card: #1a2236;
+      --hub-bg-card-hover: #1f2a42;
       --hub-bg-input: #0d1424;
       --hub-border: #2a3a5c;
+      --hub-border-hover: #3a4d75;
       --hub-border-focus: #3b82f6;
       --hub-text-primary: #e2e8f0;
       --hub-text-secondary: #94a3b8;
       --hub-text-muted: #64748b;
       --hub-accent-blue: #3b82f6;
       --hub-accent-cyan: #22d3ee;
-      --hub-accent-green: #10b981;
-      --hub-accent-amber: #f59e0b;
-      --hub-accent-red: #ef4444;
       --hub-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
       --hub-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
       --hub-radius: 8px;
@@ -33,7 +32,7 @@
       font-family: var(--hub-font-sans);
       color: var(--hub-text-primary);
       line-height: 1.6;
-      max-width: 980px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 2rem 1rem 3rem;
       box-sizing: border-box;
@@ -44,6 +43,60 @@
     .hub-wrapper *::after {
       box-sizing: border-box;
     }
+
+    .hub-wrapper a {
+      color: inherit;
+    }
+
+    .hub-wrapper :focus-visible {
+      outline: 2px solid var(--hub-accent-cyan);
+      outline-offset: 2px;
+    }
+
+    .hub-sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* ---------- Site links ---------- */
+
+    .hub-text-link {
+      color: var(--hub-text-secondary) !important;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .hub-text-link:hover {
+      color: var(--hub-accent-cyan) !important;
+    }
+
+    .hub-byline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem 0.6rem;
+      margin: 0.35rem 0 0;
+      font-size: 0.88rem;
+      color: var(--hub-text-muted);
+    }
+
+    .hub-byline a {
+      border-bottom: 1px dotted var(--hub-border-hover);
+    }
+
+    .hub-byline a:hover {
+      border-bottom-color: var(--hub-accent-cyan);
+    }
+
+    .hub-sep {
+      color: var(--hub-border-hover);
+    }
+
+    /* ---------- Header ---------- */
 
     .hub-header {
       background: linear-gradient(135deg, #111827, #1a2236 45%, #0d1424);
@@ -65,76 +118,252 @@
       max-width: 70ch;
     }
 
+    .hub-stats {
+      margin: 0.75rem 0 0;
+      font-size: 0.9rem;
+      color: var(--hub-text-secondary);
+    }
+
+    .hub-stats strong {
+      color: var(--hub-text-primary);
+      font-weight: 600;
+    }
+
+    .hub-search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .hub-search {
+      flex: 1;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0.6rem 0.9rem;
+      background: var(--hub-bg-input);
+      border: 1px solid var(--hub-border);
+      border-radius: 6px;
+      color: var(--hub-text-primary);
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    .hub-search::placeholder {
+      color: var(--hub-text-muted);
+    }
+
+    .hub-search:focus {
+      border-color: var(--hub-border-focus);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .hub-count {
+      font-size: 0.85rem;
+      color: var(--hub-text-muted);
+      white-space: nowrap;
+    }
+
+    /* ---------- Group chips ---------- */
+
+    .hub-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1.25rem;
+    }
+
+    .hub-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 36px;
+      padding: 0.3rem 0.8rem;
+      background: var(--hub-bg-secondary);
+      border: 1px solid var(--hub-border);
+      border-radius: 999px;
+      color: var(--hub-text-secondary);
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .hub-chip:hover {
+      color: var(--hub-text-primary);
+      border-color: var(--hub-border-hover);
+    }
+
+    .hub-chip[aria-pressed="true"] {
+      color: var(--hub-text-primary);
+      border-color: var(--hub-accent-blue);
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .hub-chip-n {
+      font-family: var(--hub-font-mono);
+      font-size: 0.75rem;
+      color: var(--hub-text-muted);
+    }
+
+    .hub-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--group, var(--hub-text-muted));
+    }
+
+    /* ---------- Groups and cards ---------- */
+
+    .hub-section {
+      margin-bottom: 1.75rem;
+    }
+
+    .hub-section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    .hub-section-head .hub-dot {
+      width: 10px;
+      height: 10px;
+    }
+
+    .hub-section-n {
+      font-family: var(--hub-font-mono);
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--hub-text-muted);
+    }
+
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.8rem;
     }
 
     .hub-card {
-      background: var(--hub-bg-card);
-      border: 1px solid var(--hub-border);
-      border-radius: var(--hub-radius);
-      padding: 1rem;
+      position: relative;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.7rem;
-      min-height: 168px;
+      gap: 0.5rem;
+      padding: 0.95rem 1rem;
+      background: var(--hub-bg-card);
+      border: 1px solid var(--hub-border);
+      border-left: 3px solid var(--group, var(--hub-border));
+      border-radius: var(--hub-radius);
+      transition: background 0.15s, border-color 0.15s;
     }
 
-    .hub-card h2 {
+    .hub-card:hover {
+      background: var(--hub-bg-card-hover);
+      border-color: var(--hub-border-hover);
+      border-left-color: var(--group, var(--hub-border));
+    }
+
+    .hub-card-title {
       margin: 0;
-      font-size: 1.05rem;
-      line-height: 1.25;
+      font-size: 1rem;
+      line-height: 1.3;
     }
 
-    .hub-card p {
-      margin: 0;
-      color: var(--hub-text-secondary);
-      flex: 1;
-    }
-
-    .hub-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
+    .hub-card-link {
       text-decoration: none;
-      padding: 0.65rem 1rem;
-      background: var(--hub-accent-blue);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      white-space: nowrap;
-      font-family: inherit;
     }
 
-    .hub-btn:hover {
-      background: #2563eb;
+    .hub-card-link::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--hub-radius);
     }
 
-    .hub-btn:active {
-      transform: scale(0.97);
+    .hub-card-link:focus-visible {
+      outline: none;
+    }
+
+    .hub-card-link:focus-visible::after {
+      outline: 2px solid var(--hub-accent-cyan);
+      outline-offset: 2px;
+    }
+
+    .hub-card-desc {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--hub-text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ---------- Empty state and footer ---------- */
+
+    .hub-empty {
+      margin: 2rem 0;
+      text-align: center;
+      color: var(--hub-text-secondary);
     }
 
     .hub-footer {
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       color: var(--hub-text-muted);
       font-size: 0.9rem;
       text-align: center;
     }
+
+    .hub-noscript {
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid var(--hub-border);
+      border-radius: var(--hub-radius);
+      color: var(--hub-text-primary);
+    }
+
+    /* ---------- Responsive ---------- */
 
     @media (max-width: 640px) {
       .hub-wrapper {
         padding: 1rem 0.75rem 2rem;
       }
 
+      .hub-title {
+        font-size: 1.5rem;
+      }
+
+      .hub-byline a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+      }
+
       .hub-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hub-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        margin-right: -0.75rem;
+        padding-right: 0.75rem;
+        scrollbar-width: thin;
+      }
+
+      .hub-chip {
+        flex-shrink: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hub-wrapper * {
+        transition: none !important;
       }
     }
   </style>
@@ -143,249 +372,426 @@
   <main class="hub-wrapper">
     <header class="hub-header">
       <h1 class="hub-title">Vahac Tools</h1>
-      <p class="hub-subtitle">
-        Quick access page for all tools in this repository.
-        Each tool runs as a standalone frontend page.
+      <p class="hub-byline">
+        <a class="hub-text-link" href="https://vahac.com/">vahac.com</a>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <a class="hub-text-link" href="https://vahac.com/tools/">tools page</a>
       </p>
+      <p class="hub-subtitle">
+        Every tool in this repository. Each one is a standalone page that runs in the browser.
+      </p>
+      <p class="hub-stats" id="hub-stats"></p>
+      <div class="hub-search-row">
+        <label class="hub-sr" for="hub-search">Search tools</label>
+        <input class="hub-search" id="hub-search" type="search" autocomplete="off" spellcheck="false">
+        <span class="hub-count" id="hub-count" aria-live="polite"></span>
+      </div>
     </header>
 
-    <section class="hub-grid" aria-label="Tools list">
-      <article class="hub-card">
-        <h2>Backup Retention (Prune) Simulator</h2>
-        <p>See which snapshots Proxmox Backup Server, borg prune and restic forget keep for the same keep-last, daily, weekly, monthly and yearly rules, why they differ, and the matching commands.</p>
-        <a class="hub-btn" href="backup-retention-prune-simulator/index.html">Open tool</a>
-      </article>
+    <nav class="hub-chips" id="hub-chips" aria-label="Filter by group"></nav>
 
-      <article class="hub-card">
-        <h2>Base64 Encode / Decode</h2>
-        <p>Encode and decode Base64 for text or files, with URL-safe and data URI output.</p>
-        <a class="hub-btn" href="base64-encode-decode/index.html">Open tool</a>
-      </article>
+    <div id="hub-list"></div>
 
-      <article class="hub-card">
-        <h2>Byte and Storage Converter</h2>
-        <p>Convert SI and IEC units and calculate bitrate or file size.</p>
-        <a class="hub-btn" href="byte-storage-converter/index.html">Open tool</a>
-      </article>
+    <p class="hub-empty" id="hub-empty" hidden></p>
 
-      <article class="hub-card">
-        <h2>Chmod File Permission Calculator</h2>
-        <p>Convert Unix-like permissions between symbolic and octal forms.</p>
-        <a class="hub-btn" href="chmod-file-permission-calculator/index.html">Open tool</a>
-      </article>
+    <noscript>
+      <p class="hub-noscript">This index is built with JavaScript. Without it, open any tool folder's <code>index.html</code> directly.</p>
+    </noscript>
 
-      <article class="hub-card">
-        <h2>Cron Expression Generator</h2>
-        <p>Build cron expressions with guided scheduling options.</p>
-        <a class="hub-btn" href="cron-expression-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>CSP and HTTP Security Headers Builder</h2>
-        <p>Build a Content-Security-Policy and the other security headers, copy them as Nginx, Apache, Caddy or Traefik config, and grade headers you paste.</p>
-        <a class="hub-btn" href="csp-security-headers-builder/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>CSV JSON SQL Converter</h2>
-        <p>Convert CSV and JSON both ways with delimiter and header detection, and generate SQL INSERT statements.</p>
-        <a class="hub-btn" href="csv-json-sql-converter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>cURL to Code Converter</h2>
-        <p>Turn curl commands from docs or browser DevTools into fetch, Python requests, or Node.js code, with notes for unsupported flags.</p>
-        <a class="hub-btn" href="curl-to-code-converter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Docker Compose Validator and Formatter</h2>
-        <p>Validate and format Compose YAML and convert common docker run commands.</p>
-        <a class="hub-btn" href="docker-compose-validator-formatter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Docker Run to Compose Converter</h2>
-        <p>Convert docker run commands to docker-compose.yml and back again.</p>
-        <a class="hub-btn" href="docker-run-compose-converter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>ESP32 GPIO Pin Picker</h2>
-        <p>Find safe GPIO pins on the ESP32, S3, C3 and C6: strapping, flash, USB, ADC2 and touch flags from Espressif datasheets, plus an ESPHome pin snippet.</p>
-        <a class="hub-btn" href="esp32-gpio-pin-picker/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Favicon Generator</h2>
-        <p>Create favicon sets and common platform icon sizes from one image.</p>
-        <a class="hub-btn" href="favicon-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Hash Generator for Files and Text</h2>
-        <p>Generate hashes for text input and uploaded files.</p>
-        <a class="hub-btn" href="hash-generator-for-files-and-text/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Home Assistant Automation Schedule Visualizer</h2>
-        <p>Build or paste an automation with time, time pattern and sun triggers plus time and sun conditions, and see its next runs and a 7-day timeline with DST days, following Home Assistant's own scheduling code.</p>
-        <a class="hub-btn" href="home-assistant-schedule-visualizer/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Homelab Power Cost Calculator</h2>
-        <p>Work out the kWh and electricity cost of every homelab device per day, month and year, with day/night tariffs and the payback time of a lower-power replacement.</p>
-        <a class="hub-btn" href="homelab-power-cost-calculator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Image Compressor Resizer</h2>
-        <p>Compress and resize images directly in the browser.</p>
-        <a class="hub-btn" href="image-compressor-resizer/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>IPv6 Subnet Calculator</h2>
-        <p>Enter an IPv6 address or prefix for its RFC 5952 and expanded forms, range, exact address count and /64 LANs, the address type from the IANA registries and its ip6.arpa reverse zone; split it into subnets page by page, generate a ULA /48 or an EUI-64 interface ID.</p>
-        <a class="hub-btn" href="ipv6-subnet-calculator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>JSON Formatter and Validator</h2>
-        <p>Format and validate JSON for cleaner reading and debugging.</p>
-        <a class="hub-btn" href="json-formatter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>JWT Decoder</h2>
-        <p>Decode a JSON Web Token, read its claims and expiry, and verify the signature in the browser.</p>
-        <a class="hub-btn" href="jwt-decoder/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Merge Text Tool</h2>
-        <p>Compare two texts side by side and merge them — push differing blocks or edit lines in place, like Araxis Merge.</p>
-        <a class="hub-btn" href="merge-text-tool/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Open Graph Meta Tag Generator and Checker</h2>
-        <p>Build the title, meta description, canonical link, Open Graph and X card tags for a page, check the share image against the sizes Meta, X and LinkedIn document, or paste a page's head to find missing, duplicate and conflicting tags.</p>
-        <a class="hub-btn" href="open-graph-meta-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Password and Passphrase Generator</h2>
-        <p>Create strong passwords and passphrases with configurable rules.</p>
-        <a class="hub-btn" href="password-passphrase-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Proxmox LXC idmap Generator</h2>
-        <p>Map container UIDs and GIDs to host IDs and get the lxc.idmap lines, /etc/subuid and /etc/subgid entries, the bind mount line and the chown command.</p>
-        <a class="hub-btn" href="proxmox-lxc-idmap-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Regex Tester</h2>
-        <p>Test regular expressions with live match highlighting, capture groups, and a replace preview.</p>
-        <a class="hub-btn" href="regex-tester/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>robots.txt Generator and Validator</h2>
-        <p>Build robots.txt rules and sitemap lines, lint an existing file, and test which URLs each crawler may fetch.</p>
-        <a class="hub-btn" href="robots-txt-generator-validator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Uptime / SLA Calculator</h2>
-        <p>Convert SLA percentages to downtime budgets and reverse-calculate targets.</p>
-        <a class="hub-btn" href="sla-calculator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>SPF and DMARC Record Generator and Checker</h2>
-        <p>Build SPF and DMARC TXT records from the includes your mail providers document, with a zone-file line and report authorization, or paste existing records to see every term explained, the SPF lookup count and each problem with its fix.</p>
-        <a class="hub-btn" href="spf-dmarc-record-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Subnet Calculator</h2>
-        <p>Calculate IPv4 subnet details for planning and validation.</p>
-        <a class="hub-btn" href="subnet-calculator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Text Diff Tool</h2>
-        <p>Compare two blocks of text and see line, word, or character-level differences.</p>
-        <a class="hub-btn" href="text-diff-tool/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Traefik Docker Labels Generator</h2>
-        <p>Build Traefik v3 or v2 labels for a Compose service: routers, TLS, HTTPS redirect, basic auth, IP allowlist and headers, plus the same config as file-provider YAML.</p>
-        <a class="hub-btn" href="traefik-docker-labels-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Unix Timestamp Converter</h2>
-        <p>Convert Unix epoch timestamps to ISO, UTC, and local dates, and back.</p>
-        <a class="hub-btn" href="unix-timestamp-converter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>URL Encoder / Decoder</h2>
-        <p>Percent-encode and decode URLs, query strings and form data, with a URL inspector.</p>
-        <a class="hub-btn" href="url-encoder-decoder/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>UTM Campaign URL Builder</h2>
-        <p>Tag links with UTM parameters, check the GA4 channel they land in, and copy them or export a QR code.</p>
-        <a class="hub-btn" href="utm-campaign-url-builder/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>vCard QR Code Generator</h2>
-        <p>Create vCard data and export QR code outputs.</p>
-        <a class="hub-btn" href="vcard-qr-code-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Wi-Fi QR Code Generator</h2>
-        <p>Turn a network name and password into a scannable Wi-Fi QR code, with PNG/SVG export and a printable card.</p>
-        <a class="hub-btn" href="wifi-qr-code-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>WireGuard Config Generator</h2>
-        <p>Build a WireGuard server config and one client config per device, with keys made in your browser, .conf downloads and QR codes for the mobile apps.</p>
-        <a class="hub-btn" href="wireguard-config-generator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>YAML JSON TOML Converter</h2>
-        <p>Convert data structures between YAML, JSON, and TOML formats.</p>
-        <a class="hub-btn" href="yaml-json-toml-converter/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>ZFS and RAID Capacity Calculator</h2>
-        <p>See the usable space of a ZFS pool in TB and TiB for mirrors and RAIDZ1/2/3 after parity, padding and slop space, how many disks may fail, and classic RAID 0/1/5/6/10 for comparison.</p>
-        <a class="hub-btn" href="zfs-raid-capacity-calculator/index.html">Open tool</a>
-      </article>
-
-      <article class="hub-card">
-        <h2>Zigbee and Wi-Fi Channel Planner</h2>
-        <p>Enter your 2.4 GHz Wi-Fi channels and see every Zigbee channel 11–26 graded clear, marginal or overlapped on a to-scale spectrum, with a recommended Zigbee channel, a Thread channel and the steps to change it.</p>
-        <a class="hub-btn" href="zigbee-wifi-channel-planner/index.html">Open tool</a>
-      </article>
-    </section>
-
-    <p class="hub-footer">Local repository index page • 39 tools</p>
+    <p class="hub-footer" id="hub-footer"></p>
   </main>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // One entry per tool folder; group is a key from GROUPS below.
+    // Adding a tool: add its entry here in folder order. Counts update by themselves.
+    var TOOLS = [
+      {
+        name: 'Backup Retention (Prune) Simulator',
+        folder: 'backup-retention-prune-simulator',
+        group: 'servers',
+        description: 'See which snapshots Proxmox Backup Server, borg prune and restic forget keep for the same keep-last, daily, weekly, monthly and yearly rules, why they differ, and the matching commands.'
+      },
+      {
+        name: 'Base64 Encode / Decode',
+        folder: 'base64-encode-decode',
+        group: 'dev',
+        description: 'Encode and decode Base64 for text or files, with URL-safe and data URI output.'
+      },
+      {
+        name: 'Byte and Storage Converter',
+        folder: 'byte-storage-converter',
+        group: 'servers',
+        description: 'Convert SI and IEC units and calculate bitrate or file size.'
+      },
+      {
+        name: 'Chmod File Permission Calculator',
+        folder: 'chmod-file-permission-calculator',
+        group: 'servers',
+        description: 'Convert Unix-like permissions between symbolic and octal forms.'
+      },
+      {
+        name: 'Cron Expression Generator',
+        folder: 'cron-expression-generator',
+        group: 'servers',
+        description: 'Build cron expressions with guided scheduling options.'
+      },
+      {
+        name: 'CSP and HTTP Security Headers Builder',
+        folder: 'csp-security-headers-builder',
+        group: 'security',
+        description: 'Build a Content-Security-Policy and the other security headers, copy them as Nginx, Apache, Caddy or Traefik config, and grade headers you paste.'
+      },
+      {
+        name: 'CSV JSON SQL Converter',
+        folder: 'csv-json-sql-converter',
+        group: 'dev',
+        description: 'Convert CSV and JSON both ways with delimiter and header detection, and generate SQL INSERT statements.'
+      },
+      {
+        name: 'cURL to Code Converter',
+        folder: 'curl-to-code-converter',
+        group: 'dev',
+        description: 'Turn curl commands from docs or browser DevTools into fetch, Python requests, or Node.js code, with notes for unsupported flags.'
+      },
+      {
+        name: 'Docker Compose Validator and Formatter',
+        folder: 'docker-compose-validator-formatter',
+        group: 'docker',
+        description: 'Validate and format Compose YAML and convert common docker run commands.'
+      },
+      {
+        name: 'Docker Run to Compose Converter',
+        folder: 'docker-run-compose-converter',
+        group: 'docker',
+        description: 'Convert docker run commands to docker-compose.yml and back again.'
+      },
+      {
+        name: 'ESP32 GPIO Pin Picker',
+        folder: 'esp32-gpio-pin-picker',
+        group: 'smart',
+        description: 'Find safe GPIO pins on the ESP32, S3, C3 and C6: strapping, flash, USB, ADC2 and touch flags from Espressif datasheets, plus an ESPHome pin snippet.'
+      },
+      {
+        name: 'Favicon Generator',
+        folder: 'favicon-generator',
+        group: 'web',
+        description: 'Create favicon sets and common platform icon sizes from one image.'
+      },
+      {
+        name: 'Hash Generator for Files and Text',
+        folder: 'hash-generator-for-files-and-text',
+        group: 'security',
+        description: 'Generate hashes for text input and uploaded files.'
+      },
+      {
+        name: 'Home Assistant Automation Schedule Visualizer',
+        folder: 'home-assistant-schedule-visualizer',
+        group: 'smart',
+        description: 'Build or paste an automation with time, time pattern and sun triggers plus time and sun conditions, and see its next runs and a 7-day timeline with DST days, following Home Assistant\'s own scheduling code.'
+      },
+      {
+        name: 'Homelab Power Cost Calculator',
+        folder: 'homelab-power-cost-calculator',
+        group: 'servers',
+        description: 'Work out the kWh and electricity cost of every homelab device per day, month and year, with day/night tariffs and the payback time of a lower-power replacement.'
+      },
+      {
+        name: 'Image Compressor Resizer',
+        folder: 'image-compressor-resizer',
+        group: 'web',
+        description: 'Compress and resize images directly in the browser.'
+      },
+      {
+        name: 'IPv6 Subnet Calculator',
+        folder: 'ipv6-subnet-calculator',
+        group: 'network',
+        description: 'Enter an IPv6 address or prefix for its RFC 5952 and expanded forms, range, exact address count and /64 LANs, the address type from the IANA registries and its ip6.arpa reverse zone; split it into subnets page by page, generate a ULA /48 or an EUI-64 interface ID.'
+      },
+      {
+        name: 'JSON Formatter and Validator',
+        folder: 'json-formatter',
+        group: 'dev',
+        description: 'Format and validate JSON for cleaner reading and debugging.'
+      },
+      {
+        name: 'JWT Decoder',
+        folder: 'jwt-decoder',
+        group: 'security',
+        description: 'Decode a JSON Web Token, read its claims and expiry, and verify the signature in the browser.'
+      },
+      {
+        name: 'Merge Text Tool',
+        folder: 'merge-text-tool',
+        group: 'dev',
+        description: 'Compare two texts side by side and merge them — push differing blocks or edit lines in place, like Araxis Merge.'
+      },
+      {
+        name: 'Open Graph Meta Tag Generator and Checker',
+        folder: 'open-graph-meta-generator',
+        group: 'web',
+        description: 'Build the title, meta description, canonical link, Open Graph and X card tags for a page, check the share image against the sizes Meta, X and LinkedIn document, or paste a page\'s head to find missing, duplicate and conflicting tags.'
+      },
+      {
+        name: 'Password and Passphrase Generator',
+        folder: 'password-passphrase-generator',
+        group: 'security',
+        description: 'Create strong passwords and passphrases with configurable rules.'
+      },
+      {
+        name: 'Proxmox LXC idmap Generator',
+        folder: 'proxmox-lxc-idmap-generator',
+        group: 'docker',
+        description: 'Map container UIDs and GIDs to host IDs and get the lxc.idmap lines, /etc/subuid and /etc/subgid entries, the bind mount line and the chown command.'
+      },
+      {
+        name: 'Regex Tester',
+        folder: 'regex-tester',
+        group: 'dev',
+        description: 'Test regular expressions with live match highlighting, capture groups, and a replace preview.'
+      },
+      {
+        name: 'robots.txt Generator and Validator',
+        folder: 'robots-txt-generator-validator',
+        group: 'web',
+        description: 'Build robots.txt rules and sitemap lines, lint an existing file, and test which URLs each crawler may fetch.'
+      },
+      {
+        name: 'Uptime / SLA Calculator',
+        folder: 'sla-calculator',
+        group: 'servers',
+        description: 'Convert SLA percentages to downtime budgets and reverse-calculate targets.'
+      },
+      {
+        name: 'SPF and DMARC Record Generator and Checker',
+        folder: 'spf-dmarc-record-generator',
+        group: 'security',
+        description: 'Build SPF and DMARC TXT records from the includes your mail providers document, with a zone-file line and report authorization, or paste existing records to see every term explained, the SPF lookup count and each problem with its fix.'
+      },
+      {
+        name: 'Subnet Calculator',
+        folder: 'subnet-calculator',
+        group: 'network',
+        description: 'Calculate IPv4 subnet details for planning and validation.'
+      },
+      {
+        name: 'Text Diff Tool',
+        folder: 'text-diff-tool',
+        group: 'dev',
+        description: 'Compare two blocks of text and see line, word, or character-level differences.'
+      },
+      {
+        name: 'Traefik Docker Labels Generator',
+        folder: 'traefik-docker-labels-generator',
+        group: 'docker',
+        description: 'Build Traefik v3 or v2 labels for a Compose service: routers, TLS, HTTPS redirect, basic auth, IP allowlist and headers, plus the same config as file-provider YAML.'
+      },
+      {
+        name: 'Unix Timestamp Converter',
+        folder: 'unix-timestamp-converter',
+        group: 'dev',
+        description: 'Convert Unix epoch timestamps to ISO, UTC, and local dates, and back.'
+      },
+      {
+        name: 'URL Encoder / Decoder',
+        folder: 'url-encoder-decoder',
+        group: 'dev',
+        description: 'Percent-encode and decode URLs, query strings and form data, with a URL inspector.'
+      },
+      {
+        name: 'UTM Campaign URL Builder',
+        folder: 'utm-campaign-url-builder',
+        group: 'web',
+        description: 'Tag links with UTM parameters, check the GA4 channel they land in, and copy them or export a QR code.'
+      },
+      {
+        name: 'vCard QR Code Generator',
+        folder: 'vcard-qr-code-generator',
+        group: 'qr',
+        description: 'Create vCard data and export QR code outputs.'
+      },
+      {
+        name: 'Wi-Fi QR Code Generator',
+        folder: 'wifi-qr-code-generator',
+        group: 'qr',
+        description: 'Turn a network name and password into a scannable Wi-Fi QR code, with PNG/SVG export and a printable card.'
+      },
+      {
+        name: 'WireGuard Config Generator',
+        folder: 'wireguard-config-generator',
+        group: 'network',
+        description: 'Build a WireGuard server config and one client config per device, with keys made in your browser, .conf downloads and QR codes for the mobile apps.'
+      },
+      {
+        name: 'YAML JSON TOML Converter',
+        folder: 'yaml-json-toml-converter',
+        group: 'dev',
+        description: 'Convert data structures between YAML, JSON, and TOML formats.'
+      },
+      {
+        name: 'ZFS and RAID Capacity Calculator',
+        folder: 'zfs-raid-capacity-calculator',
+        group: 'servers',
+        description: 'See the usable space of a ZFS pool in TB and TiB for mirrors and RAIDZ1/2/3 after parity, padding and slop space, how many disks may fail, and classic RAID 0/1/5/6/10 for comparison.'
+      },
+      {
+        name: 'Zigbee and Wi-Fi Channel Planner',
+        folder: 'zigbee-wifi-channel-planner',
+        group: 'smart',
+        description: 'Enter your 2.4 GHz Wi-Fi channels and see every Zigbee channel 11–26 graded clear, marginal or overlapped on a to-scale spectrum, with a recommended Zigbee channel, a Thread channel and the steps to change it.'
+      },
+    ];
+
+    // Topic groups, homelab topics first. Same groups as the Tools page on vahac.com.
+    var GROUPS = [
+      { key: 'docker', label: 'Docker and Proxmox', color: '#3b82f6' },
+      { key: 'network', label: 'Networking', color: '#22d3ee' },
+      { key: 'smart', label: 'Smart Home', color: '#10b981' },
+      { key: 'servers', label: 'Servers and Storage', color: '#f59e0b' },
+      { key: 'security', label: 'Security', color: '#ef4444' },
+      { key: 'web', label: 'Web and SEO', color: '#a78bfa' },
+      { key: 'dev', label: 'Developer and Data', color: '#f472b6' },
+      { key: 'qr', label: 'QR Codes', color: '#94a3b8' }
+    ];
+
+    var listEl = document.getElementById('hub-list');
+    var searchEl = document.getElementById('hub-search');
+    var countEl = document.getElementById('hub-count');
+    var emptyEl = document.getElementById('hub-empty');
+    var chipsEl = document.getElementById('hub-chips');
+    var groupByKey = {};
+    GROUPS.forEach(function (g) { groupByKey[g.key] = g; });
+
+    var state = { query: '', group: 'all' };
+
+    TOOLS.forEach(function (t) {
+      t.groupInfo = groupByKey[t.group];
+      if (!t.groupInfo) throw new Error('Unknown group "' + t.group + '" for ' + t.folder);
+      t.haystack = (t.name + ' ' + t.description + ' ' + t.groupInfo.label).toLowerCase();
+    });
+
+    function el(tag, cls, text) {
+      var node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function dot(group) {
+      var d = el('span', 'hub-dot');
+      d.style.setProperty('--group', group.color);
+      d.setAttribute('aria-hidden', 'true');
+      return d;
+    }
+
+    function matchesQuery(t) {
+      if (!state.query) return true;
+      var words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
+      return words.every(function (w) { return t.haystack.indexOf(w) !== -1; });
+    }
+
+    function byName(a, b) {
+      return a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+    }
+
+    function card(t) {
+      var article = el('article', 'hub-card');
+      article.style.setProperty('--group', t.groupInfo.color);
+      var h = el('h3', 'hub-card-title');
+      var a = el('a', 'hub-card-link', t.name);
+      a.href = t.folder + '/index.html';
+      h.appendChild(a);
+      article.appendChild(h);
+      var p = el('p', 'hub-card-desc', t.description);
+      p.title = t.description;
+      article.appendChild(p);
+      return article;
+    }
+
+    function renderChips(matched) {
+      chipsEl.textContent = '';
+      function chip(key, label, n, group) {
+        var b = el('button', 'hub-chip');
+        b.type = 'button';
+        b.setAttribute('aria-pressed', state.group === key ? 'true' : 'false');
+        if (group) b.appendChild(dot(group));
+        b.appendChild(document.createTextNode(label));
+        b.appendChild(el('span', 'hub-chip-n', String(n)));
+        b.addEventListener('click', function () {
+          state.group = state.group === key && key !== 'all' ? 'all' : key;
+          render();
+        });
+        chipsEl.appendChild(b);
+      }
+      chip('all', 'All', matched.length);
+      GROUPS.forEach(function (g) {
+        chip(g.key, g.label, matched.filter(function (t) { return t.group === g.key; }).length, g);
+      });
+    }
+
+    function render() {
+      listEl.textContent = '';
+      var matched = TOOLS.filter(matchesQuery);
+      var shown = 0;
+      GROUPS.forEach(function (g) {
+        if (state.group !== 'all' && state.group !== g.key) return;
+        var items = matched.filter(function (t) { return t.group === g.key; }).sort(byName);
+        if (!items.length) return;
+        shown += items.length;
+        var sec = el('section', 'hub-section');
+        sec.setAttribute('aria-labelledby', 'hub-group-' + g.key);
+        var h = el('h2', 'hub-section-head');
+        h.id = 'hub-group-' + g.key;
+        h.appendChild(dot(g));
+        h.appendChild(document.createTextNode(g.label));
+        h.appendChild(el('span', 'hub-section-n', String(items.length)));
+        sec.appendChild(h);
+        var grid = el('div', 'hub-grid');
+        items.forEach(function (t) { grid.appendChild(card(t)); });
+        sec.appendChild(grid);
+        listEl.appendChild(sec);
+      });
+      renderChips(matched);
+      countEl.textContent = shown === TOOLS.length ? '' : shown + ' of ' + TOOLS.length;
+      emptyEl.hidden = shown !== 0;
+      if (shown === 0) {
+        emptyEl.textContent = 'No tool matches “' + state.query + '”' + (state.group !== 'all' ? ' in this group.' : '.');
+      }
+    }
+
+    var stats = document.getElementById('hub-stats');
+    stats.appendChild(el('strong', null, String(TOOLS.length)));
+    stats.appendChild(document.createTextNode(' tools in '));
+    stats.appendChild(el('strong', null, String(GROUPS.length)));
+    stats.appendChild(document.createTextNode(' groups'));
+    searchEl.placeholder = 'Search ' + TOOLS.length + ' tools by name or topic  (press /)';
+    document.getElementById('hub-footer').textContent = 'Local repository index page · ' + TOOLS.length + ' tools';
+
+    searchEl.addEventListener('input', function () {
+      state.query = searchEl.value.trim();
+      render();
+    });
+
+    searchEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && searchEl.value) {
+        searchEl.value = '';
+        state.query = '';
+        render();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      var tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      e.preventDefault();
+      searchEl.focus();
+    });
+
+    render();
+  })();
+  </script>
 </body>
 </html>

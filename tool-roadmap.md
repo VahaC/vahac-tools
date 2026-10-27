@@ -1,6 +1,6 @@
 # Tool Growth Roadmap
 
-Last reviewed: 2026-10-26.
+Last reviewed: 2026-10-27.
 
 Tool pages go out one per week on Saturday at 09:00 site time. The next free slot after the CSP builder is 2026-11-07.
 
@@ -55,4 +55,4 @@ These cost less than a new tool and help every tool page:
 1. **Link blog posts to tools.** On 2026-10-26, four sampled posts (`docker-for-beginners-containers-images-volumes-compose`, `self-host-wireguard-vpn-on-proxmox-in-minutes`, `which-esp32-version-to-use-2026`, `nas-backup-and-restore-zfs-borg-restic`) had no links to `/tools/`. When a tool page goes live, add a link from the posts listed in its row and link back from the tool page.
 2. **Structured data.** Tool pages carry only `BreadcrumbList`. Add `WebApplication` (or `SoftwareApplication`) and `FAQPage` markup through Rank Math.
 3. **Pages competing for the same queries.** `online-text-diff-tool` and `text-diff-and-merge-tool` target overlapping queries, as do `docker-compose-validator-tool` (which also converts docker run commands) and `docker-run-to-compose-converter`. Give each page a distinct primary keyword or merge them.
-4. **Categories on /tools/.** "Text, data, formats" holds 12 tools, including the QR generators, the UTM builder and the robots.txt tool. Split out "Web and SEO" and "QR codes" so the homelab categories match the page title.
+4. **Categories on /tools/** — ✅ done 2026-10-27. "Text, data, formats" held 12 tools, including the QR generators, the UTM builder and the robots.txt tool, and the other groups mixed topics. The `tool_category` terms are now eight topic groups: Docker and Proxmox, Networking, Smart Home, Servers and Storage, Security, Web and SEO, Developer and Data, and QR Codes. Terms 64–68 were renamed in place and 76–78 were created, so each of the 39 tool posts still has exactly one term. The taxonomy has no archive URLs, so no public URL changed. The hub lists groups alphabetically and hides empty ones. Moving homelab groups to the top would need a change to the theme template.
